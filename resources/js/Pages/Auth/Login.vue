@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <ProgressBar />
     <form @submit.prevent="submit" class="bg-white p-8 rounded shadow-md w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
 
@@ -47,26 +48,23 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
-import { useForm } from '@inertiajs/inertia-vue3';
+import { useForm } from '@inertiajs/vue3'
+import ProgressBar from '@/Components/ProgressBar.vue'
 
 const form = useForm({
   email: '',
   password: '',
   remember: false,
-});
+})
 
 const submit = () => {
   form.post('/login', {
-    onError: (errors) => {
-      // errors otomatis terisi oleh Inertia
-    },
     onFinish: () => {
-      form.reset('password');
-    },
-  });
-};
+      form.reset('password')
+    }
+  })
+}
 
-const errors = form.errors;
-const processing = form.processing;
+const errors = form.errors
+const processing = form.processing
 </script>

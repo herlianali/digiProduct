@@ -1,5 +1,6 @@
 <template>
   <div class="flex h-screen bg-gray-100">
+    <ProgressBar />
     <aside
       :class="[
         'bg-white w-64 fixed inset-y-0 left-0 transform z-30 transition-transform duration-300 ease-in-out',
@@ -263,6 +264,7 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { Link, usePage, router } from '@inertiajs/vue3'
+  import ProgressBar from '@/Components/ProgressBar.vue'
   import { 
     ArchiveBoxIcon, 
     ChevronUpIcon, 
