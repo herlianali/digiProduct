@@ -1,4 +1,6 @@
-# digiProduct
+<p align="center">
+  <h1 align="center">DigiProduct</h1>
+</p>
 
 **digiProduct** is a personal portfolio-based e-commerce web application for showcasing and selling digital products and freelance services.  
 This project is designed to demonstrate full-stack development skills using modern web technologies.
