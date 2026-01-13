@@ -1,59 +1,121 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# digiProduct
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**digiProduct** is a personal portfolio-based e-commerce web application for showcasing and selling digital products and freelance services.  
+This project is designed to demonstrate full-stack development skills using modern web technologies.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Tech Stack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Backend
+- Laravel
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Frontend
+- Vue.js
+- Inertia.js
+- Tailwind CSS
 
-## Learning Laravel
+### Other
+- Docker (optional)
+- PostgreSQL
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 🛍️ Project Type
+**E-commerce Portfolio Website**
 
-## Laravel Sponsors
+This application combines a public-facing portfolio website with an admin dashboard for managing products, content, and orders.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## ✨ Main Features
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🌐 Public Website (Portfolio)
+- Home page
+- Our Work
+- About Us
+- Articles / Blog
+- Shop (digital product placement)
+- Hire Us (freelance order request)
 
-## Contributing
+### 🔐 Admin Dashboard
+- Dashboard overview
+- Product management
+- Article/content management
+- Order management
+- Website settings:
+  - Content management
+  - Home slider (image upload)
+  - Company slider (client logo / image)
+  - User testimonials
+- Product analytics
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 🧑‍💻 Installation & Setup
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Option 1: Using Docker
+If the project contains a `docker-compose.yml` or `Dockerfile`, simply run:
 
-## Security Vulnerabilities
+```bash
+docker-compose up -d
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### Option 2: Manual Setup (Local Development)
+Clone the repository
 
-## License
+```bash
+git clone <repository-url>
+cd digiProduct
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Install backend dependencies
+
+```bash
+composer install
+```
+Install frontend dependencies
+
+```bash
+npm install
+```
+Setup environment variables
+
+```bash
+cp .env.example .env
+```
+Configure your database credentials in `.env`
+
+Generate application key
+
+```bash
+php artisan key:generate
+```
+Run database seeders
+
+```bash
+php artisan db:seed
+```
+Start the development servers
+
+```bash
+php artisan serve
+npm run dev
+```
+## ⚙️ Environment Configuration
+Copy `.env.example` to `.env`
+
+Update the following values based on your database server:
+
+- `DB_DATABASE`
+
+- `DB_USERNAME`
+
+- `DB_PASSWORD`
+
+## 👤 Author
+Herlian Aliyasa Almaj Duddin
+
+## 📄 License
+This project is proprietary and does not use an open-source license.
+All rights reserved.
