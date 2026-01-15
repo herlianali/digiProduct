@@ -1,7 +1,7 @@
 <template>
   <div class="flex min-h-screen bg-gray-100">
     <ProgressBar />
-    
+
     <div
       v-if="sidebarOpen"
       @click="sidebarOpen = false"
@@ -18,7 +18,7 @@
     >
       <div class="h-16 flex items-center justify-between px-6 border-b">
         <h1 class="text-lg font-bold text-gray-800 truncate">Admin Dashboard</h1>
-        
+
         <button
           @click="sidebarOpen = false"
           class="lg:hidden text-gray-500 hover:text-gray-700"
@@ -51,14 +51,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/product')"
+              v-if="isActive('/products')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/product"
+              href="/products"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/product')
+              :class="isActive('/products')
                 ? 'bg-indigo-50 text-indigo-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -232,7 +232,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            
+
             <div class="flex flex-col min-w-0">
               <h2 class="text-lg font-semibold text-gray-800 truncate">
                 {{ getPageTitle() }}
@@ -253,7 +253,7 @@
               <div class="sm:hidden w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
                 <span class="text-white text-sm font-medium">{{ userInitial }}</span>
               </div>
-              
+
               <div class="hidden sm:flex items-center space-x-3">
                 <div class="text-right">
                   <p class="text-sm font-medium text-gray-800 truncate max-w-[120px]">{{ user.name }}</p>
@@ -330,7 +330,7 @@
         </div>
       </header>
 
-      <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 bg-gray-50">
+      <main class="flex-1 overflow-x-hidden overflow-y-auto p-4 bg-gray-50">
         <div class="max-w-7xl mx-auto">
           <slot />
         </div>
@@ -343,9 +343,9 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Link, usePage, router } from '@inertiajs/vue3'
 import ProgressBar from '@/Components/ProgressBar.vue'
-import { 
-  ArchiveBoxIcon, 
-  ChevronUpIcon, 
+import {
+  ArchiveBoxIcon,
+  ChevronUpIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   CubeIcon,
@@ -386,25 +386,25 @@ const handleLogout = () => {
 
 const getPageTitle = () => {
   const path = page.url
-  
+
   if (path.startsWith('/dashboard')) return 'Dashboard'
-  if (path.startsWith('/product')) return 'Products'
+  if (path.startsWith('/products')) return 'Products'
   if (path.startsWith('/order')) return 'Orders'
   if (path.startsWith('/article')) return 'Articles'
   if (path.startsWith('/setting')) return 'Settings'
-  
+
   return 'Dashboard'
 }
 
 const getPageDescription = () => {
   const path = page.url
-  
+
   if (path.startsWith('/dashboard')) return 'Overview of your store performance'
-  if (path.startsWith('/product')) return 'Manage your digital products'
+  if (path.startsWith('/products')) return 'Manage your digital products'
   if (path.startsWith('/order')) return 'View and manage customer orders'
   if (path.startsWith('/article')) return 'Manage blog articles and content'
   if (path.startsWith('/setting')) return 'Configure your store settings'
-  
+
   return 'Admin dashboard'
 }
 
@@ -413,20 +413,20 @@ if (page.url.startsWith('/setting')) {
 }
 
 const handleClickOutside = (event) => {
-  if (sidebarOpen.value && 
-      !event.target.closest('aside') && 
+  if (sidebarOpen.value &&
+      !event.target.closest('aside') &&
       !event.target.closest('button[aria-label="Toggle sidebar"]')) {
     sidebarOpen.value = false
   }
-  
-  if (profileOpen.value && 
-      profileContainer.value && 
+
+  if (profileOpen.value &&
+      profileContainer.value &&
       !profileContainer.value.contains(event.target)) {
     profileOpen.value = false
   }
-  
-  if (settingOpen.value && 
-      !event.target.closest('li.relative') && 
+
+  if (settingOpen.value &&
+      !event.target.closest('li.relative') &&
       !event.target.closest('button[aria-label*="Settings"]')) {
     settingOpen.value = false
   }
@@ -450,9 +450,9 @@ onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('keydown', handleEscapeKey)
   window.addEventListener('resize', handleResize)
-  
+
   handleResize()
-  
+
   router.on('finish', () => {
     if (window.innerWidth < 1024) {
       sidebarOpen.value = false
