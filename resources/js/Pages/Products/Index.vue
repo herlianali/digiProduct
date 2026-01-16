@@ -1,37 +1,46 @@
 <template>
     <DashboardLayout>
-        <BreadcrumbsComponent :items="listBreadcrumbs"/>
+        <BreadcrumbsComponent :items="breadcrumbs"/>
 
         <CardComponent title="Management Produk">
-        <TableComponent
-            :columns="columns"
-            :rows="rows"
-            :per-page="5"
-        />
-        </CardComponent>
+            <div class="flex justify-end mb-4">
+                <Link
+                    href="/products/create"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded"
+                >
+                    + Tambah Produk
+                </Link>
+            </div>
 
+            <TableComponent
+                :columns="columns"
+                :rows="products"
+                :per-page="5"
+            />
+        </CardComponent>
     </DashboardLayout>
 </template>
 
 <script setup>
-    import DashboardLayout from '@/Layouts/DashboardLayout.vue';
-    import CardComponent from '@/Components/Admin/CardComponent.vue';
-    import BreadcrumbsComponent from '@/Components/Admin/BreadcrumbsComponent.vue';
-    import TableComponent from '@/Components/Admin/TableComponent.vue';
+import { Link } from '@inertiajs/vue3'
+import DashboardLayout from '@/Layouts/DashboardLayout.vue'
+import CardComponent from '@/Components/Admin/CardComponent.vue'
+import BreadcrumbsComponent from '@/Components/Admin/BreadcrumbsComponent.vue'
+import TableComponent from '@/Components/Admin/TableComponent.vue'
 
-    const listBreadcrumbs = [
-        { label: 'Dashboard', href: '/dashboard' },
-        { label: 'Produk', active: true },
-    ];
+defineProps({
+    products: Array
+})
 
-    const columns = [
-        { key: 'name', label: 'Name', sortable: true },
-        { key: 'email', label: 'Email', sortable: true },
-        { key: 'role', label: 'Role', sortable: false },
-    ]
+const breadcrumbs = [
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Produk', active: true },
+]
 
-    const rows = [
-        { name: 'Ali', email: 'ali@mail.com', role: 'Admin' },
-        { name: 'Budi', email: 'budi@mail.com', role: 'User' },
-    ]
+const columns = [
+    { key: 'title', label: 'Nama Produk', sortable: true },
+    { key: 'type', label: 'Tipe', sortable: true },
+    { key: 'price', label: 'Harga', sortable: true },
+    { key: 'status', label: 'Status', sortable: true },
+]
 </script>

@@ -17,5 +17,5 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::get('products', [ProductController::class, 'index'])->name('products.index');
+    Route::resource('products', ProductController::class);
 });
