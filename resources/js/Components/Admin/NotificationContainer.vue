@@ -1,3 +1,4 @@
+<!-- @/Components/Admin/NotificationContainer.vue -->
 <template>
     <div class="fixed top-4 right-4 z-50 space-y-4">
         <TransitionGroup name="notification-list">
@@ -39,19 +40,22 @@ const getComponent = (type) => {
     return components[type] || components.info
 }
 
-const showNotification = (type, props) => {
+const showNotification = (type, notificationProps = {}) => {
     const id = Date.now() + Math.random()
     
     const notification = {
         id,
         type,
-        props
+        props: {
+            ...notificationProps,
+            show: true
+        }
     }
     
     // Add to beginning of array (newest on top)
     notifications.value.unshift(notification)
     
-    // Limit number of notifications
+    // Limit number of notifications - PERBAIKAN DI SINI
     if (notifications.value.length > props.limit) {
         notifications.value = notifications.value.slice(0, props.limit)
     }

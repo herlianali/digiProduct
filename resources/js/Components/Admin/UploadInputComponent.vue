@@ -250,21 +250,29 @@ const validateAndAddFiles = (newFiles) => {
     
     if (validFiles.length > 0) {
         // Generate previews for images
-        validFiles.forEach(fileObj => {
-            if (fileObj.type.startsWith('image/')) {
-                const reader = new FileReader()
-                reader.onload = (e) => {
-                    fileObj.preview = e.target.result
+        const previewPromises = validFiles.map(fileObj => {
+            return new Promise((resolve) => {
+                if (fileObj.type.startsWith('image/')) {
+                    const reader = new FileReader()
+                    reader.onload = (e) => {
+                        fileObj.preview = e.target.result
+                        resolve()
+                    }
+                    reader.readAsDataURL(fileObj.file)
+                } else {
+                    resolve()
                 }
-                reader.readAsDataURL(fileObj.file)
-            }
+            })
         })
         
-        files.value = [...files.value, ...validFiles]
-        
-        // Emit events
-        emit('files-selected', validFiles.map(f => f.file))
-        updateModelValue()
+        // Wait for all previews to be generated
+        Promise.all(previewPromises).then(() => {
+            files.value = [...files.value, ...validFiles]
+            
+            // Emit events
+            emit('files-selected', validFiles.map(f => f.file))
+            updateModelValue()
+        })
     }
 }
 
@@ -321,9 +329,14 @@ onMounted(() => {
     }
 })
 
+const getAllFiles = () => {
+    return files.value.map(f => f.file).filter(file => file instanceof File)
+}
+
 defineExpose({
     clearFiles,
-    updateProgress
+    updateProgress,
+    getAllFiles
 })
 </script>
 

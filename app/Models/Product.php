@@ -11,16 +11,20 @@ class Product extends Model
     protected $table = 'products';
     protected $guarded = [];
 
-    // Relationship dengan category
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    // Relationship dengan previews
     public function previews(): HasMany
     {
         return $this->hasMany(ProductPreview::class);
+    }
+
+    public function getThumbnailAttribute()
+    {
+        $primaryPreview = $this->previews()->where('sort_order', 0)->first();
+        return $primaryPreview ? $primaryPreview->path : null;
     }
 }
 

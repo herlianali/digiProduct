@@ -6,23 +6,58 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Intervention\Image\Facades\Image;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Product::with('category')
+            ->latest();
+
+        // Filter search
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhereHas('category', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Filter status
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        $products = $query->paginate(10);
+
         return Inertia::render('Products/Index', [
-            'products' => Product::latest()->get()->map(function ($product) {
+            'products' => $products->through(function ($product) {
                 return [
-                    'id'       => $product->id,
-                    'title'    => $product->title,
-                    'type'     => $product->type,
-                    'price'    => $product->is_free ? 'Free' : number_format($product->price, 0, ',', '.'),
-                    'status'   => ucfirst($product->status),
+                    'id'         => $product->id,
+                    'title'      => $product->title,
+                    'category'   => $product->category->name ?? '-',
+                    'price'      => $product->is_free 
+                        ? 'Free' 
+                        : 'Rp ' . number_format($product->price, 0, ',', '.'),
+                    'status'     => ucfirst($product->status),
+                    'created_at' => $product->created_at->format('d/m/Y H:i'),
+                    'actions'    => true
                 ];
             }),
+            'filters' => $request->only(['search', 'status']),
+            'meta' => [
+                'total' => $products->total(),
+                'per_page' => $products->perPage(),
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+            ]
         ]);
     }
 
@@ -35,85 +70,96 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-{
-    // Debug - lihat apa yang dikirim
-    dd($request->all());
-    
-    $validated = $request->validate([
-        'title'       => 'required|string|max:255',
-        'type'        => 'required|in:font,template,illustration,ui-kit,other',
-        'price'       => 'required_if:is_free,false|nullable|numeric|min:0',
-        'is_free'     => 'boolean',
-        'status'      => 'required|in:draft,published,archived',
-        'description' => 'required|string',
-        'images'      => 'required|array|min:1',
-        'images.*'    => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
-    ]);
-
-    try {
-        // Cari category berdasarkan type
-        $category = Category::where('name', ucfirst($validated['type'] . 's'))->first();
-        
-        // Jika tidak ada, buat baru
-        if (!$category) {
-            $category = Category::create([
-                'name' => ucfirst($validated['type'] . 's'),
-                'slug' => Str::slug($validated['type'] . 's')
-            ]);
-        }
-
-        $product = Product::create([
-            'title'       => $validated['title'],
-            'slug'        => Str::slug($validated['title']),
-            'type'        => $validated['type'],
-            'category_id' => $category->id, // Gunakan category_id yang sesuai
-            'price'       => $validated['is_free'] ? 0 : ($validated['price'] ?? 0),
-            'is_free'     => $validated['is_free'] ?? false,
-            'status'      => $validated['status'],
-            'description' => $validated['description'],
+    {
+        $validated = $request->validate([
+            'title'       => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'price'       => 'required_if:is_free,false|nullable|numeric|min:0',
+            'is_free'     => 'boolean',
+            'status'      => 'required|in:draft,published,archived',
+            'description' => 'required|string',
+            'images'      => 'required|array|min:1',
+            'images.*'    => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
         ]);
 
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $index => $file) {
-                $path = $file->store('products/previews', 'public');
+        try {
+            $product = Product::create([
+                'title'       => $validated['title'],
+                'slug'        => Str::slug($validated['title']),
+                'category_id' => $validated['category_id'],
+                'price'       => $validated['is_free'] ? 0 : ($validated['price'] ?? 0),
+                'is_free'     => $validated['is_free'] ?? false,
+                'status'      => $validated['status'],
+                'description' => $validated['description'],
+            ]);
 
-                $product->previews()->create([
-                    'type'       => 'image',
-                    'path'       => $path,
-                    'sort_order' => $index,
-                ]);
-
-                if ($index === 0) {
-                    $product->update(['thumbnail' => $path]);
+            if ($request->hasFile('images')) {
+                $sortOrder = 0;
+                
+                foreach ($request->file('images') as $image) {
+                    // Generate unique filename
+                    $filename = Str::random(20) . '.' . $image->getClientOriginalExtension();
+                    
+                    // Define paths
+                    $folder = 'product-previews';
+                    $path = $image->storeAs($folder, $filename, 'public');
+                    
+                    // Anda juga bisa resize gambar jika perlu
+                    $resizedImage = Image::make($image)->resize(800, 800, function ($constraint) {
+                        $constraint->aspectRatio();
+                        $constraint->upsize();
+                    });
+                    Storage::disk('public')->put($folder . '/' . $filename, $resizedImage->encode());
+                    
+                    // Save to product_previews table
+                    $product->previews()->create([
+                        'type' => 'image',
+                        'path' => $path,
+                        'sort_order' => $sortOrder,
+                    ]);
+                    
+                    $sortOrder++;
+                }
+                
+                // Jika ingin set thumbnail di products table (opsional)
+                $firstPreview = $product->previews()->first();
+                if ($firstPreview) {
+                    $product->update([
+                        'thumbnail' => $firstPreview->path
+                    ]);
                 }
             }
-        }
 
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'Produk berhasil ditambahkan');
-            
-    } catch (\Exception $e) {
-        Log::error('Error creating product: ' . $e->getMessage());
-        return back()
-            ->withInput()
-            ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return redirect()->route('products.index')
+                ->with('success', 'Produk berhasil ditambahkan');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withErrors(['error' => $e->getMessage()]);
+        }
     }
-}
+
 
     public function edit(Product $product)
     {
-        return Inertia::render('Products/Form', [
+        // Load previews dengan URL yang benar
+        $existingImages = $product->previews()->get()->map(function ($preview) {
+            return [
+                'id' => $preview->id,
+                'path' => $preview->path,
+                'url' => asset('storage/' . $preview->path),
+                'filename' => basename($preview->path),
+                'extension' => pathinfo($preview->path, PATHINFO_EXTENSION),
+                'is_primary' => $preview->sort_order === 0,
+                'sort_order' => $preview->sort_order,
+            ];
+        })->toArray();
+
+        return inertia('Products/Form', [
             'mode' => 'edit',
             'product' => $product,
+            'existingImages' => $existingImages,
             'categories' => Category::all(),
-            'existingImages' => $product->previews->map(fn ($img) => [
-                'id'   => $img->id,
-                'url'  => asset('storage/' . $img->path),
-                'name' => basename($img->path),
-                'type' => $img->type,
-                'size' => $img->size ?? 0,
-            ]),
         ]);
     }
 
@@ -122,7 +168,7 @@ class ProductController extends Controller
         // Untuk update, gambar tidak wajib jika sudah ada
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'type'        => 'required|in:font,template,illustration,ui-kit,other',
+            'category_id' => 'required|exists:categories,id',
             'price'       => 'required_if:is_free,false|nullable|numeric|min:0',
             'is_free'     => 'boolean',
             'status'      => 'required|in:draft,published,archived',
@@ -132,8 +178,8 @@ class ProductController extends Controller
             'delete_images.*' => 'nullable|exists:product_previews,id',
         ], [
             'title.required' => 'Nama produk wajib diisi.',
-            'type.required' => 'Tipe produk wajib dipilih.',
-            'type.in' => 'Tipe produk tidak valid.',
+            'category_id.required' => 'Tipe produk wajib dipilih.',
+            'category_id.exists' => 'Tipe produk tidak valid.',
             'price.required_if' => 'Harga wajib diisi untuk produk berbayar.',
             'price.numeric' => 'Harga harus berupa angka.',
             'price.min' => 'Harga tidak boleh kurang dari 0.',
@@ -151,12 +197,13 @@ class ProductController extends Controller
             $product->update([
                 'title'       => $validated['title'],
                 'slug'        => Str::slug($validated['title']),
-                'type'        => $validated['type'],
+                'category_id' => $validated['category_id'],
                 'price'       => $validated['is_free'] ? 0 : ($validated['price'] ?? 0),
                 'is_free'     => $validated['is_free'] ?? false,
                 'status'      => $validated['status'],
                 'description' => $validated['description'],
             ]);
+
 
             // Hapus gambar yang dipilih
             if ($request->filled('delete_images')) {

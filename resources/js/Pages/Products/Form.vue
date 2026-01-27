@@ -244,16 +244,28 @@
     })
 
     // Handle file selection
-    const handleFilesSelected = async (files) => {
+    const handleFilesSelected = async (selectedFiles) => {
+        console.log('Files selected from UploadInput:', selectedFiles)
+        
         uploadActive.value = true
         
-        for (const file of files) {
+        // Reset jika perlu
+        if (imagePreviews.value.length === 0) {
+            form.delete_images = []
+        }
+        
+        // Tambahkan file ke preview
+        for (const file of selectedFiles) {
             await addFileToPreview(file)
         }
+        
+        // Update form.images dengan file asli
+        updateFormImages()
         
         // Start upload simulation
         startUploadSimulation()
     }
+
 
     // Add file to preview with FileReader
     const addFileToPreview = (file) => {
@@ -262,7 +274,7 @@
             reader.onload = (e) => {
                 const preview = {
                     id: Date.now() + Math.random(),
-                    file: file,
+                    file: file, // Simpan File object asli
                     name: file.name,
                     size: file.size,
                     type: file.type,
@@ -271,7 +283,7 @@
                     progress: 0
                 }
                 imagePreviews.value.push(preview)
-                updateFormImages()
+                console.log('Added file to preview:', file.name)
                 resolve()
             }
             reader.readAsDataURL(file)
@@ -336,37 +348,47 @@
 
     // Update form.images with uploaded files
     const updateFormImages = () => {
-        // Ambil file dari imagePreviews yang sudah selesai diupload
-        const uploadedFiles = imagePreviews.value
-            .filter(img => img.file && img.progress === 100)
-            .map(img => {
-                // Pastikan ini adalah File object
-                if (img.file instanceof File) {
-                    return img.file
-                } else {
-                    // Jika bukan File object, coba buat ulang
-                    console.warn('img.file is not a File object:', img.file)
-                    return null
-                }
-            })
-            .filter(file => file !== null) // Hapus yang null
+        console.log('Updating form images...')
         
-        console.log('updateFormImages - uploadedFiles:', uploadedFiles)
-        form.images = uploadedFiles
+        // Ambil file dari UploadInputComponent jika ada
+        const uploadInputFiles = uploadInput.value?.getAllFiles?.() || []
+        
+        // Ambil juga file dari imagePreviews (jika ada file langsung)
+        const previewFiles = imagePreviews.value
+            .filter(img => img.file && img.file instanceof File && img.progress === 100)
+            .map(img => img.file)
+        
+        // Gabungkan semua file
+        const allFiles = [...uploadInputFiles, ...previewFiles]
+        
+        // Hapus duplikat berdasarkan nama dan size
+        const uniqueFiles = allFiles.filter((file, index, self) => 
+            index === self.findIndex(f => 
+                f.name === file.name && 
+                f.size === file.size && 
+                f.lastModified === file.lastModified
+            )
+        )
+        
+        console.log('Unique files to upload:', uniqueFiles.map(f => f.name))
+        form.images = uniqueFiles
     }
 
     // Remove image
     const removeImage = (index) => {
         const image = imagePreviews.value[index]
         
-        // If image is already uploaded (has an ID from server), add to delete list
-        if (image.id && !image.file) {
-            form.delete_images.push(image.id)
+        // Jika image adalah existing image dari server (ada ID), tambahkan ke delete_images
+        if (image.id && !image.file) { // image.file tidak ada berarti dari server
+            // Pastikan ID tidak duplikat
+            if (!form.delete_images.includes(image.id)) {
+                form.delete_images.push(image.id)
+            }
         }
         
         imagePreviews.value.splice(index, 1)
         
-        // If we removed the primary image and there are other images, make the first one primary
+        // Jika kita menghapus gambar utama dan ada gambar lain, buat yang pertama jadi utama
         if (image.isPrimary && imagePreviews.value.length > 0) {
             imagePreviews.value[0].isPrimary = true
         }
@@ -410,15 +432,30 @@
     // Initialize with existing images
     onMounted(() => {
         if (props.existingImages && props.existingImages.length > 0) {
+            // Existing images dari server (sudah ada di product_previews)
             imagePreviews.value = props.existingImages.map((img, index) => ({
-                id: img.id,
-                name: img.name,
-                size: img.size,
-                type: img.type,
-                url: img.url,
+                id: img.id, // ID dari product_previews table
+                name: img.filename || 'image',
+                size: img.size || 0,
+                type: 'image/' + (img.extension || 'jpg'),
+                url: img.url || '/storage/' + img.path, // Path dari database
                 isPrimary: index === 0,
                 progress: 100 // Already uploaded
             }))
+            
+            // Set existing images untuk thumbnail
+            if (props.existingImages.length > 0 && props.product?.thumbnail) {
+                const thumbnailImage = props.existingImages.find(img => 
+                    img.path === props.product.thumbnail || 
+                    '/storage/' + img.path === props.product.thumbnail
+                )
+                if (thumbnailImage) {
+                    const index = props.existingImages.findIndex(img => img.id === thumbnailImage.id)
+                    if (index !== -1 && imagePreviews.value[index]) {
+                        imagePreviews.value[index].isPrimary = true
+                    }
+                }
+            }
         }
         
         // Set default category_id jika tidak ada
@@ -428,34 +465,78 @@
     })
 
     const submit = async () => {
+        console.log('=== SUBMIT STARTED ===')
+        console.log('Upload in progress:', uploadInProgress.value)
+        console.log('Image previews count:', imagePreviews.value.length)
+        
+        // Pastikan semua upload selesai
         if (uploadInProgress.value) {
             notification.value?.warning('Harap tunggu sampai semua gambar selesai diunggah', 'Upload Sedang Berjalan')
             return
         }
-
-        if (form.images.length === 0 && props.mode === 'create') {
-            notification.value?.error('Minimal satu gambar produk wajib diupload', 'Validation Error')
+        
+        // Update form.images terakhir kali sebelum validasi
+        await updateFormImages()
+        
+        console.log('Form images after update:', form.images.length)
+        console.log('Form images detail:', form.images)
+        
+        // Validasi untuk create mode
+        if (props.mode === 'create') {
+            const hasImages = form.images.length > 0 || 
+                            (props.existingImages && props.existingImages.length > 0)
+            
+            if (!hasImages) {
+                notification.value?.error('Minimal satu gambar produk wajib diupload', 'Validation Error')
+                
+                // Debug: Tampilkan semua file yang ada
+                const uploadInputFiles = uploadInput.value?.getAllFiles?.() || []
+                console.log('UploadInput files:', uploadInputFiles.length)
+                console.log('imagePreviews with file:', imagePreviews.value.filter(img => img.file).length)
+                
+                return
+            }
+        }
+        
+        // Pastikan form.images adalah array File objects
+        if (form.images.length > 0 && !(form.images[0] instanceof File)) {
+            console.error('form.images is not File objects:', form.images)
+            notification.value?.error('Format file tidak valid. Silakan upload ulang gambar.', 'Error')
             return
         }
-
-        // Gunakan Inertia dengan data langsung
-        // Inertia akan otomatis handle FormData jika ada file
-        const postData = {
-            title: form.title,
-            category_id: form.category_id,
-            price: form.price,
-            is_free: form.is_free,
-            description: form.description,
-            status: form.status,
-            images: form.images, // Array of File objects
-            delete_images: form.delete_images
+        
+        // Prepare FormData untuk upload file
+        const formData = new FormData()
+        
+        // Tambahkan data form biasa
+        formData.append('title', form.title)
+        formData.append('category_id', form.category_id)
+        formData.append('price', form.price)
+        formData.append('is_free', form.is_free ? '1' : '0')
+        formData.append('description', form.description)
+        formData.append('status', form.status)
+        
+        // Tambahkan images sebagai multiple files
+        form.images.forEach((file, index) => {
+            if (file instanceof File) {
+                formData.append(`images[${index}]`, file)
+            }
+        })
+        
+        // Tambahkan delete_images jika ada
+        if (form.delete_images.length > 0) {
+            formData.append('delete_images', JSON.stringify(form.delete_images))
         }
-
-        console.log('Posting data with images:', postData.images.length)
-
+        
+        console.log('FormData entries:')
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ', pair[1])
+        }
+        
+        // Gunakan FormData untuk submit
         if (props.mode === 'create') {
             form.post('/products', {
-                data: postData,
+                data: formData, // Gunakan FormData
                 preserveScroll: true,
                 onSuccess: () => {
                     notification.value?.success('Produk berhasil ditambahkan!', 'Success')
@@ -466,9 +547,16 @@
                 }
             })
         } else {
-            form.post(`/products/${props.product.id}`, {
-                data: postData,
-                method: 'put',
+            // Untuk update, gunakan method PUT dengan FormData
+            const url = `/products/${props.product.id}`
+            
+            // Inertia tidak mendukung PUT dengan FormData secara langsung,
+            // jadi kita gunakan approach berbeda
+            form.transform((data) => ({
+                ...data,
+                _method: 'PUT' // Untuk spoofing PUT dengan FormData
+            })).post(url, {
+                data: formData,
                 preserveScroll: true,
                 onSuccess: () => {
                     notification.value?.success('Produk berhasil diperbarui!', 'Success')

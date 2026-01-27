@@ -1,21 +1,3 @@
-<!--
-|--------------------------------------------------------------------------
-| DATA TABLE COMPONENT
-|--------------------------------------------------------------------------
-|
-| FEATURES:
-| - Search (global, all pages)
-| - Sorting (asc / desc)
-| - Pagination
-|
-| PROPS:
-| - columns : [{ key, label, sortable }]
-| - rows    : Array of data
-| - perPage : Number (default 10)
-|
-|--------------------------------------------------------------------------
--->
-
 <template>
   <div class="space-y-4">
 

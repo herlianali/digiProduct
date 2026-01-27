@@ -105,6 +105,24 @@
 
           <li class="relative">
             <div
+              v-if="isActive('/analytic')"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+            ></div>
+
+            <Link
+              href="/analytic"
+              class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
+              :class="isActive('/analytic')
+                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <ChartBarSquareIcon class="w-5 h-5 flex-shrink-0"/>
+              <span class="truncate">Analytics</span>
+            </Link>
+          </li>
+
+          <li class="relative">
+            <div
               v-if="isActive('/setting')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
             ></div>
@@ -351,7 +369,8 @@ import {
   CubeIcon,
   ShoppingCartIcon,
   BookOpenIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  ChartBarSquareIcon
 } from '@heroicons/vue/24/outline'
 
 const sidebarOpen = ref(false)
