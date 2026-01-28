@@ -13,51 +13,32 @@ use Intervention\Image\Facades\Image;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Product::with('category')
-            ->latest();
-
-        // Filter search
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%")
-                ->orWhereHas('category', function($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%");
-                });
-            });
-        }
-
-        // Filter status
-        if ($request->has('status') && !empty($request->status)) {
-            $query->where('status', $request->status);
-        }
-
-        $products = $query->paginate(10);
-
-        return Inertia::render('Products/Index', [
-            'products' => $products->through(function ($product) {
+        $products = Product::with('category')
+            ->latest()
+            ->get()
+            ->map(function ($product) {
+                // Pastikan semua field ada
                 return [
                     'id'         => $product->id,
-                    'title'      => $product->title,
+                    'title'      => $product->title ?? 'No Title',
                     'category'   => $product->category->name ?? '-',
-                    'price'      => $product->is_free 
-                        ? 'Free' 
-                        : 'Rp ' . number_format($product->price, 0, ',', '.'),
-                    'status'     => ucfirst($product->status),
-                    'created_at' => $product->created_at->format('d/m/Y H:i'),
-                    'actions'    => true
+                    'price'      => $product->is_free ? 'Free' : 'Rp ' . number_format($product->price ?? 0, 0, ',', '.'),
+                    'status'     => ucfirst($product->status ?? 'draft'),
+                    'created_at' => $product->created_at ? $product->created_at->format('d/m/Y H:i') : '-',
                 ];
-            }),
-            'filters' => $request->only(['search', 'status']),
+            })
+            ->filter() // Hapus null jika ada
+            ->values() // Reset keys
+            ->toArray();
+
+        return Inertia::render('Products/Index', [
+            'products' => $products,
+            'filters' => request()->only(['search', 'status']),
             'meta' => [
-                'total' => $products->total(),
-                'per_page' => $products->perPage(),
-                'current_page' => $products->currentPage(),
-                'last_page' => $products->lastPage(),
-            ]
+                'total' => count($products),
+            ],
         ]);
     }
 

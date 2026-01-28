@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-4">
-
     <!-- Search -->
     <div class="flex justify-between items-center">
       <input
@@ -40,7 +39,7 @@
         <tbody>
           <tr
             v-for="(row, index) in paginatedData"
-            :key="index"
+            :key="row?.id || index"
             class="border-t hover:bg-gray-50"
           >
             <td
@@ -49,7 +48,7 @@
               class="px-4 py-3"
             >
               <slot :name="col.key" :row="row">
-                {{ row[col.key] }}
+                {{ getSafeValue(row, col.key) }}
               </slot>
             </td>
           </tr>
@@ -90,7 +89,6 @@
         </button>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -117,48 +115,60 @@ const currentPage = ref(1)
 const sortKey = ref('')
 const sortDirection = ref('asc')
 
-/*
-|--------------------------------------------------------------------------
-| FILTER (SEARCH)
-|--------------------------------------------------------------------------
-| Search dilakukan ke SELURUH DATA (semua halaman)
-*/
-const filteredData = computed(() => {
+// Helper function untuk mendapatkan value dengan aman
+const getSafeValue = (row, key) => {
+  if (!row || typeof row !== 'object') return '-'
+  const value = row[key]
+  return value !== null && value !== undefined ? value : '-'
+}
+
+// Filter dan validasi data
+const validRows = computed(() => {
   const data = props.rows || []
-
-  if (!search.value) return data
-
-  return data.filter(row =>
-    Object.values(row).some(value =>
-      String(value).toLowerCase().includes(search.value.toLowerCase())
-    )
-  )
+  return data.filter(row => row && typeof row === 'object')
 })
 
+const filteredData = computed(() => {
+  if (!search.value) return validRows.value
 
-/*
-|--------------------------------------------------------------------------
-| SORTING
-|--------------------------------------------------------------------------
-*/
+  return validRows.value.filter(row => {
+    // Cek apakah row valid
+    if (!row || typeof row !== 'object') return false
+    
+    // Cari di semua properti yang ada
+    return Object.values(row).some(value => {
+      if (value === null || value === undefined) return false
+      return String(value).toLowerCase().includes(search.value.toLowerCase())
+    })
+  })
+})
+
 const sortedData = computed(() => {
   if (!sortKey.value) return filteredData.value
 
   return [...filteredData.value].sort((a, b) => {
+    // Handle null/undefined values
     const valA = a[sortKey.value]
     const valB = b[sortKey.value]
-
+    
+    // Jika salah satu null, taruh di akhir
+    if (valA === null || valA === undefined) return 1
+    if (valB === null || valB === undefined) return -1
+    
+    // Compare values
+    if (typeof valA === 'string' && typeof valB === 'string') {
+      return sortDirection.value === 'asc' 
+        ? valA.localeCompare(valB)
+        : valB.localeCompare(valA)
+    }
+    
+    // For numbers and other types
     if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1
     if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1
     return 0
   })
 })
 
-/*
-|--------------------------------------------------------------------------
-| PAGINATION
-|--------------------------------------------------------------------------
-*/
 const totalPages = computed(() =>
   Math.ceil(sortedData.value.length / props.perPage)
 )
@@ -168,11 +178,6 @@ const paginatedData = computed(() => {
   return sortedData.value.slice(start, start + props.perPage)
 })
 
-/*
-|--------------------------------------------------------------------------
-| METHODS
-|--------------------------------------------------------------------------
-*/
 function sort(col) {
   if (!col.sortable) return
 
@@ -184,13 +189,21 @@ function sort(col) {
   }
 }
 
-/*
-|--------------------------------------------------------------------------
-| WATCH
-|--------------------------------------------------------------------------
-| Reset page jika search berubah
-*/
 watch(search, () => {
   currentPage.value = 1
 })
+
+// Debug log untuk melihat data
+watch(() => props.rows, (newRows) => {
+  console.log('TableComponent received rows:', newRows)
+  console.log('Valid rows count:', validRows.value.length)
+  
+  // Cek jika ada null/undefined
+  if (newRows) {
+    const nullRows = newRows.filter(row => row === null || row === undefined)
+    if (nullRows.length > 0) {
+      console.warn('Found null/undefined rows:', nullRows.length)
+    }
+  }
+}, { immediate: true, deep: true })
 </script>

@@ -7,27 +7,23 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <StatCard 
                     title="Total Produk" 
-                    :value="meta.total" 
-                    icon="📦"
-                    class="bg-blue-50"
+                    :value="meta.total || productList.length" 
+                    :icon="CubeIcon"
                 />
                 <StatCard 
                     title="Published" 
                     :value="publishedCount" 
-                    icon="✅"
-                    class="bg-green-50"
+                    :icon="CheckCircleIcon"
                 />
                 <StatCard 
                     title="Draft" 
                     :value="draftCount" 
-                    icon="📝"
-                    class="bg-yellow-50"
+                    :icon="PencilSquareIcon"
                 />
                 <StatCard 
                     title="Archived" 
                     :value="archivedCount" 
-                    icon="📁"
-                    class="bg-gray-50"
+                    :icon="ArchiveBoxIcon"
                 />
             </div>
 
@@ -36,7 +32,7 @@
                 <div class="flex items-center gap-4">
                     <Link
                         href="/products/create"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2"
+                        class="px-4 py-2 bg-brand-500 text-black rounded-lg hover:bg-brand-600 transition flex items-center gap-2"
                     >
                         <PlusIcon class="w-5 h-5" />
                         Tambah Produk
@@ -45,7 +41,7 @@
                     <!-- Status Filter -->
                     <select 
                         v-model="statusFilter"
-                        class="border rounded-lg px-3 py-2 text-sm focus:ring focus:ring-indigo-200"
+                        class="border rounded-lg px-3 py-2 text-sm focus:ring focus:ring-brand-200 focus:border-brand-400"
                         @change="filterByStatus"
                     >
                         <option value="">Semua Status</option>
@@ -67,8 +63,9 @@
 
             <!-- Table Component -->
             <TableComponent
+                v-if="productList.length > 0"
                 :columns="columns"
-                :rows="products"
+                :rows="productList"
                 :per-page="10"
                 :search="filters.search"
                 @search="handleSearch"
@@ -76,7 +73,7 @@
                 <!-- Custom slot untuk status dengan badge -->
                 <template #status="{ value }">
                     <span :class="statusBadgeClass(value)">
-                        {{ value }}
+                        {{ value || '-' }}
                     </span>
                 </template>
 
@@ -95,7 +92,7 @@
                         <!-- Edit Button -->
                         <Link
                             :href="`/products/${row.id}/edit`"
-                            class="px-3 py-1 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition flex items-center gap-1 text-sm"
+                            class="px-3 py-1 bg-brand-100 text-brand-700 rounded-md hover:bg-brand-200 transition flex items-center gap-1 text-sm"
                             title="Edit"
                         >
                             <PencilIcon class="w-4 h-4" />
@@ -113,9 +110,28 @@
                 </template>
             </TableComponent>
 
+            <!-- Empty State -->
+            <div v-else class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+                <div class="mx-auto w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <p class="text-gray-500">Belum ada produk</p>
+                <p class="text-sm text-gray-400 mt-1">Mulai dengan menambahkan produk pertama Anda</p>
+                <Link
+                    href="/products/create"
+                    class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-brand-500 text-black rounded-lg hover:bg-brand-600 transition font-medium"
+                >
+                    <PlusIcon class="w-4 h-4" />
+                    Tambah Produk Pertama
+                </Link>
+            </div>
+
             <!-- Info Pagination -->
-            <div class="mt-4 text-sm text-gray-600">
-                Menampilkan {{ products.length }} dari {{ meta.total }} produk
+            <div v-if="productList.length > 0" class="mt-4 text-sm text-gray-600">
+                Menampilkan {{ productList.length }} dari {{ meta.total || productList.length }} produk
             </div>
         </CardComponent>
 
@@ -164,7 +180,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { Link, router } from '@inertiajs/vue3'
 import DashboardLayout from '@/Layouts/DashboardLayout.vue'
 import CardComponent from '@/Components/Admin/CardComponent.vue'
@@ -178,11 +194,21 @@ import {
     PencilIcon, 
     TrashIcon,
     ArrowPathIcon,
-    ExclamationTriangleIcon 
+    ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline'
+import {
+  CubeIcon,
+  CheckCircleIcon,
+  PencilSquareIcon,
+  ArchiveBoxIcon,
+} from '@heroicons/vue/24/solid'
+
 
 const props = defineProps({
-    products: Array,
+    products: {
+        type: [Array, Object],
+        default: () => []
+    },
     filters: {
         type: Object,
         default: () => ({})
@@ -212,27 +238,53 @@ const columns = [
     { key: 'actions', label: 'Aksi', sortable: false }
 ]
 
+// Pastikan products selalu array
+const productList = computed(() => {
+    if (!props.products) return []
+    
+    if (Array.isArray(props.products)) {
+        return props.products.filter(product => 
+            product && typeof product === 'object' && product.id
+        )
+    } else if (props.products && typeof props.products === 'object') {
+        // Jika object (misalnya dari Laravel paginate), convert ke array
+        const values = Object.values(props.products)
+        return values.filter(product => 
+            product && typeof product === 'object' && product.id
+        )
+    }
+    return []
+})
+
 // Hitung statistik status
 const publishedCount = computed(() => {
-    return props.products.filter(p => p.status.toLowerCase() === 'published').length
+    return productList.value.filter(p => 
+        p && typeof p === 'object' && p.status && p.status.toLowerCase() === 'published'
+    ).length
 })
 
 const draftCount = computed(() => {
-    return props.products.filter(p => p.status.toLowerCase() === 'draft').length
+    return productList.value.filter(p => 
+        p && typeof p === 'object' && p.status && p.status.toLowerCase() === 'draft'
+    ).length
 })
 
 const archivedCount = computed(() => {
-    return props.products.filter(p => p.status.toLowerCase() === 'archived').length
+    return productList.value.filter(p => 
+        p && typeof p === 'object' && p.status && p.status.toLowerCase() === 'archived'
+    ).length
 })
 
 const statusBadgeClass = (status) => {
+    if (!status) return 'px-3 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800'
+    
     const statusLower = status.toLowerCase()
     const baseClass = 'px-3 py-1 text-xs font-medium rounded-full inline-flex items-center gap-1'
     
     const variants = {
-        published: 'bg-green-100 text-green-800 border border-green-200',
-        draft: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-        archived: 'bg-gray-100 text-gray-800 border border-gray-200'
+        published: 'bg-brand-100 text-brand-800 border border-brand-200',
+        draft: 'bg-brand-50 text-brand-700 border border-brand-200',
+        archived: 'bg-gray-100 text-gray-700 border border-gray-200'
     }
     
     return `${baseClass} ${variants[statusLower] || 'bg-gray-100 text-gray-800'}`
@@ -288,4 +340,11 @@ const deleteProduct = async () => {
         isDeleting.value = false
     }
 }
+
+// Debug log
+watch(() => props.products, (newProducts) => {
+    console.log('Products data:', newProducts)
+    console.log('Type:', typeof newProducts)
+    console.log('Is array:', Array.isArray(newProducts))
+}, { immediate: true })
 </script>

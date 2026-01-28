@@ -34,14 +34,14 @@
           <li class="relative">
             <div
               v-if="isActive('/dashboard')"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/dashboard"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
               :class="isActive('/dashboard')
-                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
               <ArchiveBoxIcon class="w-5 h-5 flex-shrink-0"/>
@@ -52,14 +52,14 @@
           <li class="relative">
             <div
               v-if="isActive('/products')"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/products"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
               :class="isActive('/products')
-                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
               <CubeIcon class="w-5 h-5 flex-shrink-0"/>
@@ -70,14 +70,14 @@
           <li class="relative">
             <div
               v-if="isActive('/order')"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/order"
+              href="/orders"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
               :class="isActive('/order')
-                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
               <ShoppingCartIcon class="w-5 h-5 flex-shrink-0"/>
@@ -88,14 +88,14 @@
           <li class="relative">
             <div
               v-if="isActive('/article')"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/article"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
               :class="isActive('/article')
-                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
               <BookOpenIcon class="w-5 h-5 flex-shrink-0"/>
@@ -106,14 +106,14 @@
           <li class="relative">
             <div
               v-if="isActive('/analytic')"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/analytic"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
               :class="isActive('/analytic')
-                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
               <ChartBarSquareIcon class="w-5 h-5 flex-shrink-0"/>
@@ -124,14 +124,14 @@
           <li class="relative">
             <div
               v-if="isActive('/setting')"
-              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-indigo-600 rounded-r-lg"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <button
               @click="settingOpen = !settingOpen"
               class="flex items-center justify-between w-full gap-3 p-3 rounded-lg transition-all duration-200"
               :class="isActive('/setting')
-                ? 'bg-indigo-50 text-indigo-700 font-semibold'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
               <div class="flex items-center gap-3">
@@ -167,7 +167,7 @@
                     href="/setting/content"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
                     :class="isActive('/setting/content')
-                      ? 'bg-indigo-100 text-indigo-700 font-medium'
+                      ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
                     <span class="truncate">Content</span>
@@ -179,7 +179,7 @@
                     href="/setting/slider-home"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
                     :class="isActive('/setting/slider-home')
-                      ? 'bg-indigo-100 text-indigo-700 font-medium'
+                      ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
                     <span class="truncate">Home Slider</span>
@@ -191,7 +191,7 @@
                     href="/setting/slider-company"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
                     :class="isActive('/setting/slider-company')
-                      ? 'bg-indigo-100 text-indigo-700 font-medium'
+                      ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
                     <span class="truncate">Company Slider</span>
@@ -203,7 +203,7 @@
                     href="/setting/testimoni-user"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
                     :class="isActive('/setting/testimoni-user')
-                      ? 'bg-indigo-100 text-indigo-700 font-medium'
+                      ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
                     <span class="truncate">User Testimonials</span>
@@ -216,7 +216,7 @@
 
         <div class="lg:hidden mt-8 pt-6 border-t">
           <div class="flex items-center gap-3 px-3 py-2">
-            <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
+            <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
               <span class="text-white text-sm font-medium">{{ userInitial }}</span>
             </div>
             <div class="min-w-0 flex-1">
@@ -268,7 +268,7 @@
               aria-label="User menu"
               :aria-expanded="profileOpen"
             >
-              <div class="sm:hidden w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
+              <div class="sm:hidden w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center">
                 <span class="text-white text-sm font-medium">{{ userInitial }}</span>
               </div>
 
@@ -277,7 +277,7 @@
                   <p class="text-sm font-medium text-gray-800 truncate max-w-[120px]">{{ user.name }}</p>
                   <p class="text-xs text-gray-500 truncate max-w-[120px]">{{ user.email }}</p>
                 </div>
-                <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center flex-shrink-0">
+                <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center flex-shrink-0">
                   <span class="text-white text-sm font-medium">{{ userInitial }}</span>
                 </div>
                 <div class="text-gray-500">
