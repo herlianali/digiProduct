@@ -17,7 +17,10 @@
       ]"
     >
       <div class="h-16 flex items-center justify-between px-6 border-b">
-        <h1 class="text-lg font-bold text-gray-800 truncate">Admin Dashboard</h1>
+        <div class="flex gap-4">
+          <img src="/public/assets/image/logo-supplaybox.png" alt="" class="w-7 h-7">
+          <h1 class="text-lg font-bold text-gray-800 truncate">SupplayBox</h1>
+        </div>
 
         <button
           @click="sidebarOpen = false"
@@ -87,14 +90,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/article')"
+              v-if="isActive('/articles')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/article"
+              href="/articles"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/article')
+              :class="isActive('/articles')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -409,7 +412,7 @@ const getPageTitle = () => {
   if (path.startsWith('/dashboard')) return 'Dashboard'
   if (path.startsWith('/products')) return 'Products'
   if (path.startsWith('/order')) return 'Orders'
-  if (path.startsWith('/article')) return 'Articles'
+  if (path.startsWith('/articles')) return 'Articles'
   if (path.startsWith('/setting')) return 'Settings'
 
   return 'Dashboard'
@@ -421,7 +424,7 @@ const getPageDescription = () => {
   if (path.startsWith('/dashboard')) return 'Overview of your store performance'
   if (path.startsWith('/products')) return 'Manage your digital products'
   if (path.startsWith('/order')) return 'View and manage customer orders'
-  if (path.startsWith('/article')) return 'Manage blog articles and content'
+  if (path.startsWith('/articles')) return 'Manage blog articles and content'
   if (path.startsWith('/setting')) return 'Configure your store settings'
 
   return 'Admin dashboard'

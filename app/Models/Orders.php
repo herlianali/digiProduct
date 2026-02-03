@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Order extends Model
+class Orders extends Model
 {
     protected $fillable = [
         'user_id', 'order_number', 'subtotal', 'discount', 'total',
@@ -37,7 +37,7 @@ class OrderItem extends Model
     // Relasi ke Order
     public function order(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Orders::class);
     }
 
     // Relasi ke Product

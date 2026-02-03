@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\OrderController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Admin\ProductController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -20,4 +21,5 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('products', ProductController::class);
     Route::resource('orders', OrderController::class);
+    Route::resource('articles', ArticleController::class);
 });
