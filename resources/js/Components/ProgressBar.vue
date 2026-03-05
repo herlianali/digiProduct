@@ -1,51 +1,54 @@
 <template>
   <transition name="splash-fade">
     <div v-if="visible" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center">
-      <!-- Your animated content (keep as is) -->
       <div class="relative mb-8">
         <div class="absolute inset-0 animate-ping">
-          <div class="w-32 h-32 rounded-full bg-indigo-100 opacity-20"></div>
+          <div class="w-32 h-32 rounded-full bg-amber-50 opacity-20"></div>
         </div>
-        
-        <div class="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center shadow-xl transform transition-transform duration-500 hover:scale-105">
-          <span class="text-white text-2xl font-bold tracking-tight">DP</span>
-          
-          <div class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-pink-500 animate-float" style="animation-delay: 0s"></div>
-          <div class="absolute -bottom-2 -left-2 w-3 h-3 rounded-full bg-blue-500 animate-float" style="animation-delay: 0.2s"></div>
-          <div class="absolute -top-2 -left-2 w-3 h-3 rounded-full bg-green-500 animate-float" style="animation-delay: 0.4s"></div>
-          <div class="absolute -bottom-2 -right-2 w-4 h-4 rounded-full bg-yellow-500 animate-float" style="animation-delay: 0.6s"></div>
+
+        <div class="relative w-24 h-24 rounded-2xl bg-gradient-to-br flex items-center justify-center transform transition-transform duration-500 hover:scale-105">
+          <img 
+            src="/public/assets/image/logo-supplaybox.png" 
+            alt="SupplyBox Logo" 
+            class="w-18 h-18 object-contain"
+          />
+
+          <div class="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-amber-400 animate-float" style="animation-delay: 0s"></div>
+          <div class="absolute -bottom-2 -left-2 w-3 h-3 rounded-full bg-yellow-400 animate-float" style="animation-delay: 0.2s"></div>
+          <div class="absolute -top-2 -left-2 w-3 h-3 rounded-full bg-orange-300 animate-float" style="animation-delay: 0.4s"></div>
+          <div class="absolute -bottom-2 -right-2 w-4 h-4 rounded-full bg-amber-300 animate-float" style="animation-delay: 0.6s"></div>
         </div>
-        
+
         <div class="absolute -inset-4">
-          <div class="w-32 h-32 rounded-full border-4 border-transparent border-t-indigo-400 border-r-purple-400 animate-spin-slow"></div>
+          <div class="w-32 h-32 rounded-full border-4 border-transparent border-t-amber-300 border-r-yellow-300 animate-spin-slow"></div>
         </div>
       </div>
-      
+
       <div class="text-center">
         <h2 class="text-2xl font-bold text-gray-800 mb-2">
           <span class="typewriter">{{ currentText }}</span>
           <span class="animate-pulse">|</span>
         </h2>
         <p class="text-gray-600 mb-6">Please wait while we prepare your dashboard</p>
-        
+
         <div class="flex justify-center space-x-2">
-          <div class="w-2 h-2 rounded-full bg-indigo-600 animate-bounce" style="animation-delay: 0ms"></div>
-          <div class="w-2 h-2 rounded-full bg-purple-600 animate-bounce" style="animation-delay: 150ms"></div>
-          <div class="w-2 h-2 rounded-full bg-pink-600 animate-bounce" style="animation-delay: 300ms"></div>
-          <div class="w-2 h-2 rounded-full bg-blue-600 animate-bounce" style="animation-delay: 450ms"></div>
+          <div class="w-2 h-2 rounded-full bg-amber-600 animate-bounce" style="animation-delay: 0ms"></div>
+          <div class="w-2 h-2 rounded-full bg-yellow-600 animate-bounce" style="animation-delay: 150ms"></div>
+          <div class="w-2 h-2 rounded-full bg-orange-500 animate-bounce" style="animation-delay: 300ms"></div>
+          <div class="w-2 h-2 rounded-full bg-amber-500 animate-bounce" style="animation-delay: 450ms"></div>
         </div>
-        
+
         <div v-if="showPercentage" class="mt-6">
           <div class="w-48 bg-gray-200 rounded-full h-1.5 overflow-hidden mx-auto">
             <div 
-              class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-300"
+              class="h-full bg-gradient-to-r from-amber-500 to-yellow-500 rounded-full transition-all duration-300"
               :style="{ width: `${progress}%` }"
             ></div>
           </div>
           <p class="text-xs text-gray-500 mt-2">{{ Math.round(progress) }}%</p>
         </div>
       </div>
-      
+
       <div class="absolute bottom-8 left-0 right-0 px-4">
         <div class="max-w-md mx-auto text-center">
           <p class="text-sm text-gray-500 italic">
@@ -60,21 +63,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 
-const visible = ref(true) // Start as visible on page load
+const visible = ref(true)
 const progress = ref(0)
 const currentText = ref('')
 const showPercentage = ref(false)
 const currentTip = ref(0)
 
 const texts = ['Loading', 'Initializing', 'Preparing', 'Almost ready']
-let textIndex = 0
-let charIndex = 0
-let typingInterval = null
-let progressInterval = null
-let tipInterval = null
-let finishTimeout = null
-
-// Fun loading tips
 const tips = [
   'Pro tip: Use dark mode for better battery life',
   'Did you know? Keyboard shortcuts can save you time',
@@ -83,6 +78,13 @@ const tips = [
   'Fetching the latest updates...',
   'Almost there! Preparing your workspace...'
 ]
+
+let textIndex = 0
+let charIndex = 0
+let typingInterval = null
+let progressInterval = null
+let tipInterval = null
+let finishTimeout = null
 
 const startTyping = () => {
   typingInterval = setInterval(() => {
@@ -121,7 +123,7 @@ const start = () => {
   if (typingInterval) clearInterval(typingInterval)
   if (tipInterval) clearInterval(tipInterval)
   if (finishTimeout) clearTimeout(finishTimeout)
-  
+
   // Reset values
   visible.value = true
   progress.value = 0
@@ -130,14 +132,14 @@ const start = () => {
   charIndex = 0
   currentTip.value = Math.floor(Math.random() * tips.length)
   showPercentage.value = false
-  
+
   // Show percentage after 1.5 seconds if still loading
   setTimeout(() => {
     if (visible.value) {
       showPercentage.value = true
     }
   }, 1500)
-  
+
   // Start animations
   startTyping()
   startProgress()
@@ -147,12 +149,12 @@ const start = () => {
 const finish = () => {
   // Complete progress
   progress.value = 100
-  
+
   // Clear intervals
   if (progressInterval) clearInterval(progressInterval)
   if (typingInterval) clearInterval(typingInterval)
   if (tipInterval) clearInterval(tipInterval)
-  
+
   // Hide after short delay
   finishTimeout = setTimeout(() => {
     visible.value = false
@@ -165,7 +167,7 @@ const finish = () => {
 // Show splash immediately on page load
 const showOnPageLoad = () => {
   start()
-  
+
   // Auto-hide after 2 seconds as fallback
   setTimeout(() => {
     if (visible.value) {
@@ -177,20 +179,20 @@ const showOnPageLoad = () => {
 // Monitor fetch requests for Inertia
 const setupInertiaMonitoring = () => {
   const originalFetch = window.fetch
-  
+
   window.fetch = function(...args) {
     const options = args[1] || {}
-    
+
     // Check if it's an Inertia request
     const isInertiaRequest = 
       options.headers && 
       (options.headers['X-Inertia'] === true || 
        options.headers['X-Inertia'] === 'true' ||
        (typeof options.headers.get === 'function' && options.headers.get('X-Inertia') === 'true'))
-    
+
     if (isInertiaRequest && !visible.value) {
       start()
-      
+
       return originalFetch.apply(this, args)
         .then(response => {
           finish()
@@ -201,7 +203,7 @@ const setupInertiaMonitoring = () => {
           throw error
         })
     }
-    
+
     return originalFetch.apply(this, args)
   }
 }
@@ -210,18 +212,18 @@ const setupInertiaMonitoring = () => {
 const setupLinkMonitoring = () => {
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a')
-    
+
     // Check if it's an Inertia link
     if (link && link.href) {
       const url = new URL(link.href)
       const currentUrl = new URL(window.location.href)
-      
+
       // Only intercept same-origin links
       if (url.origin === currentUrl.origin && !link.target && !link.download) {
         const isSignificantNavigation = 
           !link.href.includes('/#') && 
           !link.closest('[data-no-splash]')
-        
+
         if (isSignificantNavigation && !visible.value) {
           start()
         }
@@ -243,20 +245,20 @@ const setupFormMonitoring = () => {
 onMounted(() => {
   // Show splash on initial load
   showOnPageLoad()
-  
+
   // Setup monitoring for future navigations
   setupInertiaMonitoring()
   setupLinkMonitoring()
   setupFormMonitoring()
-  
+
   // Show splash when browser back/forward buttons are used
   window.addEventListener('popstate', () => {
     if (!visible.value) start()
   })
-  
+
   // Hide when page is fully loaded
   window.addEventListener('load', finish)
-  
+
   // Also hide when Inertia app is ready
   if (window.Inertia) {
     window.Inertia.on('finish', finish)
@@ -268,13 +270,13 @@ onUnmounted(() => {
   if (typingInterval) clearInterval(typingInterval)
   if (tipInterval) clearInterval(tipInterval)
   if (finishTimeout) clearTimeout(finishTimeout)
-  
+
   // Restore original fetch
   window.fetch = window.fetch?.__originalFetch || window.fetch
-  
+
   window.removeEventListener('popstate', start)
   window.removeEventListener('load', finish)
-  
+
   if (window.Inertia) {
     window.Inertia.off('finish', finish)
   }
@@ -282,7 +284,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Keep all your existing styles */
 .splash-fade-enter-active,
 .splash-fade-leave-active {
   transition: opacity 0.5s ease;
@@ -328,32 +329,52 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .typewriter {
-  border-right: 2px solid #4f46e5;
+  border-right: 2px solid #f59e0b; /* amber-500 */
   animation: blink 1s step-end infinite;
 }
 
 @keyframes blink {
-  0%, 100% { border-color: #4f46e5; }
-  50% { border-color: transparent; }
+  0%, 100% {
+    border-color: #f59e0b;
+  }
+  50% {
+    border-color: transparent;
+  }
 }
 </style>

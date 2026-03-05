@@ -167,9 +167,9 @@
               >
                 <li>
                   <Link
-                    href="/setting/content"
+                    href="/settings/content"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/setting/content')
+                    :class="isActive('/settings/content')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -179,9 +179,9 @@
 
                 <li>
                   <Link
-                    href="/setting/slider-home"
+                    href="/settings/slider-home"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/setting/slider-home')
+                    :class="isActive('/settings/slider-home')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -191,9 +191,9 @@
 
                 <li>
                   <Link
-                    href="/setting/slider-company"
+                    href="/settings/slider-company"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/setting/slider-company')
+                    :class="isActive('/settings/slider-company')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -203,9 +203,9 @@
 
                 <li>
                   <Link
-                    href="/setting/testimoni-user"
+                    href="/settings/testimoni-user"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/setting/testimoni-user')
+                    :class="isActive('/settings/testimoni-user')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
