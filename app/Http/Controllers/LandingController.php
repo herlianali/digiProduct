@@ -11,4 +11,9 @@ class LandingController extends Controller
     {
         return Inertia::render('Landing/Index');
     }
+
+    public function gsap()
+    {
+        return Inertia::render('Landing/Gsap/Index');
+    }
 }

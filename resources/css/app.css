@@ -3,53 +3,453 @@
 @tailwind utilities;
 
 * {
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 .debug-dark {
-  background-color: #1f2937 !important; /* gray-800 */
-  color: #f9fafb !important; /* gray-50 */
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
 }
 
-/* Custom NProgress Styles */
+/* NProgress */
 #nprogress {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 #nprogress .bar {
-  background: linear-gradient(90deg, #4f46e5, #8b5cf6, #ec4899);
-  height: 3px;
-  box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
-  position: fixed;
-  z-index: 1031;
-  top: 0;
-  left: 0;
-  width: 100%;
+    background: linear-gradient(90deg, #4f46e5, #8b5cf6, #ec4899);
+    height: 3px;
+    box-shadow: 0 0 10px rgba(79, 70, 229, 0.5);
+    position: fixed;
+    z-index: 1031;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
 #nprogress .peg {
-  display: none;
+    display: none;
 }
 
 #nprogress .spinner {
-  display: block;
-  position: fixed;
-  z-index: 1031;
-  top: 15px;
-  right: 15px;
+    display: block;
+    position: fixed;
+    z-index: 1031;
+    top: 15px;
+    right: 15px;
 }
 
 #nprogress .spinner-icon {
-  width: 24px;
-  height: 24px;
-  border: solid 3px transparent;
-  border-top-color: #4f46e5;
-  border-left-color: #4f46e5;
-  border-radius: 50%;
-  animation: nprogress-spinner 400ms linear infinite;
+    width: 24px;
+    height: 24px;
+    border: solid 3px transparent;
+    border-top-color: #4f46e5;
+    border-left-color: #4f46e5;
+    border-radius: 50%;
+    animation: nprogress-spinner 400ms linear infinite;
 }
 
 @keyframes nprogress-spinner {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============ NAVBAR ============ */
+.navbar-container {
+    width: 100%;
+    background-color: white;
+    z-index: 50;
+    box-sizing: border-box;
+}
+
+.navbar-content {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 64px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    /* JANGAN overflow:hidden di sini — biarkan konten menentukan lebar */
+}
+
+/* Nav Links */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    /* kecil, biar hemat ruang */
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+/* Nav Item */
+.nav-item {
+    font-size: 0.9375rem !important;
+    /* 15px */
+    font-weight: 500 !important;
+    line-height: 1.5rem !important;
+    color: #111827 !important;
+    padding: 0.4rem 0.6rem !important;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.nav-item:hover {
+    color: #eab308 !important;
+    background-color: rgba(234, 179, 8, 0.1);
+}
+
+/* Nav Right wrapper */
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 0.75rem;
+    flex-shrink: 0;
+}
+
+/* Price */
+.navbar-price {
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    color: #374151 !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Button */
+/* .nav-button {
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    padding: 0.45rem 1rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+*/
+.nav-button:hover {
+    transform: scale(1.05);
+}
+
+/* Mobile menu */
+.mobile-menu-btn {
+    color: #1f2937;
+    flex-shrink: 0;
+    transition: color 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+    color: #eab308;
+}
+
+/* ======================================================
+   STICKY MODE — lebar menyesuaikan konten (width: auto)
+   overflow TIDAK di-clip agar item tidak terpotong
+   ====================================================== */
+.navbar-sticky-mode {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+
+    /* width mengikuti konten, dibatasi agar tidak lebih dari viewport */
+    width: auto !important;
+    max-width: calc(100vw - 40px) !important;
+
+    border-radius: 50px !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(10px) !important;
+    background-color: rgba(255, 255, 255, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    padding: 0 20px !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+    /* TIDAK ada overflow:hidden — biarkan konten menentukan lebar */
+}
+
+.navbar-sticky-mode:hover {
+    box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* navbar-content di dalam sticky: height lebih kecil, NO overflow clip */
+.navbar-sticky-mode .navbar-content {
+    height: 52px !important;
+    max-width: 100% !important;
+    width: auto !important;
+    padding: 0 !important;
+    gap: 0.25rem;
+    /* TIDAK overflow:hidden */
+}
+
+/* nav-links di sticky — gap lebih rapat */
+.navbar-sticky-mode .nav-links {
+    gap: 0 !important;
+}
+
+/* nav-item di sticky — font & padding lebih kecil */
+.navbar-sticky-mode .nav-item {
+    font-size: 0.8125rem !important;
+    /* 13px */
+    padding: 0.3rem 0.5rem !important;
+}
+
+/* price di sticky */
+.navbar-sticky-mode .navbar-price {
+    font-size: 0.8125rem !important;
+}
+
+/* button di sticky */
+.navbar-sticky-mode .nav-button {
+    font-size: 0.75rem !important;
+    padding: 0.35rem 0.75rem !important;
+}
+
+/* nav-right di sticky */
+.navbar-sticky-mode .nav-right {
+    gap: 0.4rem;
+    margin-left: 0.4rem;
+}
+
+/* ============ LOGO ============ */
+.nav-logo-full,
+.nav-logo-small {
+    transition: all 0.3s ease;
+}
+
+/* ============ TRANSITIONS ============ */
+.navbar-container-animated {
+    transform: translateZ(0);
+    will-change: transform, left, right, top, width;
+}
+
+.navbar-sticky {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-glass {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.navbar-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-enter-active,
+.navbar-leave-active {
+    transition: all 0.3s ease;
+}
+
+.navbar-enter-from,
+.navbar-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+/* ============ SECTION ============ */
+section {
+    scroll-margin-top: 100px;
+}
+
+.section-with-offset {
+    scroll-margin-top: 120px;
+}
+
+.section-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 2.25rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+/* ============ ANIMATIONS ============ */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.float-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.navbar-appear {
+    animation: slideInRight 0.3s ease forwards;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.navbar-oval .nav-item {
+    animation: fadeInScale 0.3s ease forwards;
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============ CARDS ============ */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .1), 0 10px 10px -5px rgba(0, 0, 0, .04);
+}
+
+.gradient-text {
+    background: linear-gradient(90deg, #4f46e5, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px) {
+    .navbar-sticky-mode {
+        right: 10px !important;
+        max-width: calc(100vw - 20px) !important;
+    }
+
+    section {
+        scroll-margin-top: 80px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar-content {
+        padding: 0 0.75rem;
+    }
+
+    .navbar-sticky-mode {
+        right: 8px !important;
+        top: 10px !important;
+        padding: 0 12px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+
+    .navbar-sticky-mode .nav-item {
+        font-size: 0.6875rem !important;
+        /* 11px */
+        padding: 0.25rem 0.35rem !important;
+    }
+
+    .navbar-sticky-mode .nav-button {
+        font-size: 0.6875rem !important;
+        padding: 0.3rem 0.5rem !important;
+    }
+
+    section {
+        scroll-margin-top: 60px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 520px) {
+
+    /* Layar sangat sempit: sembunyikan item tengah, sisakan Home+Products+Btn */
+    .navbar-sticky-mode .nav-item:nth-child(2),
+    /* Services */
+    .navbar-sticky-mode .nav-item:nth-child(3),
+    /* Testimonials */
+    .navbar-sticky-mode .nav-item:nth-child(4) {
+        /* Work */
+        display: none !important;
+    }
+
+    .navbar-sticky-mode .navbar-price {
+        display: none !important;
+    }
+}
+
+/* ============ UTILITY ============ */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@media print {
+    .navbar-sticky-mode {
+        display: none !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
 }

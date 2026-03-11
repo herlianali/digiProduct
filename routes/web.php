@@ -18,6 +18,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::get('/', [LandingController::class, 'index']);
+ROute::get('/gsap', [LandingController::class, 'gsap'])->name('gsap');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -36,5 +37,4 @@ Route::middleware('auth')->group(function () {
         Route::resource('slider-home', HomeSlidersController::class);
         Route::resource('testimoni-user', TestimonialsController::class);
     });
-
 });
