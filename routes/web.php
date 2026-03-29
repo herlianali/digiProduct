@@ -18,7 +18,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::get('/', [LandingController::class, 'index']);
-ROute::get('/gsap', [LandingController::class, 'gsap'])->name('gsap');
+Route::get('/gsap', [LandingController::class, 'gsap'])->name('gsap');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
