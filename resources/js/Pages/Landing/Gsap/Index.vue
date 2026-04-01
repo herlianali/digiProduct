@@ -140,7 +140,6 @@ const scrollToSection = (sectionId) => {
 <template>
     <div class="min-h-screen bg-gradient-to-b from-gray-200 to-white">
 
-        <!-- Navbar (tetap sama seperti script asli) -->
         <section class="relative bg-white text-white w-full">
             <div ref="navbarContainerRef" class="z-[1000] transition-all duration-300">
                 <nav ref="navbarRef" class="w-full">
@@ -170,10 +169,10 @@ const scrollToSection = (sectionId) => {
         </section>
 
         <!-- HERO SECTION - BENTO GRID menggunakan Tailwind CSS (tanpa custom CSS) -->
-        <div class="bg-gradient-to-b from-[#dedede] to-[#f2f2f2] px-3 pt-3 pb-0">
-            <div class="max-w-[1280px] mx-auto">
+        <div class="bg-gradient-to-b from-[#dedede] to-[#f2f2f2]">
+            <div class=" mx-auto">
                 <!-- Grid 5 kolom, 2 baris dengan gap 2.5 (10px) -->
-                <div class="grid grid-cols-12 gap-2.5 auto-rows-min">
+                <div class="grid grid-cols-12 gap-2.5 auto-rows-min bg-[#ffffff] px-4">
 
                     <!-- Kolom 1-2: Welcome (span 3 kolom di grid 12) + baris 1 -->
                     <div class="col-span-3 row-span-1 bg-[#fce109] rounded-2xl p-4 md:p-5 flex flex-col">
@@ -379,28 +378,26 @@ const scrollToSection = (sectionId) => {
                     </div>
                 </div>
 
-                <!-- Rack Divider (tetap menggunakan komponen RackDivider) -->
-                <div class="mt-2">
-                    <RackDivider
-                        :color="'#000000'"
-                        :top-color="'#ffffff'"
-                        :mid-radius="40"
-                        :height="36"
-                        :tab-height="28"
-                        :notch-depth="28"
-                        :tab-width="35"
-                        :radius="8"
-                        :responsive="true"
-                        :manual-positions="[
-                            { xPct: 3,  type: 'out' },
-                            { xPct: 27, type: 'out' },
-                            { xPct: 30, type: 'in'  },
-                            { xPct: 40, type: 'out' },
-                            { xPct: 43, type: 'in'  },
-                            { xPct: 95, type: 'out' }
-                        ]"
-                    />
-                </div>
+                <RackDivider
+                    :color="'#000000'"
+                    :top-color="'#ffffff'"
+                    :mid-radius="40"
+                    :height="36"
+                    :tab-height="28"
+                    :notch-depth="28"
+                    :tab-width="35"
+                    :radius="8"
+                    :responsive="true"
+                    :manual-positions="[
+                        { xPct: 3,  type: 'out' },
+                        { xPct: 27, type: 'out' },
+                        { xPct: 30, type: 'in'  },
+                        { xPct: 40, type: 'out' },
+                        { xPct: 43, type: 'in'  },
+                        { xPct: 95, type: 'out' }
+                    ]"
+                />
+
             </div>
         </div>
 
