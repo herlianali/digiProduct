@@ -176,7 +176,7 @@ const scrollToSection = (sectionId) => {
                             />
                         </div>
                     </div>
-            
+
                     <!-- Kolom 3: Merged Card (span 2, row 1-2) -->
                     <div class="col-span-2 row-span-2 bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden">
                         <div class="flex justify-center items-center py-4">
@@ -186,28 +186,30 @@ const scrollToSection = (sectionId) => {
                                 alt=""
                             />
                         </div>
-                        <div class="bg-black rounded-tl-2xl rounded-tr-2xl px-4 py-2 border-b border-gray-800">
-                            <h3 class="font-['Archivo_Black',sans-serif] text-white ">
+                        <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
+                            <h3 class="font-bold text-white px-4 py-1">
                                 Design Service
                             </h3>
+                            <div class="rounded-t-2xl bg-gray-200">
+                                <p class="text-[10px] md:text-[11px] text-gray-500 leading-relaxed px-4 py-3">
+                                    Brand Identity / Logo Design / Poster<br />Design / Packaging
+                                    Design / Social<br />Media Design / Infographic Design /<br />Editorial
+                                    Design / Book Design
+                                </p>
+                                <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
+                                    <h3 class="font-bold text-white px-4 py-1">
+                                        Illustration Service
+                                    </h3>
+                                    <div class="rounded-t-2xl bg-gray-200">
+                                        <p class="text-[10px] md:text-[11px] text-gray-500 leading-relaxed px-4 pt-3">
+                                            2D Illustration / Environmental Design<br />Game Design /
+                                            Character design /<br />Mascot Illustration / Advertising<br />Illustration
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="px-4 py-3 border-b border-gray-800 rounded-t-2xl bg-gray-200 relative">
-                            <p class="text-[10px] md:text-[11px] text-gray-500 leading-relaxed mt-1">
-                                Brand Identity / Logo Design / Poster<br />Design / Packaging
-                                Design / Social<br />Media Design / Infographic Design /<br />Editorial
-                                Design / Book Design
-                            </p>
-                        </div>
-                        <div class="px-4 py-3 border-b border-gray-800">
-                            <h3 class="font-['Archivo_Black',sans-serif] text-white text-sm md:text-base">
-                                Illustration Service
-                            </h3>
-                            <p class="text-[10px] md:text-[11px] text-gray-500 leading-relaxed mt-1">
-                                2D Illustration / Environmental Design<br />Game Design /
-                                Character design /<br />Mascot Illustration / Advertising<br />Illustration
-                            </p>
-                        </div>
-                        <div class="py-2 flex justify-center">
+                        <div class="pb-2 flex justify-center">
                             <img
                                 src="/public/assets/image/banner/arrow-black-bottom.svg"
                                 alt=""
@@ -221,16 +223,17 @@ const scrollToSection = (sectionId) => {
                             />
                         </div>
                     </div>
-            
+
                     <!-- Kolom 4: Teepublic (span 2) -->
-                    <div class="col-span-2 bg-[#4c60d8] rounded-2xl flex flex-col">
+                    <div class="col-span-2 bg-[#4c60d8] rounded-2xl flex flex-col ">
                         <div class="px-3 pt-3 flex justify-between items-center">
-                            <span class="text-white text-[10px] font-bold tracking-wider flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 bg-white rounded-full"></span>TEEPUBLIC
-                            </span>
-                            <ArrowUpRightSolid class="text-white w-4 h-4" />
+                            <div class=" tracking-wider flex items-center gap-1">
+                                <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" class="w-4 h-4">
+                                <span class="text-white font-bold text-lg">TEEPUBLIC</span>
+                            </div>
+                            <img src="/public/assets/image/banner/arrow-white-right.svg" alt="">
                         </div>
-                        <div class="flex-1 overflow-hidden max-h-[120px]">
+                        <div class="flex-1 overflow-hidden ">
                             <img
                                 src="/public/assets/image/banner/card-teepublic-animated.svg"
                                 alt="teepublic"
@@ -238,30 +241,30 @@ const scrollToSection = (sectionId) => {
                             />
                         </div>
                         <div class="px-3 pb-3">
-                            <p class="font-['Archivo_Black',sans-serif] text-white text-base md:text-lg leading-tight">
+                            <p class="font-bold text-white text-lg">
                                 Unlimited<br />Prints.
                             </p>
                         </div>
                     </div>
-            
+
                     <!-- Kolom 5: Behance (span 2) -->
                     <div class="col-span-2 bg-black rounded-2xl flex flex-col">
                         <div class="px-3 pt-3 flex justify-between items-start">
                             <div>
-                                <p class="font-['Archivo_Black',sans-serif] text-white text-2xl md:text-3xl">
+                                <p class="font-bold text-white text-3xl leading-tight">
                                     Bē
                                 </p>
-                                <p class="text-[9px] text-gray-500 leading-tight">
+                                <p class="text-[11px] text-white leading-tight">
                                     More<br />Professional<br />Portofolio
                                 </p>
                             </div>
-                            <ArrowUpRightSolid class="text-white w-4 h-4" />
+                            <img src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="" />
                         </div>
                         <div class="flex-1 overflow-hidden">
-                            <img src="" alt="behance" class="w-full h-full object-cover" />
+                            <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-full object-cover object-left" />
                         </div>
                     </div>
-            
+
                     <!-- Kolom 6: Upwork (span 2) -->
                     <div class="col-span-2 bg-black rounded-2xl flex flex-col">
                         <div class="flex-1 px-3 pt-3 relative">
@@ -287,7 +290,7 @@ const scrollToSection = (sectionId) => {
                             </p>
                         </div>
                     </div>
-            
+
                     <!-- Row 2 - Stack Card (Pinterest + TikTok + Starter) span 3 -->
                     <div class="col-span-3 grid grid-cols-2 grid-rows-2 gap-6 h-[460px]">
                         <!-- Pinterest -->
@@ -364,7 +367,7 @@ const scrollToSection = (sectionId) => {
                             </div>
                         </div>
                     </div>
-            
+
                     <!-- Fiverr + Product + Team Group (span 4) -->
                     <div class="col-span-4 flex flex-col gap-6">
                         <!-- Fiverr Card -->
@@ -385,7 +388,7 @@ const scrollToSection = (sectionId) => {
                             </div>
                             <div class="absolute bottom-0 left-0 h-[75%] w-[45%] overflow-hidden">
                                 <img
-                                    src=""
+                                    src="/public/assets/image/banner/card-toprated-animated.svg"
                                     alt="fiverr"
                                     class="w-full h-full object-cover object-top"
                                 />
@@ -397,19 +400,25 @@ const scrollToSection = (sectionId) => {
                         </div>
                         <!-- Product + Team -->
                         <div class="flex gap-6 flex-1">
-                            <div class="flex-1 bg-[#fee100] rounded-2xl p-3 flex flex-col relative">
-                                <p class="font-['Archivo_Black',sans-serif] text-black text-xl leading-tight">
+                            <div class="flex-1 bg-[#fee100] rounded-2xl p-3 flex flex-col relative overflow-hidden">
+                                <p class="font-['Archivo_Black',sans-serif] text-black text-xl leading-tight relative z-10">
                                     Our<br />Product
                                 </p>
-                                <div class="flex-1 flex items-center justify-center py-2">
+                                <div
+                                    class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0
+                                            border-l-[280px] border-r-[280px] border-b-[150px]
+                                            border-l-transparent border-r-transparent border-b-[#c0f900]"
+                                    ></div>
+                                <div class="flex-1 flex items-center justify-center py-2 relative z-10">
                                     <img
-                                        src=""
+                                        src="/public/assets/image/banner/card-ourproduct-animated.svg"
                                         alt="product"
-                                        class="h-12 w-auto object-contain"
+                                        class="w-full h-full object-contain"
                                     />
                                 </div>
-                                <div class="text-center">
-                                    <ArrowDownSolid class="text-black w-4 h-4 inline" />
+                                <div class="text-center relative z-10">
+                                    <!-- <ArrowDownSolid class="text-black w-4 h-4 inline" /> -->
+                                    <img src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline">
                                 </div>
                             </div>
                             <div class="flex-1 bg-[#abdec9] rounded-2xl relative overflow-hidden">
@@ -431,7 +440,7 @@ const scrollToSection = (sectionId) => {
                             </div>
                         </div>
                     </div>
-        
+
                     <!-- Amidst Text (span 2) -->
                     <div class="col-span-2 bg-white rounded-2xl p-4 flex flex-col justify-center">
                         <p class="text-gray-300 text-lg md:text-xl leading-tight">Amidst</p>
