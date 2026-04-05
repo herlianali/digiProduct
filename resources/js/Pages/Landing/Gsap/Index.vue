@@ -248,7 +248,7 @@ const scrollToSection = (sectionId) => {
                     </div>
 
                     <!-- Kolom 5: Behance (span 2) -->
-                    <div class="col-span-2 bg-black rounded-2xl flex flex-col">
+                    <div class="col-span-2 bg-black rounded-2xl flex flex-col overflow-hidden">
                         <div class="px-3 pt-3 flex justify-between items-start">
                             <div>
                                 <p class="font-bold text-white text-3xl leading-tight">
@@ -265,23 +265,45 @@ const scrollToSection = (sectionId) => {
                         </div>
                     </div>
 
+                    <!-- div for icon trolly and price and image icon unser -->
+                    <div class="col-span-1 row-span-2 flex flex-col justify-end items-center gap-3 pb-1">
+                        
+                        <!-- Icon user/avatar -->
+                        <div class="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center">
+                            <img 
+                                src="" 
+                                alt="user" 
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
+
+                        <!-- Shopping cart -->
+                        <ShoppingCartIcon class="w-6 h-6 text-black cursor-pointer hover:text-green-600 transition-colors" />
+
+                        <!-- Price badge -->
+                        <span class="border border-gray-400 rounded-full px-3 py-1 text-black text-sm font-medium whitespace-nowrap">
+                            $100
+                        </span>
+
+                    </div>
+
                     <!-- Kolom 6: Upwork (span 2) -->
-                    <div class="col-span-2 bg-black rounded-2xl flex flex-col">
+                    <div class="col-span-2 bg-black rounded-2xl flex flex-col overflow-hidden">
                         <div class="flex-1 px-3 pt-3 relative">
                             <p class="text-[10px] text-gray-500 uppercase">New Seller</p>
                             <p class="text-white text-lg font-light">
                                 on <b class="font-['Archivo_Black',sans-serif]">upwork</b>
                             </p>
                             <ArrowUpRightSolid class="absolute top-3 right-3 text-white w-4 h-4"/>
-                            <div class="h-[90px] mt-2 overflow-hidden">
-                                <img
-                                    src=""
-                                    alt="upwork"
-                                    class="w-full h-full object-cover object-top"
-                                />
-                            </div>
                         </div>
-                        <div class="bg-[#268a00] px-3 py-2">
+                        <div class="h-[130px] mt-2 overflow-hidden">
+                            <img
+                                src="/public/assets/image/banner/card-upwork-animated.svg"
+                                alt="upwork"
+                                class="w-full h-full object-cover object-top"
+                            />
+                        </div>
+                        <div class="rounded-t-2xl bg-[#268a00] px-3 py-2">
                             <p class="text-white text-xs font-extrabold leading-tight">
                                 Enjoy many Bonuses<br />and Discounts<br />on this Platform!
                             </p>
@@ -401,7 +423,7 @@ const scrollToSection = (sectionId) => {
                         <!-- Product + Team -->
                         <div class="flex gap-6 flex-1">
                             <div class="flex-1 bg-[#fee100] rounded-2xl p-3 flex flex-col relative overflow-hidden">
-                                <p class="font-['Archivo_Black',sans-serif] text-black text-xl leading-tight relative z-10">
+                                <p class="font-extrabold text-black text-3xl relative z-20">
                                     Our<br />Product
                                 </p>
                                 <div
@@ -413,7 +435,7 @@ const scrollToSection = (sectionId) => {
                                     <img
                                         src="/public/assets/image/banner/card-ourproduct-animated.svg"
                                         alt="product"
-                                        class="w-full h-full object-contain"
+                                        class="w-[80%] h-[80%] object-contain"
                                     />
                                 </div>
                                 <div class="text-center relative z-10">
@@ -423,19 +445,19 @@ const scrollToSection = (sectionId) => {
                             </div>
                             <div class="flex-1 bg-[#abdec9] rounded-2xl relative overflow-hidden">
                                 <img
-                                    src=""
+                                    src="/public/assets/image/banner/card-ourteam-animated.svg"
                                     alt="team"
-                                    class="w-full h-full object-cover object-top"
+                                    class="w-full h-full object-cover object-bottom"
                                 />
-                                <ArrowUpRightSolid class="absolute top-2 right-2 text-white w-4 h-4"/>
-                                <div class="absolute bottom-2 left-2 right-2">
+                                <!-- <ArrowUpRightSolid class="absolute top-2 right-2 text-white w-4 h-4"/> -->
+                                <div class="absolute bottom-10 left-2 right-2">
                                     <p class="font-['Archivo_Black',sans-serif] text-white text-base leading-tight">
                                         Meet<br />Our Team
                                     </p>
-                                    <div class="inline-flex items-center gap-1 bg-black/50 border border-white/20 rounded-full px-2 py-0.5 mt-1">
+                                    <!-- <div class="inline-flex items-center gap-1 bg-black/50 border border-white/20 rounded-full px-2 py-0.5 mt-1">
                                         <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
                                         <span class="text-[9px] text-white">RIN</span>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
