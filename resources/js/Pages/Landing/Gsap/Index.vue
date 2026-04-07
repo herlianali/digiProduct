@@ -51,13 +51,13 @@ onMounted(() => {
 onUnmounted(() => {
     if (sliderTween) sliderTween.kill()
     ScrollTrigger.getAll().forEach(t => t.kill())
-    
+
     // Cleanup hover animations
     hoverAnimations.forEach(({ element, enterHandler, leaveHandler }) => {
         element.removeEventListener('mouseenter', enterHandler)
         element.removeEventListener('mouseleave', leaveHandler)
     })
-    
+
     // Cleanup slider navigation
     if (sliderPrevBtn.value) {
         sliderPrevBtn.value.removeEventListener('click', () => {})
@@ -83,21 +83,21 @@ const initCardHoverAnimations = () => {
         '.col-span-5 .col-span-5.bg-\\[\\#fee100\\]', // Our Product card
         '.col-span-5 .col-span-7.bg-\\[\\#abdec9\\]' // Our Team card
     ]
-    
+
     const allCards = bentoGridRef.value?.querySelectorAll(cardSelectors.join(','))
-    
+
     if (!allCards) return
-    
+
     allCards.forEach(card => {
         // Skip if already has hover animation
         if (card._hasHoverAnimation) return
-        
+
         // Set initial styles
         gsap.set(card, {
             transformOrigin: 'center center',
             zIndex: 1
         })
-        
+
         // Create hover animations
         const onMouseEnter = () => {
             // Main card animation
@@ -110,7 +110,7 @@ const initCardHoverAnimations = () => {
                 ease: 'back.out(0.4)',
                 overwrite: true
             }, 0)
-            
+
             // Animate images inside card
             const images = card.querySelectorAll('img')
             if (images.length) {
@@ -122,7 +122,7 @@ const initCardHoverAnimations = () => {
                     overwrite: true
                 }, 0)
             }
-            
+
             // Animate text elements
             const texts = card.querySelectorAll('p, h1, h2, h3, h4, span, button')
             if (texts.length) {
@@ -134,7 +134,7 @@ const initCardHoverAnimations = () => {
                     overwrite: true
                 }, 0)
             }
-            
+
             // Special animation for specific cards
             if (card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]')) {
                 tl.to(card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]'), {
@@ -143,7 +143,7 @@ const initCardHoverAnimations = () => {
                     ease: 'power2.out'
                 }, 0)
             }
-            
+
             // Add border highlight effect
             gsap.to(card, {
                 borderColor: 'rgba(0,0,0,0.2)',
@@ -151,7 +151,7 @@ const initCardHoverAnimations = () => {
                 overwrite: true
             })
         }
-        
+
         const onMouseLeave = () => {
             const tl = gsap.timeline()
             tl.to(card, {
@@ -162,7 +162,7 @@ const initCardHoverAnimations = () => {
                 ease: 'power2.in',
                 overwrite: true
             }, 0)
-            
+
             const images = card.querySelectorAll('img')
             if (images.length) {
                 tl.to(images, {
@@ -172,7 +172,7 @@ const initCardHoverAnimations = () => {
                     overwrite: true
                 }, 0)
             }
-            
+
             const texts = card.querySelectorAll('p, h1, h2, h3, h4, span, button')
             if (texts.length) {
                 tl.to(texts, {
@@ -182,7 +182,7 @@ const initCardHoverAnimations = () => {
                     overwrite: true
                 }, 0)
             }
-            
+
             if (card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]')) {
                 tl.to(card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]'), {
                     y: 0,
@@ -190,24 +190,24 @@ const initCardHoverAnimations = () => {
                     ease: 'power2.in'
                 }, 0)
             }
-            
+
             gsap.to(card, {
                 borderColor: '',
                 duration: 0.2,
                 overwrite: true
             })
         }
-        
+
         card.addEventListener('mouseenter', onMouseEnter)
         card.addEventListener('mouseleave', onMouseLeave)
-        
+
         // Store for cleanup
         hoverAnimations.push({
             element: card,
             enterHandler: onMouseEnter,
             leaveHandler: onMouseLeave
         })
-        
+
         card._hasHoverAnimation = true
     })
 }
@@ -215,13 +215,13 @@ const initCardHoverAnimations = () => {
 const initCardEntranceAnimation = () => {
     const cards = bentoGridRef.value?.querySelectorAll('[class*="col-span"]')
     if (!cards) return
-    
+
     // Filter out container elements
-    const validCards = Array.from(cards).filter(card => 
-        !card.classList.contains('grid') || 
+    const validCards = Array.from(cards).filter(card =>
+        !card.classList.contains('grid') ||
         card.querySelectorAll('[class*="col-span"]').length <= 1
     )
-    
+
     gsap.fromTo(validCards,
         {
             opacity: 0,
@@ -285,7 +285,7 @@ const initInfiniteSlider = () => {
         isSliderHovered.value = true
         showNavigationButtons()
     })
-    
+
     container.addEventListener('mouseleave', () => {
         sliderTween.resume()
         isSliderHovered.value = false
@@ -340,7 +340,7 @@ const initInfiniteSlider = () => {
             slidePrev()
         })
     }
-    
+
     if (sliderNextBtn.value) {
         sliderNextBtn.value.addEventListener('click', (e) => {
             e.stopPropagation()
@@ -368,17 +368,17 @@ const initInfiniteSlider = () => {
         if (!isDragging) return
         isDragging = false
         gsap.set(track, { cursor: 'grab' })
-        
+
         // Snap to nearest slide
         const currentX = parseFloat(gsap.getProperty(track, 'x'))
         const slideWidth = track.children[0]?.offsetWidth + 20
         const totalWidth = track.scrollWidth / 2
         let normalizedX = currentX % totalWidth
         if (normalizedX > 0) normalizedX = -totalWidth + normalizedX
-        
+
         const slideIndex = Math.round(-normalizedX / slideWidth)
         const targetX = -slideIndex * slideWidth
-        
+
         gsap.to(track, {
             x: targetX,
             duration: 0.4,
@@ -606,14 +606,14 @@ const scrollToSection = (sectionId) => {
                             <h3 class="font-bold text-white px-4 py-1 text-lg">Design Service</h3>
                             <div class="rounded-t-2xl bg-gray-200">
                                 <p class="text-[9px] md:text-[10px] text-gray-800 leading-relaxed px-4 py-2 text-justify">
-                                    Brand Identity / Logo Design / Poster Design / Packaging Design / Social 
+                                    Brand Identity / Logo Design / Poster Design / Packaging Design / Social
                                     Media Design / Infographic Design / Editorial Design / Book Design
                                 </p>
                                 <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
                                     <h3 class="font-bold text-white px-4 py-1 text-lg">Illustration Service</h3>
                                     <div class="rounded-t-2xl bg-gray-200">
                                         <p class="text-[9px] md:text-[10px] text-gray-800 leading-relaxed px-4 pt-2 text-justify">
-                                            2D Illustration / Environmental Design Game Design / Character design / 
+                                            2D Illustration / Environmental Design Game Design / Character design /
                                             Mascot Illustration / Advertising Illustration
                                         </p>
                                     </div>
@@ -820,10 +820,10 @@ const scrollToSection = (sectionId) => {
         </div>
 
         <!-- Slider with Navigation -->
-        <div 
-            ref="sliderContainerRef" 
+        <div
+            ref="sliderContainerRef"
             class="relative w-full overflow-hidden py-4 group"
-            
+
         >
             <!-- Previous Button -->
             <button
@@ -870,124 +870,237 @@ const scrollToSection = (sectionId) => {
             </div>
         </div>
         <!-- featured section -->
-        <div class="bg-black text-white py-12 rounded-3xl rounded-tr-3xl text-center">
-            <div class="mx-auto px-10 justify-between flex gap-6">
-                <img src="/assets/image/our-work.svg" alt="Featured Image" class="">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Featured</h2>
-            </div>
-            
-            <OurWorkSection />
-            
-            <!-- section footer - POSISI KANAN -->
-            <div class="flex justify-end items-center mt-8 opacity-70 px-10">
-                <div class="flex items-center gap-6">
-                    <!-- More Portfolio Link -->
-                    <div class="flex items-center gap-2 group cursor-pointer">
-                        <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">
-                            More Portfolio
-                        </span>
-                        <img 
-                            src="/assets/image/panah-porto.svg" 
-                            alt="" 
-                            class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]"
-                        >
+        <div class="bg-white">
+            <div class="bg-black text-white py-12 rounded-3xl rounded-tr-3xl text-center">
+                <div class="mx-auto px-10 justify-between flex gap-6">
+                    <img src="/public/assets/image/our-work.svg" alt="Featured Image" class="">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Featured</h2>
+                </div>
+
+                <OurWorkSection />
+
+                <!-- section footer - POSISI KANAN -->
+                <div class="flex justify-end items-center mt-8 opacity-70 px-10">
+                    <div class="flex items-center gap-6">
+                        <!-- More Portfolio Link -->
+                        <div class="flex items-center gap-2 group cursor-pointer">
+                            <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">
+                                More Portfolio
+                            </span>
+                            <img
+                                src="/public/assets/image/panah-porto.svg"
+                                alt=""
+                                class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]"
+                            >
+                        </div>
+
+                        <!-- Social Icons -->
+                        <div class="bg-[#333333] rounded-lg px-4 flex items-center gap-4">
+                            <div class="social-icon-wrapper group" @click="openLink('https://pin.it/yegYhYpFy')">
+                                <img
+                                    src="/public/assets/image/pinterest-icon-porto.svg"
+                                    alt="Pinterest"
+                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg] group-hover:brightness-[100%]"
+                                >
+                            </div>
+
+                            <div class="social-icon-wrapper group" @click="openLink('https://www.behance.net/supplay_box')">
+                                <img
+                                    src="/public/assets/image/behance-icon-porto.svg"
+                                    alt="Behance"
+                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
+                                >
+                            </div>
+
+                            <div class="social-icon-wrapper group" @click="openLink('https://www.fiverr.com/user/supplaybox/portfolio')">
+                                <img
+                                    src="/public/assets/image/fiverr-icon-porto.svg"
+                                    alt="Fiverr"
+                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
+                                >
+                            </div>
+
+                            <div class="social-icon-wrapper group" @click="openLink('https://www.upwork.com/freelancers/~018928f9b657bc5557?p=2002178990555295744')">
+                                <img
+                                    src="/public/assets/image/upwork-icon-porto.svg"
+                                    alt="Upwork"
+                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
+                                >
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Social Icons -->
-                    <div class="bg-[#333333] rounded-lg px-4 py-1 flex items-center gap-4">
-                        <div class="social-icon-wrapper group">
-                            <img 
-                                src="/assets/image/pinterest-icon-porto.svg" 
-                                alt="Pinterest" 
-                                class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg] group-hover:brightness-[100%]"
-                            >
+                </div>
+            </div>
+
+            <div class="py-8 px-16 text-black">
+                <div class="flex justify-center items-start gap-8">
+                    <div class="flex flex-col flex-shrink-0">
+                        <h1 class="text-6xl font-bold pb-2">Our Services</h1>
+                        <p class="max-w-md">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
+                    </div>
+
+                    <div class="flex flex-col w-full">
+                        <div class="flex justify-center gap-8">
+                            <div class="flex flex-col flex-1">
+                                <h1 class="text-4xl font-bold pb-2">Design Service</h1>
+                                <p class="leading-relaxed">
+                                    <span class="bg-[#b4f000] rounded-full border border-black text-black px-3 py-1 inline-block whitespace-nowrap">Brand Identity</span>
+                                    <span class="inline-flex flex-wrap gap-x-1 mt-2">
+                                        <span><b class="text-yellow-500">/</b> Logo Design</span>
+                                        <span><b class="text-yellow-500">/</b> Poster Design</span>
+                                        <span><b class="text-yellow-500">/</b> Packaging Design</span>
+                                        <span><b class="text-yellow-500">/</b> Social Media Design</span>
+                                        <span><b class="text-yellow-500">/</b> Infographic Design</span>
+                                        <span><b class="text-yellow-500">/</b> Editorial Design</span>
+                                        <span><b class="text-yellow-500">/</b> Book Design</span>
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="flex flex-col flex-1">
+                                <h1 class="text-4xl font-bold pb-2">Illustration Service</h1>
+                                <p class="leading-relaxed">
+                                    <span class="inline-flex flex-wrap gap-x-1">
+                                        <span>2D Illustration</span>
+                                        <span><b class="text-yellow-500">/</b> Environmental Design</span>
+                                        <span><b class="text-yellow-500">/</b> Game Design</span>
+                                        <span><b class="text-yellow-500">/</b> Character design</span>
+                                        <span><b class="text-yellow-500">/</b> Mascot Illustration</span>
+                                        <span><b class="text-yellow-500">/</b> Advertising Illustration</span>
+                                    </span>
+                                </p>
+                            </div>
                         </div>
-                        
-                        <div class="social-icon-wrapper group">
-                            <img 
-                                src="/assets/image/behance-icon-porto.svg" 
-                                alt="Behance" 
-                                class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
-                            >
-                        </div>
-                        
-                        <div class="social-icon-wrapper group">
-                            <img 
-                                src="/assets/image/fiverr-icon-porto.svg" 
-                                alt="Fiverr" 
-                                class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
-                            >
-                        </div>
-                        
-                        <div class="social-icon-wrapper group">
-                            <img 
-                                src="/assets/image/upwork-icon-porto.svg" 
-                                alt="Upwork" 
-                                class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
-                            >
+
+                        <div class="flex justify-center items-center mt-6">
+                            <div class="flex items-center gap-0">
+                                <div class="bg-[#e6e6e6] rounded-r-full py-2 pl-4 pr-2">
+                                    <span class="text-lg">
+                                        Claim coupon <b class="text-black">10% off</b> for your first order
+                                    </span>
+                                    <button class="bg-black text-white px-6 py-1 rounded-full uppercase text-lg font-medium whitespace-nowrap ml-1">
+                                        claim!
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-[#ff6600] p-2 rounded-full ml-4">
+                                <img src="/public/assets/image/banner/arrow-white-bottom.svg" alt="" class="rotate-90 -scale-100 w-5 h-5">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="min-h-screen bg-gradient-to-b from-gray-200 to-white">
-        <div ref="bannerRef" class="bg-white">
-            <BannerCards />
+        <div class="bg-[#cfcfcf]">
+            <RackDivider
+                :color="'#e6e6e6'"
+                :top-color="'#ffffff'"
+                :mid-radius="40"
+                :height="40"
+                :tab-height="34"
+                :notch-depth="34"
+                :tab-width="40"
+                :radius="10"
+                :responsive="true"
+                :manual-positions="[
+                    { xPct: 25, type: 'out' },
+                    { xPct: 30, type: 'in' },
+                    { xPct: 90, type: 'out' },
+                ]"
+            />
         </div>
 
-        <main>
-            
-            <ProductSection />
-        </main>
 
-        <footer class="bg-gray-900 text-white py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid md:grid-cols-4 gap-8">
-                    <div>
-                        <h3 class="text-xl font-bold mb-4">SUPLAYBOX</h3>
-                        <p class="text-gray-400">Creative design and illustration services for your brand.</p>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Quick Links</h4>
-                        <ul class="space-y-2 text-gray-400">
-                            <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                            <li><a href="#" class="hover:text-white transition">Platform</a></li>
-                            <li><a href="#" class="hover:text-white transition">Shop</a></li>
-                            <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Services</h4>
-                        <ul class="space-y-2 text-gray-400">
-                            <li>Brand Identity</li>
-                            <li>Logo Design</li>
-                            <li>Illustration</li>
-                            <li>Packaging Design</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold mb-4">Connect</h4>
-                        <p class="text-gray-400 mb-4">Let's CONNECT on Pinterest</p>
-                        <button class="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition">Follow Us</button>
-                    </div>
+        <div class="bg-[#e6e6e6] py-12 px-16 text-black">
+            <div class="flex justify-start items-center">
+                <h1 class="text-6xl font-bold">Official Supplaybox Shop</h1>
+            </div>
+
+        </div>
+    </div>
+
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">SUPLAYBOX</h3>
+                    <p class="text-gray-400">Creative design and illustration services for your brand.</p>
                 </div>
-                <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                    <p>&copy; 2024 SUPPLAYBOX. All rights reserved.</p>
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Platform</a></li>
+                        <li><a href="#" class="hover:text-white transition">Shop</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Services</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>Brand Identity</li>
+                        <li>Logo Design</li>
+                        <li>Illustration</li>
+                        <li>Packaging Design</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <p class="text-gray-400 mb-4">Let's CONNECT on Pinterest</p>
+                    <button class="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition">Follow Us</button>
                 </div>
             </div>
-        </footer>
-    </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 SUPPLAYBOX. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
 </template>
 
 <style scoped>
-.social-icon-wrapper:hover img {
-  filter: brightness(0) saturate(100%) invert(78%) sepia(54%) saturate(1234%) hue-rotate(38deg) brightness(101%) contrast(101%);
+.social-icon-wrapper {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.hover-bright-green:hover {
-  filter: brightness(0) saturate(100%) invert(89%) sepia(23%) saturate(1397%) hue-rotate(36deg) brightness(98%) contrast(94%);
+.social-icon-wrapper:hover {
+  background-color: #b4f000;
+  border-radius: 0.5rem;
+}
+
+.social-icon-wrapper:hover img {
+  filter: brightness(0) saturate(100%);
+}
+
+/* Alternative if you want the specific green-yellow color transformation */
+.social-icon-wrapper:hover img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+}
+
+/* Keep your existing hover styles but remove the previous img filter */
+.social-icon-wrapper:hover img {
+  filter: brightness(0) saturate(100%);
+}
+
+/* If you want the exact #b4f000 background with black icons */
+.social-icon-wrapper {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.social-icon-wrapper:hover {
+  background-color: #b4f000;
+  transform: scale(1.05);
+}
+
+.social-icon-wrapper:hover img {
+  filter: brightness(0) saturate(100%);
 }
 
 [class*="col-span"] {
