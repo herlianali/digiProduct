@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import BannerCards from './Components/BannerCards.vue'
 import OurWorkSection from './Components/OurWorkSection.vue'
 import ProductSection from './Components/ProductSection.vue'
@@ -14,6 +14,7 @@ import {
     ArrowDownIcon as ArrowDownSolid,
 } from '@heroicons/vue/24/solid'
 
+
 gsap.registerPlugin(ScrollTrigger)
 
 const bannerRef = ref(null)
@@ -27,9 +28,11 @@ const sliderPrevBtn = ref(null)
 const sliderNextBtn = ref(null)
 let isSliderHovered = ref(false)
 let autoScrollInterval = null
+const activeTab = ref('artwork')
+const isAnimating = ref(false)
 
 let sliderTween = null
-let hoverAnimations = [] // Store animations for cleanup
+let hoverAnimations = []
 
 const testimonials = [
     { id: 1, name: 'Sarah Johnson', role: 'Brand Director', company: 'Luxe Studio', avatar: 'SJ', avatarColor: '#6366f1', text: 'The creativity and attention to detail is absolutely unmatched. Our brand identity has never looked better.', rating: 5 },
@@ -542,6 +545,68 @@ const scrollToSection = (sectionId) => {
         })
     }
 }
+
+
+const artworkProducts = [
+    { id: 1, title: 'Neon Jungle Pack', category: 'artwork', price: '$12', tag: 'Bestseller', color: '#fee100', img: '/public/assets/image/products/artwork-1.svg' },
+    { id: 2, title: 'Retro Wave Set', category: 'artwork', price: '$9', tag: 'New', color: '#abdec9', img: '/public/assets/image/products/artwork-2.svg' },
+    { id: 3, title: 'Urban Sketch Series', category: 'artwork', price: '$15', tag: null, color: '#f2ecea', img: '/public/assets/image/products/artwork-3.svg' },
+    { id: 4, title: 'Dark Matter Bundle', category: 'artwork', price: '$18', tag: 'Hot', color: '#e0e0e0', img: '/public/assets/image/products/artwork-4.svg' },
+    { id: 5, title: 'Floral Bloom Kit', category: 'artwork', price: '$10', tag: null, color: '#fce4ec', img: '/public/assets/image/products/artwork-5.svg' },
+    { id: 6, title: 'Geo Abstract Pack', category: 'artwork', price: '$13', tag: 'Sale', color: '#e8f5e9', img: '/public/assets/image/products/artwork-6.svg' },
+]
+
+const fontProducts = [
+    { id: 7, title: 'Groovy Display', category: 'font', price: '$8', tag: 'New', color: '#4c60d8', img: '/public/assets/image/products/font-1.svg' },
+    { id: 8, title: 'Brutalist Sans', category: 'font', price: '$14', tag: 'Bestseller', color: '#222222', img: '/public/assets/image/products/font-2.svg' },
+    { id: 9, title: 'Soft Script Pro', category: 'font', price: '$11', tag: null, color: '#f9e4ff', img: '/public/assets/image/products/font-3.svg' },
+    { id: 10, title: 'Pixel Mono', category: 'font', price: '$7', tag: 'Hot', color: '#e3f2fd', img: '/public/assets/image/products/font-4.svg' },
+]
+
+const productGridRef = ref(null)
+
+const switchTab = async (tab) => {
+  if (activeTab.value === tab || isAnimating.value) return
+  isAnimating.value = true
+
+  const cards = productGridRef.value?.querySelectorAll('.product-card')
+  if (cards?.length) {
+    await gsap.to(cards, {
+      opacity: 0,
+      y: 20,
+      scale: 0.96,
+      duration: 0.22,
+      stagger: 0.03,
+      ease: 'power2.in',
+    })
+  }
+
+  activeTab.value = tab
+
+  await new Promise(r => setTimeout(r, 30))
+
+  const newCards = productGridRef.value?.querySelectorAll('.product-card')
+  if (newCards?.length) {
+    gsap.fromTo(newCards,
+      { opacity: 0, y: 24, scale: 0.95 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.38,
+        stagger: 0.055,
+        ease: 'back.out(0.5)',
+        onComplete: () => { isAnimating.value = false }
+      }
+    )
+  } else {
+    isAnimating.value = false
+  }
+}
+
+const currentProducts = computed(() =>
+  activeTab.value === 'artwork' ? artworkProducts : fontProducts
+)
 </script>
 
 <template>
@@ -932,8 +997,8 @@ const scrollToSection = (sectionId) => {
                 </div>
             </div>
 
-            <div class="py-8 px-16 text-black">
-                <div class="flex justify-center items-start gap-8">
+            <div class="py-8 px-[64px] text-black">
+                <div class="flex justify-center items-start gap-8 px-[64px]">
                     <div class="flex flex-col flex-shrink-0">
                         <h1 class="text-6xl font-bold pb-2">Our Services</h1>
                         <p class="max-w-md">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
@@ -944,8 +1009,8 @@ const scrollToSection = (sectionId) => {
                             <div class="flex flex-col flex-1">
                                 <h1 class="text-4xl font-bold pb-2">Design Service</h1>
                                 <p class="leading-relaxed">
-                                    <span class="bg-[#b4f000] rounded-full border border-black text-black px-3 py-1 inline-block whitespace-nowrap">Brand Identity</span>
                                     <span class="inline-flex flex-wrap gap-x-1 mt-2">
+                                        <span class="bg-[#b4f000] rounded-full border border-black text-black px-3 inline-block whitespace-nowrap">Brand Identity</span>
                                         <span><b class="text-yellow-500">/</b> Logo Design</span>
                                         <span><b class="text-yellow-500">/</b> Poster Design</span>
                                         <span><b class="text-yellow-500">/</b> Packaging Design</span>
@@ -1012,11 +1077,81 @@ const scrollToSection = (sectionId) => {
         </div>
 
 
-        <div class="bg-[#e6e6e6] py-12 px-16 text-black">
-            <div class="flex justify-start items-center">
+        <div id="shop" class="bg-[#e6e6e6] py-12 px-16 text-black ">
+            <div class="flex justify-between items-center mb-8">
                 <h1 class="text-6xl font-bold">Official Supplaybox Shop</h1>
+                <div class="relative flex items-center bg-white border border-black/10 rounded-full p-1 cursor-pointer shadow-sm">
+                    <div
+                        class="absolute top-1 bottom-1 rounded-full bg-[#4dfa03] border border-black/10 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                        :style="{
+                            left: activeTab === 'artwork' ? '4px' : 'calc(50%)',
+                            width: 'calc(50% - 4px)'
+                        }"
+                    ></div>
+                    <button
+                        @click="switchTab('artwork')"
+                        class="relative z-10 text-sm font-semibold px-6 py-1.5 rounded-full transition-colors duration-200 select-none"
+                        :class="activeTab === 'artwork' ? 'text-black' : 'text-gray-500'"
+                    >
+                        Artwork
+                    </button>
+                    <button
+                        @click="switchTab('font')"
+                        class="relative z-10 text-sm font-semibold px-6 py-1.5 rounded-full transition-colors duration-200 select-none"
+                        :class="activeTab === 'font' ? 'text-black' : 'text-gray-500'"
+                    >
+                        Font
+                    </button>
+                </div>
             </div>
 
+            <div ref="productGridRef" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5" >
+                <div
+                    v-for="product in currentProducts"
+                    :key="product.id"
+                    class="product-card group bg-white rounded-2xl overflow-hidden border border-black/5 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                    <div
+                        class="w-full h-48 flex items-center justify-center relative overflow-hidden"
+                        :style="{ backgroundColor: product.color }"
+                    >
+                        <img
+                            :src="product.img"
+                            :alt="product.title"
+                            class="w-[70%] h-[70%] object-contain transition-transform duration-500 group-hover:scale-110"
+                            @error="(e) => e.target.style.display = 'none'"
+                        />
+                        <span
+                            v-if="product.tag"
+                            class="absolute top-3 left-3 bg-black text-white text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wide"
+                        >
+                            {{ product.tag }}
+                        </span>
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                            <button class="opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300 bg-[#4dfa03] border border-black text-black text-xs font-extrabold px-4 py-2 rounded-full">
+                                ADD TO CART
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-3 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-sm text-black leading-tight">{{ product.title }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5 capitalize">{{ product.category }}</p>
+                        </div>
+                        <span class="font-extrabold text-sm bg-[#fee100] px-2.5 py-1 rounded-full border border-black/10">
+                            {{ product.price }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mt-10">
+                <button class="flex items-center gap-2 border-2 border-black text-black font-bold px-8 py-3 rounded-full hover:bg-black hover:text-white transition-all duration-300 text-sm">
+                    View All
+                    <ChevronRightIcon class="w-4 h-4" />
+                </button>
+            </div>
         </div>
     </div>
 
