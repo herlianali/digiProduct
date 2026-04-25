@@ -863,10 +863,18 @@ const scrollToSection = (sectionId) => {
 
         <div class="px-10 md:px-20 pt-10 pb-14">
             <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-40">
-                <svg class="h-7 fill-white" viewBox="0 0 80 30"><path d="M7.2 23.4L0 6.6h5.2l4.5 11.8L22.8 6.6H80l-58.4 16.1c-3.1.8-5.4.9-7.2.7-2-.2-5.3-1.4-7.2 0z"/></svg>
-                <svg class="h-7 fill-white" viewBox="0 0 80 40"><path d="M40 4L20 38h10l10-18 10 18h10L40 4z"/><rect x="15" y="30" width="50" height="5" rx="1"/></svg>
-                <svg class="h-8 fill-white" viewBox="0 0 814 1000"><path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 454.9 0 306.3 0 164.8 0 67.7 54.5 16.4 107.4 16.4c55.3 0 97.1 38.3 137.5 38.3 38.9 0 88.1-41.4 155.3-41.4 24.6 0 108.8 2.6 168.9 80.8zm-172.3-117.1c-3.9-24.5-11.1-49.4-28.2-71.3-23.2-29.5-57.4-50.9-91.4-50.9-2.6 0-5.2.3-7.8.6 2.6 27.5 13 52.3 28.2 72.1 18.8 24.5 52.4 44.7 99.2 49.5z"/></svg>
-                <svg class="h-7 fill-white" viewBox="0 0 272 92"><path d="M115.8 47.2c0 15.6-12.2 27.1-27.1 27.1S61.6 62.8 61.6 47.2C61.6 31.5 73.8 20 88.7 20s27.1 11.6 27.1 27.2zm-11.9 0c0-9.7-7.1-16.4-15.2-16.4s-15.2 6.7-15.2 16.4 7.1 16.4 15.2 16.4 15.2-6.8 15.2-16.4zM168 47.2c0 15.6-12.2 27.1-27.1 27.1s-27.1-11.5-27.1-27.1c0-15.6 12.1-27.2 27.1-27.2S168 31.5 168 47.2zm-11.9 0c0-9.7-7.1-16.4-15.2-16.4s-15.2 6.7-15.2 16.4 7.1 16.4 15.2 16.4 15.2-6.8 15.2-16.4zM219 21.5v49.5c0 20.3-12 28.6-26.2 28.6-13.4 0-21.4-9-24.4-16.3l10.3-4.3c1.9 4.5 6.5 9.8 14.2 9.8 9.3 0 15-5.7 15-16.5v-4.1h-.4c-2.7 3.4-8 6.3-14.6 6.3-13.9 0-26.6-12.1-26.6-27.6C166.3 31.2 179 20 192.9 20c6.6 0 12 2.9 14.6 6.1h.4V21.5H219zm-11 25.9c0-9.5-6.3-16.4-14.4-16.4-8.2 0-15 6.9-15 16.4 0 9.4 6.8 16.3 15 16.3 8.1 0 14.4-6.9 14.4-16.3zM233 3v70h-11.6V3H233zM271.7 56.5l9.2 6.1c-3 4.4-10.1 12-22.4 12-15.3 0-26.7-11.8-26.7-27.1 0-16.1 11.5-27.2 25.4-27.2 14 0 20.8 11.3 23 17.4l1.2 3.1-36 14.9c2.8 5.4 7 8.2 13 8.2s10.2-3 13.3-7.4zm-28.3-9.7l24.1-10c-1.3-3.3-5.3-5.6-10-5.6-6 0-14.4 5.3-14.1 15.6z"/><path d="M35.3 40.5V29.3h39.9c.4 2.1.6 4.5.6 7.2 0 8.9-2.4 19.9-10.3 27.8-7.6 8-17.4 12.2-30.2 12.2C16.1 76.5 0 60.9 0 41.2S16.1 5.9 35.3 5.9c13.1 0 22.4 5.1 29.4 11.8l-8.3 8.3c-5-4.7-11.8-8.3-21.1-8.3-17.2 0-30.7 13.9-30.7 31.3s13.4 31.3 30.7 31.3c11.2 0 17.5-4.5 21.6-8.6 3.3-3.3 5.5-8.1 6.3-14.6H35.3z"/></svg>
+                <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="">
+                <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="">
+                <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="">
+                <img src="/public/assets/icons/brand-partner/04_resurock.png" alt="">
+                <img src="/public/assets/icons/brand-partner/05_ufo_logo.png" alt="">
+                <img src="/public/assets/icons/brand-partner/06_balkun_brothers.png" alt="">
+                <img src="/public/assets/icons/brand-partner/07_fuego.png" alt="">
+                <img src="/public/assets/icons/brand-partner/08_p_logo.png" alt="">
+                <img src="/public/assets/icons/brand-partner/09_pigdon_street_film_festival.png" alt="">
+                <img src="/public/assets/icons/brand-partner/10_atliens.png" alt="">
+                <img src="/public/assets/icons/brand-partner/11_showdown.png" alt="">
+                <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="">
             </div>
         </div>
         <!-- featured section -->
@@ -1011,7 +1019,7 @@ const scrollToSection = (sectionId) => {
             />
         </div>
 
-
+        <!-- product placement -->
         <div class="bg-[#e6e6e6] py-12 px-16 text-black">
             <div class="flex justify-start items-center">
                 <h1 class="text-6xl font-bold">Official Supplaybox Shop</h1>
