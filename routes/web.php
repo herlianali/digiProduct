@@ -20,6 +20,9 @@ Route::middleware('guest')->group(function () {
 Route::get('/', [LandingController::class, 'index']);
 Route::get('/gsap', [LandingController::class, 'gsap'])->name('gsap');
 Route::get('/our-work', [LandingController::class, 'ourWork'])->name('ourWork');
+Route::get('/get-in-touch', [LandingController::class, 'getInTuch'])->name('getInTuch');
+Route::get('/our-team', [LandingController::class, 'OurTeam'])->name('OurTeam');
+Route::get('/portfolio/detail', [LandingController::class, 'PortfolioDetail'])->name('PortfolioDetail');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

@@ -1,5 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import FooterSection from './ComponentsV2/FooterSection.vue'
+import LoadingScreen from './ComponentsV2/LoadingScreen.vue'
 import BannerCards from './Components/BannerCards.vue'
 import OurWorkSection from './Components/OurWorkSection.vue'
 import ProductSection from './Components/ProductSection.vue'
@@ -28,8 +30,48 @@ const sliderNextBtn = ref(null)
 let isSliderHovered = ref(false)
 let autoScrollInterval = null
 
+// ─── Product Section ───────────────────────────────────────────────
+const productSectionRef = ref(null)
+const activeFilter = ref('artwork')
+const activeProductId = ref(2)
+
+const products = [
+    { id: 1,  name: 'Autobiography',      category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-1.png' },
+    { id: 2,  name: 'Incarnation',        category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-2.png' },
+    { id: 3,  name: 'Everything is Evil', category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-3.png' },
+    { id: 4,  name: 'Drunk',              category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-4.png' },
+    { id: 5,  name: 'Minor Threat',       category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-5.png' },
+    { id: 6,  name: 'Simple',             category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-6.png' },
+    { id: 7,  name: 'Rest in Happy',      category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-7.png' },
+    { id: 8,  name: 'Enemy',              category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-8.png' },
+    { id: 9,  name: 'Grotesk Bold',       category: 'font',    image: 'http://127.0.0.1:5173/public/assets/image/shop/product-4.png' },
+    { id: 10, name: 'Display Noir',       category: 'font',    image: 'http://127.0.0.1:5173/public/assets/image/shop/product-6.png' },
+]
+
+const filteredProducts = () => products.filter(p => p.category === activeFilter.value)
+
+const setFilter = (filter) => {
+    if (activeFilter.value === filter) return
+    const cards = productSectionRef.value?.querySelectorAll('.product-card')
+    if (cards) {
+        gsap.to(cards, {
+            opacity: 0,
+            y: 12,
+            duration: 0.18,
+            stagger: 0.03,
+            ease: 'power2.in',
+            onComplete: () => {
+                activeFilter.value = filter
+            }
+        })
+    } else {
+        activeFilter.value = filter
+    }
+}
+// ───────────────────────────────────────────────────────────────────
+
 let sliderTween = null
-let hoverAnimations = [] // Store animations for cleanup
+let hoverAnimations = []
 
 const testimonials = [
     { id: 1, name: 'Sarah Johnson', role: 'Brand Director', company: 'Luxe Studio', avatar: 'SJ', avatarColor: '#6366f1', text: 'The creativity and attention to detail is absolutely unmatched. Our brand identity has never looked better.', rating: 5 },
@@ -46,19 +88,18 @@ onMounted(() => {
     initInfiniteSlider()
     initCardHoverAnimations()
     initCardEntranceAnimation()
+    initProductSectionAnimation() // ← tambahan
 })
 
 onUnmounted(() => {
     if (sliderTween) sliderTween.kill()
     ScrollTrigger.getAll().forEach(t => t.kill())
 
-    // Cleanup hover animations
     hoverAnimations.forEach(({ element, enterHandler, leaveHandler }) => {
         element.removeEventListener('mouseenter', enterHandler)
         element.removeEventListener('mouseleave', leaveHandler)
     })
 
-    // Cleanup slider navigation
     if (sliderPrevBtn.value) {
         sliderPrevBtn.value.removeEventListener('click', () => {})
     }
@@ -67,21 +108,101 @@ onUnmounted(() => {
     }
 })
 
+// ─── Product Section Animation ─────────────────────────────────────
+const initProductSectionAnimation = () => {
+    if (!productSectionRef.value) return
+
+    // Title slides up on scroll
+    gsap.from('.shop-title', {
+        scrollTrigger: {
+            trigger: productSectionRef.value,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse',
+        },
+        y: 36,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+    })
+
+    // Filter buttons fade in
+    gsap.from('.shop-filter-btn', {
+        scrollTrigger: {
+            trigger: productSectionRef.value,
+            start: 'top 82%',
+            toggleActions: 'play none none reverse',
+        },
+        y: 16,
+        opacity: 0,
+        duration: 0.45,
+        stagger: 0.08,
+        ease: 'power2.out',
+        delay: 0.15,
+    })
+
+    // Cards stagger in on scroll
+    animateProductCards()
+}
+
+const animateProductCards = () => {
+    // Small delay so v-if renders first
+    setTimeout(() => {
+        const cards = productSectionRef.value?.querySelectorAll('.product-card')
+        if (!cards || !cards.length) return
+
+        gsap.fromTo(cards,
+            { opacity: 0, y: 30, scale: 0.97 },
+            {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                duration: 0.55,
+                stagger: { each: 0.06, from: 'start', grid: 'auto' },
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: productSectionRef.value,
+                    start: 'top 78%',
+                    toggleActions: 'play none none reverse',
+                },
+            }
+        )
+
+        // CTA button entrance
+        gsap.from('.shop-cta-btn', {
+            scrollTrigger: {
+                trigger: '.shop-cta-btn',
+                start: 'top 95%',
+                toggleActions: 'play none none reverse',
+            },
+            y: 20,
+            opacity: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+        })
+    }, 50)
+}
+
+// Re-animate cards whenever filter changes
+const onFilterChange = (filter) => {
+    setFilter(filter)
+    setTimeout(() => animateProductCards(), 80)
+}
+// ───────────────────────────────────────────────────────────────────
+
 const initCardHoverAnimations = () => {
-    // Target semua card utama dalam bento grid
     const cardSelectors = [
-        '.col-span-3:not(.grid)', // Welcome card
-        '.col-span-2.row-span-2', // Design & Illustration Service
-        '.col-span-2:not(.row-span-2):not(.flex-col.gap-3)', // Teepublic
-        '.col-span-3.bg-black', // Behance
-        '.col-span-2.row-span-2 > .bg-black', // Upwork card
-        '.bg-white.rounded-2xl.p-3', // Amidst text card
-        '.col-span-3.grid .row-span-2', // Pinterest card
-        '.col-span-3.grid .bg-white.border', // TikTok card
-        '.col-span-3.grid .bg-gray-200', // Starter Pack card
-        '.bg-\\[\\#f2ecea\\]', // Fiverr card
-        '.col-span-5 .col-span-5.bg-\\[\\#fee100\\]', // Our Product card
-        '.col-span-5 .col-span-7.bg-\\[\\#abdec9\\]' // Our Team card
+        '.col-span-3:not(.grid)',
+        '.col-span-2.row-span-2',
+        '.col-span-2:not(.row-span-2):not(.flex-col.gap-3)',
+        '.col-span-3.bg-black',
+        '.col-span-2.row-span-2 > .bg-black',
+        '.bg-white.rounded-2xl.p-3',
+        '.col-span-3.grid .row-span-2',
+        '.col-span-3.grid .bg-white.border',
+        '.col-span-3.grid .bg-gray-200',
+        '.bg-\\[\\#f2ecea\\]',
+        '.col-span-5 .col-span-5.bg-\\[\\#fee100\\]',
+        '.col-span-5 .col-span-7.bg-\\[\\#abdec9\\]'
     ]
 
     const allCards = bentoGridRef.value?.querySelectorAll(cardSelectors.join(','))
@@ -89,18 +210,14 @@ const initCardHoverAnimations = () => {
     if (!allCards) return
 
     allCards.forEach(card => {
-        // Skip if already has hover animation
         if (card._hasHoverAnimation) return
 
-        // Set initial styles
         gsap.set(card, {
             transformOrigin: 'center center',
             zIndex: 1
         })
 
-        // Create hover animations
         const onMouseEnter = () => {
-            // Main card animation
             const tl = gsap.timeline()
             tl.to(card, {
                 scale: 1.03,
@@ -111,7 +228,6 @@ const initCardHoverAnimations = () => {
                 overwrite: true
             }, 0)
 
-            // Animate images inside card
             const images = card.querySelectorAll('img')
             if (images.length) {
                 tl.to(images, {
@@ -123,7 +239,6 @@ const initCardHoverAnimations = () => {
                 }, 0)
             }
 
-            // Animate text elements
             const texts = card.querySelectorAll('p, h1, h2, h3, h4, span, button')
             if (texts.length) {
                 tl.to(texts, {
@@ -135,7 +250,6 @@ const initCardHoverAnimations = () => {
                 }, 0)
             }
 
-            // Special animation for specific cards
             if (card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]')) {
                 tl.to(card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]'), {
                     y: -4,
@@ -144,7 +258,6 @@ const initCardHoverAnimations = () => {
                 }, 0)
             }
 
-            // Add border highlight effect
             gsap.to(card, {
                 borderColor: 'rgba(0,0,0,0.2)',
                 duration: 0.2,
@@ -201,7 +314,6 @@ const initCardHoverAnimations = () => {
         card.addEventListener('mouseenter', onMouseEnter)
         card.addEventListener('mouseleave', onMouseLeave)
 
-        // Store for cleanup
         hoverAnimations.push({
             element: card,
             enterHandler: onMouseEnter,
@@ -216,28 +328,19 @@ const initCardEntranceAnimation = () => {
     const cards = bentoGridRef.value?.querySelectorAll('[class*="col-span"]')
     if (!cards) return
 
-    // Filter out container elements
     const validCards = Array.from(cards).filter(card =>
         !card.classList.contains('grid') ||
         card.querySelectorAll('[class*="col-span"]').length <= 1
     )
 
     gsap.fromTo(validCards,
-        {
-            opacity: 0,
-            y: 40,
-            scale: 0.95
-        },
+        { opacity: 0, y: 40, scale: 0.95 },
         {
             opacity: 1,
             y: 0,
             scale: 1,
             duration: 0.7,
-            stagger: {
-                each: 0.04,
-                from: 'start',
-                grid: 'auto'
-            },
+            stagger: { each: 0.04, from: 'start', grid: 'auto' },
             ease: 'back.out(0.3)',
             scrollTrigger: {
                 trigger: bentoGridRef.value,
@@ -272,13 +375,10 @@ const initInfiniteSlider = () => {
         },
     })
 
-    // Store current position for manual control
-    let currentX = 0
     let isDragging = false
     let startX = 0
     let dragOffset = 0
 
-    // Mouse enter - pause auto scroll and show navigation buttons
     const container = sliderContainerRef.value
     container.addEventListener('mouseenter', () => {
         sliderTween.pause()
@@ -292,11 +392,10 @@ const initInfiniteSlider = () => {
         hideNavigationButtons()
     })
 
-    // Manual navigation functions
     const slidePrev = () => {
         if (!sliderTween) return
         const currentX = parseFloat(gsap.getProperty(track, 'x'))
-        const slideWidth = track.children[0]?.offsetWidth + 20 // width + gap
+        const slideWidth = track.children[0]?.offsetWidth + 20
         const newX = currentX + slideWidth
         gsap.to(track, {
             x: newX,
@@ -333,7 +432,6 @@ const initInfiniteSlider = () => {
         })
     }
 
-    // Attach navigation functions to buttons
     if (sliderPrevBtn.value) {
         sliderPrevBtn.value.addEventListener('click', (e) => {
             e.stopPropagation()
@@ -348,7 +446,6 @@ const initInfiniteSlider = () => {
         })
     }
 
-    // Optional: Add drag to slide functionality
     const onMouseDown = (e) => {
         isDragging = true
         startX = e.clientX
@@ -368,22 +465,14 @@ const initInfiniteSlider = () => {
         if (!isDragging) return
         isDragging = false
         gsap.set(track, { cursor: 'grab' })
-
-        // Snap to nearest slide
         const currentX = parseFloat(gsap.getProperty(track, 'x'))
         const slideWidth = track.children[0]?.offsetWidth + 20
         const totalWidth = track.scrollWidth / 2
         let normalizedX = currentX % totalWidth
         if (normalizedX > 0) normalizedX = -totalWidth + normalizedX
-
         const slideIndex = Math.round(-normalizedX / slideWidth)
         const targetX = -slideIndex * slideWidth
-
-        gsap.to(track, {
-            x: targetX,
-            duration: 0.4,
-            ease: 'power2.out'
-        })
+        gsap.to(track, { x: targetX, duration: 0.4, ease: 'power2.out' })
     }
 
     track.addEventListener('mousedown', onMouseDown)
@@ -395,22 +484,8 @@ const initInfiniteSlider = () => {
 const showNavigationButtons = () => {
     if (sliderPrevBtn.value && sliderNextBtn.value) {
         gsap.killTweensOf([sliderPrevBtn.value, sliderNextBtn.value])
-        gsap.to(sliderPrevBtn.value, {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.4,
-            ease: 'back.out(0.5)',
-            display: 'flex'
-        })
-        gsap.to(sliderNextBtn.value, {
-            opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: 0.4,
-            ease: 'back.out(0.5)',
-            display: 'flex'
-        })
+        gsap.to(sliderPrevBtn.value, { opacity: 1, x: 0, scale: 1, duration: 0.4, ease: 'back.out(0.5)', display: 'flex' })
+        gsap.to(sliderNextBtn.value, { opacity: 1, x: 0, scale: 1, duration: 0.4, ease: 'back.out(0.5)', display: 'flex' })
     }
 }
 
@@ -418,58 +493,15 @@ const hideNavigationButtons = () => {
     if (sliderPrevBtn.value && sliderNextBtn.value) {
         gsap.killTweensOf([sliderPrevBtn.value, sliderNextBtn.value])
         gsap.to(sliderPrevBtn.value, {
-            opacity: 0,
-            x: -20,
-            scale: 0.8,
-            duration: 0.3,
-            ease: 'power2.in',
-            onComplete: () => {
-                if (!isSliderHovered.value) {
-                    gsap.set(sliderPrevBtn.value, { display: 'none' })
-                }
-            }
+            opacity: 0, x: -20, scale: 0.8, duration: 0.3, ease: 'power2.in',
+            onComplete: () => { if (!isSliderHovered.value) gsap.set(sliderPrevBtn.value, { display: 'none' }) }
         })
         gsap.to(sliderNextBtn.value, {
-            opacity: 0,
-            x: 20,
-            scale: 0.8,
-            duration: 0.3,
-            ease: 'power2.in',
-            onComplete: () => {
-                if (!isSliderHovered.value) {
-                    gsap.set(sliderNextBtn.value, { display: 'none' })
-                }
-            }
+            opacity: 0, x: 20, scale: 0.8, duration: 0.3, ease: 'power2.in',
+            onComplete: () => { if (!isSliderHovered.value) gsap.set(sliderNextBtn.value, { display: 'none' }) }
         })
     }
 }
-
-
-// const initInfiniteSlider = () => {
-//     const track = sliderTrackRef.value
-//     if (!track) return
-
-//     Array.from(track.children).forEach(card => {
-//         const clone = card.cloneNode(true)
-//         clone.setAttribute('aria-hidden', 'true')
-//         track.appendChild(clone)
-//     })
-
-//     const totalWidth = track.scrollWidth / 2
-
-//     sliderTween = gsap.to(track, {
-//         x: `-=${totalWidth}`,
-//         duration: 30,
-//         ease: 'none',
-//         repeat: -1,
-//         modifiers: {
-//             x: gsap.utils.unitize(x => parseFloat(x) % totalWidth),
-//         },
-//     })
-
-//     track.addEventListener('mouseenter', () => sliderTween.pause())
-//     track.addEventListener('mouseleave', () => sliderTween.resume())
-// }
 
 const initNavbarAnimation = () => {
     gsap.set(navbarContainerRef.value, {
@@ -496,24 +528,12 @@ const initNavbarAnimation = () => {
         onEnter: () => {
             if (isNavbarVisible.value) return
             isNavbarVisible.value = true
-            gsap.to(navbarContainerRef.value, {
-                opacity: 1,
-                y: 0,
-                pointerEvents: 'auto',
-                duration: 0.45,
-                ease: 'power3.out',
-            })
+            gsap.to(navbarContainerRef.value, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.45, ease: 'power3.out' })
         },
         onLeaveBack: () => {
             if (!isNavbarVisible.value) return
             isNavbarVisible.value = false
-            gsap.to(navbarContainerRef.value, {
-                opacity: 0,
-                y: -16,
-                pointerEvents: 'none',
-                duration: 0.3,
-                ease: 'power2.in',
-            })
+            gsap.to(navbarContainerRef.value, { opacity: 0, y: -16, pointerEvents: 'none', duration: 0.3, ease: 'power2.in' })
         },
     })
 }
@@ -545,6 +565,7 @@ const scrollToSection = (sectionId) => {
 </script>
 
 <template>
+    <LoadingScreen />
     <div ref="navbarContainerRef" class="z-[1000]">
         <nav ref="navbarRef">
             <div class="flex items-center gap-1 py-2.5">
@@ -820,12 +841,7 @@ const scrollToSection = (sectionId) => {
         </div>
 
         <!-- Slider with Navigation -->
-        <div
-            ref="sliderContainerRef"
-            class="relative w-full overflow-hidden py-4 group"
-
-        >
-            <!-- Previous Button -->
+        <div ref="sliderContainerRef" class="relative w-full overflow-hidden py-4 group">
             <button
                 ref="sliderPrevBtn"
                 class="absolute left-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-white rounded-full p-3 shadow-lg hover:bg-green-700 transition-all duration-300 opacity-0 -translate-x-5 scale-90 hidden"
@@ -834,7 +850,6 @@ const scrollToSection = (sectionId) => {
                 <ChevronLeftIcon class="w-6 h-6" />
             </button>
 
-            <!-- Next Button -->
             <button
                 ref="sliderNextBtn"
                 class="absolute right-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-white rounded-full p-3 shadow-lg hover:bg-green transition-all duration-300 opacity-0 translate-x-5 scale-90 hidden"
@@ -843,7 +858,6 @@ const scrollToSection = (sectionId) => {
                 <ChevronRightIcon class="w-6 h-6" />
             </button>
 
-            <!-- Slider Track -->
             <div ref="sliderTrackRef" class="flex gap-5 w-max will-change-transform px-6 py-2 cursor-grab active:cursor-grabbing">
                 <div v-for="item in testimonials" :key="item.id" class="flex-shrink-0 w-[500px] bg-white border border-white/10 rounded-2xl p-6 flex flex-col gap-1 cursor-default transition-all duration-300 hover:border-white/30 hover:-translate-y-1 backdrop-blur-sm">
                     <div class="flex items-center gap-3 mb-3">
@@ -877,6 +891,7 @@ const scrollToSection = (sectionId) => {
                 <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="">
             </div>
         </div>
+
         <!-- featured section -->
         <div class="bg-white">
             <div class="bg-black text-white py-12 rounded-3xl rounded-tr-3xl text-center">
@@ -887,53 +902,24 @@ const scrollToSection = (sectionId) => {
 
                 <OurWorkSection />
 
-                <!-- section footer - POSISI KANAN -->
                 <div class="flex justify-end items-center mt-8 opacity-70 px-10">
                     <div class="flex items-center gap-6">
-                        <!-- More Portfolio Link -->
                         <div class="flex items-center gap-2 group cursor-pointer">
-                            <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">
-                                More Portfolio
-                            </span>
-                            <img
-                                src="/public/assets/image/panah-porto.svg"
-                                alt=""
-                                class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]"
-                            >
+                            <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">More Portfolio</span>
+                            <img src="/public/assets/image/panah-porto.svg" alt="" class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]">
                         </div>
-
-                        <!-- Social Icons -->
                         <div class="bg-[#333333] rounded-lg px-4 flex items-center gap-4">
                             <div class="social-icon-wrapper group" @click="openLink('https://pin.it/yegYhYpFy')">
-                                <img
-                                    src="/public/assets/image/pinterest-icon-porto.svg"
-                                    alt="Pinterest"
-                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg] group-hover:brightness-[100%]"
-                                >
+                                <img src="/public/assets/image/pinterest-icon-porto.svg" alt="Pinterest" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
                             </div>
-
                             <div class="social-icon-wrapper group" @click="openLink('https://www.behance.net/supplay_box')">
-                                <img
-                                    src="/public/assets/image/behance-icon-porto.svg"
-                                    alt="Behance"
-                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
-                                >
+                                <img src="/public/assets/image/behance-icon-porto.svg" alt="Behance" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
                             </div>
-
                             <div class="social-icon-wrapper group" @click="openLink('https://www.fiverr.com/user/supplaybox/portfolio')">
-                                <img
-                                    src="/public/assets/image/fiverr-icon-porto.svg"
-                                    alt="Fiverr"
-                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
-                                >
+                                <img src="/public/assets/image/fiverr-icon-porto.svg" alt="Fiverr" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
                             </div>
-
                             <div class="social-icon-wrapper group" @click="openLink('https://www.upwork.com/freelancers/~018928f9b657bc5557?p=2002178990555295744')">
-                                <img
-                                    src="/public/assets/image/upwork-icon-porto.svg"
-                                    alt="Upwork"
-                                    class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]"
-                                >
+                                <img src="/public/assets/image/upwork-icon-porto.svg" alt="Upwork" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
                             </div>
                         </div>
                     </div>
@@ -946,7 +932,6 @@ const scrollToSection = (sectionId) => {
                         <h1 class="text-6xl font-bold pb-2">Our Services</h1>
                         <p class="max-w-md">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
                     </div>
-
                     <div class="flex flex-col w-full">
                         <div class="flex justify-center gap-8">
                             <div class="flex flex-col flex-1">
@@ -978,19 +963,13 @@ const scrollToSection = (sectionId) => {
                                 </p>
                             </div>
                         </div>
-
                         <div class="flex justify-center items-center mt-6">
                             <div class="flex items-center gap-0">
                                 <div class="bg-[#e6e6e6] rounded-r-full py-2 pl-4 pr-2">
-                                    <span class="text-lg">
-                                        Claim coupon <b class="text-black">10% off</b> for your first order
-                                    </span>
-                                    <button class="bg-black text-white px-6 py-1 rounded-full uppercase text-lg font-medium whitespace-nowrap ml-1">
-                                        claim!
-                                    </button>
+                                    <span class="text-lg">Claim coupon <b class="text-black">10% off</b> for your first order</span>
+                                    <button class="bg-black text-white px-6 py-1 rounded-full uppercase text-lg font-medium whitespace-nowrap ml-1">claim!</button>
                                 </div>
                             </div>
-
                             <div class="bg-[#ff6600] p-2 rounded-full ml-4">
                                 <img src="/public/assets/image/banner/arrow-white-bottom.svg" alt="" class="rotate-90 -scale-100 w-5 h-5">
                             </div>
@@ -1019,87 +998,90 @@ const scrollToSection = (sectionId) => {
             />
         </div>
 
-        <!-- product placement -->
-        <div class="bg-[#e6e6e6] py-12 px-16 text-black">
-            <div class="flex justify-start items-center">
-                <h1 class="text-6xl font-bold">Official Supplaybox Shop</h1>
+        <!-- ============================================================ -->
+        <!-- product placement                                            -->
+        <!-- ============================================================ -->
+        <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-14 px-16 text-black">
+
+            <!-- Header row: title + filter tabs -->
+            <div class="flex justify-between items-end mb-10">
+                <h1 class="shop-title text-6xl font-bold leading-tight">
+                    Official<br />Supplaybox Shop
+                </h1>
+
+                <!-- Filter tabs: wrapped in a single pill container -->
+                <div class="shop-filter-wrap">
+                    <button
+                        class="shop-filter-btn"
+                        :class="activeFilter === 'artwork' ? 'shop-filter-active' : 'shop-filter-inactive'"
+                        @click="onFilterChange('artwork')"
+                    >
+                        <span class="filter-dot" :class="activeFilter === 'artwork' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
+                        Artwork
+                    </button>
+                    <button
+                        class="shop-filter-btn"
+                        :class="activeFilter === 'font' ? 'shop-filter-active' : 'shop-filter-inactive'"
+                        @click="onFilterChange('font')"
+                    >
+                        <span class="filter-dot" :class="activeFilter === 'font' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
+                        Font
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product grid -->
+            <div class="grid grid-cols-4 mb-10">
+                <div
+                    v-for="product in filteredProducts()"
+                    :key="product.id"
+                    class="product-card group bg-white overflow-hidden cursor-pointer border border-black/10 transition-all duration-300 ease-out"
+                    :style="{ outlineColor: activeProductId === product.id ? '#b4f000' : 'transparent' }"
+                    @click="activeProductId = product.id"
+                >
+                    <!-- Artwork image wrapper - rounded top corners -->
+                    <div class="overflow-hidden aspect-[3/4] w-full bg-[#d0d0d0] rounded-t-2xl">
+                        <img
+                            :src="product.image"
+                            :alt="product.name"
+                            class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05] rounded-t-2xl"
+                        />
+                    </div>
+
+                    <!-- Card footer - rounded bottom corners -->
+                    <div class="px-4 py-3 border-t border-black/10 flex items-center justify-center bg-[#d0d0d0]">
+                        <span class="text-lg font-semibold text-black">{{ product.name }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA button -->
+            <div class="flex justify-center">
+                <button class="shop-cta-btn group relative overflow-hidden bg-black text-white font-bold text-sm tracking-widest uppercase px-12 py-4 rounded-full transition-all duration-300 hover:tracking-[0.18em]">
+                    <!-- Green fill slides in from left on hover -->
+                    <span class="absolute inset-0 bg-[#b4f000] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-350 ease-out rounded-full"></span>
+                    <span class="relative z-10 group-hover:text-black transition-colors duration-200">View All Product</span>
+                </button>
             </div>
 
         </div>
+        <!-- ============================================================ -->
+
     </div>
 
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">SUPLAYBOX</h3>
-                    <p class="text-gray-400">Creative design and illustration services for your brand.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
-                        <li><a href="#" class="hover:text-white transition">Platform</a></li>
-                        <li><a href="#" class="hover:text-white transition">Shop</a></li>
-                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Services</h4>
-                    <ul class="space-y-2 text-gray-400">
-                        <li>Brand Identity</li>
-                        <li>Logo Design</li>
-                        <li>Illustration</li>
-                        <li>Packaging Design</li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Connect</h4>
-                    <p class="text-gray-400 mb-4">Let's CONNECT on Pinterest</p>
-                    <button class="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-200 transition">Follow Us</button>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 SUPPLAYBOX. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <FooterSection />
 
 </template>
 
 <style scoped>
 .social-icon-wrapper {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.social-icon-wrapper:hover {
-  background-color: #b4f000;
-  border-radius: 0.5rem;
-}
-
-.social-icon-wrapper:hover img {
-  filter: brightness(0) saturate(100%);
-}
-
-/* Alternative if you want the specific green-yellow color transformation */
-.social-icon-wrapper:hover img {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
-}
-
-/* Keep your existing hover styles but remove the previous img filter */
-.social-icon-wrapper:hover img {
-  filter: brightness(0) saturate(100%);
-}
-
-/* If you want the exact #b4f000 background with black icons */
-.social-icon-wrapper {
   padding: 0.5rem;
   border-radius: 0.375rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .social-icon-wrapper:hover {
@@ -1133,49 +1115,113 @@ p, h1, h2, h3, h4, span, button {
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
-.bg-black.rounded-2xl,
-.bg-\\[\\#fce109\\],
-.bg-\\[\\#4c60d8\\],
-.bg-\\[\\#E60023\\],
-.bg-\\[\\#f2ecea\\] {
-    transition: all 0.2s ease;
-}
-
 .overflow-hidden {
     -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 
 button:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
 }
 
-.cursor-grab {
-    cursor: grab;
+/* Filter pill container */
+.shop-filter-wrap {
+    display: inline-flex;
+    align-items: center;
+    background: #d4d4d4;
+    border-radius: 100px;
+    padding: 3px;
+    gap: 0;
 }
 
-.cursor-grabbing {
-    cursor: grabbing;
+.shop-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 16px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background 0.22s ease, color 0.22s ease;
+    letter-spacing: 0.01em;
+    line-height: 1;
 }
 
-.slider-nav-btn {
-    transition: all 0.3s ease;
+/* Active: green-yellow background, black text */
+.shop-filter-active {
+    background: #b4f000;
+    color: #111;
 }
 
-.slider-nav-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+/* Inactive: transparent, muted text */
+.shop-filter-inactive {
+    background: transparent;
+    color: #666;
 }
 
-@keyframes pulse-ring {
-    0% {
-        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.5);
-    }
-    100% {
-        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
-    }
+.shop-filter-inactive:hover {
+    color: #111;
 }
 
-.group:hover .slider-nav-btn {
-    animation: pulse-ring 0.6s ease-out;
+/* Dot — filled black circle when active */
+.filter-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.22s ease, border-color 0.22s ease;
 }
+
+.filter-dot-active {
+    background: #111;
+    border: none;
+}
+
+/* Hollow circle when inactive */
+.filter-dot-inactive {
+    background: transparent;
+    border: 1.5px solid #999;
+}
+
+/* Product card hover — background changes to #b4f000, no outline, image original */
+.product-card {
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+                background-color 0.3s ease-out;
+    will-change: transform, box-shadow;
+    border-radius: 1rem;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.18);
+    background-color: #b4f000 !important;
+    z-index: 10;
+}
+
+/* Override child background on hover */
+.product-card:hover .bg-[#d0d0d0] {
+    background-color: #b4f000 !important;
+}
+
+/* Keep image original colors - no filter or blend mode */
+.product-card:hover img {
+    filter: none;
+}
+
+/* Image container styling */
+.product-card .overflow-hidden {
+    border-radius: 1rem 1rem 0 0;
+}
+
+
+/* CTA button fill animation */
+.shop-cta-btn .absolute {
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cursor-grab  { cursor: grab; }
+.cursor-grabbing { cursor: grabbing; }
 </style>
