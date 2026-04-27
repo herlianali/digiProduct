@@ -36,17 +36,25 @@ const activeFilter = ref('artwork')
 const activeProductId = ref(2)
 
 const products = [
-    { id: 1,  name: 'Autobiography',      category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-1.png' },
-    { id: 2,  name: 'Incarnation',        category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-2.png' },
-    { id: 3,  name: 'Everything is Evil', category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-3.png' },
-    { id: 4,  name: 'Drunk',              category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-4.png' },
-    { id: 5,  name: 'Minor Threat',       category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-5.png' },
-    { id: 6,  name: 'Simple',             category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-6.png' },
-    { id: 7,  name: 'Rest in Happy',      category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-7.png' },
-    { id: 8,  name: 'Enemy',              category: 'artwork', image: 'http://127.0.0.1:5173/public/assets/image/shop/product-8.png' },
-    { id: 9,  name: 'Grotesk Bold',       category: 'font',    image: 'http://127.0.0.1:5173/public/assets/image/shop/product-4.png' },
-    { id: 10, name: 'Display Noir',       category: 'font',    image: 'http://127.0.0.1:5173/public/assets/image/shop/product-6.png' },
+    { id: 1,  name: 'Autobiography',      category: 'artwork', image: '/assets/image/shop/product-1.png' },
+    { id: 2,  name: 'Incarnation',        category: 'artwork', image: '/assets/image/shop/product-2.png' },
+    { id: 3,  name: 'Everything is Evil', category: 'artwork', image: '/assets/image/shop/product-3.png' },
+    { id: 4,  name: 'Drunk',              category: 'artwork', image: '/assets/image/shop/product-4.png' },
+    { id: 5,  name: 'Minor Threat',       category: 'artwork', image: '/assets/image/shop/product-5.png' },
+    { id: 6,  name: 'Simple',             category: 'artwork', image: '/assets/image/shop/product-6.png' },
+    { id: 7,  name: 'Rest in Happy',      category: 'artwork', image: '/assets/image/shop/product-7.png' },
+    { id: 8,  name: 'Enemy',              category: 'artwork', image: '/assets/image/shop/product-8.png' },
+    { id: 9,  name: 'Grotesk Bold',       category: 'font',    image: '/assets/image/shop/product-4.png' },
+    { id: 10, name: 'Display Noir',       category: 'font',    image: '/assets/image/shop/product-6.png' },
 ]
+
+const redirectToProduct = (id) => {
+    window.location.href = `/product-place/detail/${id}`
+}
+
+const redirectToAboutUs = () => {
+    window.location.href = `/our-team`
+}
 
 const filteredProducts = () => products.filter(p => p.category === activeFilter.value)
 
@@ -1037,10 +1045,10 @@ const scrollToSection = (sectionId) => {
                     :key="product.id"
                     class="product-card group bg-white overflow-hidden cursor-pointer border border-black/10 transition-all duration-300 ease-out"
                     :style="{ outlineColor: activeProductId === product.id ? '#b4f000' : 'transparent' }"
-                    @click="activeProductId = product.id"
+                    @click="redirectToProduct(product.id)"
                 >
                     <!-- Artwork image wrapper - rounded top corners -->
-                    <div class="overflow-hidden aspect-[3/4] w-full bg-[#d0d0d0] rounded-t-2xl">
+                    <div class="overflow-hidden aspect-[3/4] w-full bg-[#d0d0d0] rounded-t-2xl" >
                         <img
                             :src="product.image"
                             :alt="product.name"

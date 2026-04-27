@@ -9,7 +9,7 @@ class LandingController extends Controller
 {
     public function index()
     {
-        return Inertia::render('Landing/Index');
+        return Inertia::render('Landing/Gsap/Index');
     }
 
     public function gsap()
@@ -17,12 +17,12 @@ class LandingController extends Controller
         return Inertia::render('Landing/Gsap/Index');
     }
 
-    public function ourWork()
+    public function ProductDetail($id)
     {
-        return Inertia::render('Landing/Gsap/OurWork/Index');
+        return Inertia::render('Landing/Gsap/Product/Detail');
     }
 
-    public function getInTuch()
+    public function GetInTuch()
     {
         return Inertia::render('Landing/Gsap/GetInTuch/Index');
     }
@@ -32,7 +32,7 @@ class LandingController extends Controller
         return Inertia::render('Landing/Gsap/OurTeam/Index');
     }
 
-    public function PortfolioDetail()
+    public function PortfolioDetail($id)
     {
         return Inertia::render('Landing/Gsap/Portfolio/Detail');
     }

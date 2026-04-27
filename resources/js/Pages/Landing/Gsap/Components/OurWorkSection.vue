@@ -75,6 +75,11 @@ const stopAutoPlay = () => {
   }
 }
 
+const readmoreLink = (id) => {
+    return window.location.origin + `/portfolio/detail/${id}`
+    // return `/works/${id}`
+}
+
 const startAutoPlay = () => {
   stopAutoPlay() // ✅ Selalu clear dulu — cegah interval menumpuk
   autoPlayInterval = setInterval(() => {
@@ -359,7 +364,7 @@ const handleCardClick = (index) => {
 
                   <div class="flex justify-end">
                     <a
-                      href="#"
+                      :href="readmoreLink(work.id)"
                       class="bg-black rounded-full hover:bg-[#0cb7ff] px-4 py-2 flex items-center gap-1 text-md font-semibold text-white mt-3 transition-colors"
                       @click.stop
                     >

@@ -73,6 +73,17 @@ const handleClickOutside = (e) => {
     }
 }
 
+const redirectLink = (section) => {
+    switch (section) {
+        case 'aboutUs':
+            return window.location.origin + '/our-team'
+        case 'contact':
+            return window.location.origin + '/get-in-touch'
+        default:
+            return '#'
+    }
+}
+
 onMounted(() => {
     if (!props.staticMode) initNavbarAnimation()
     document.addEventListener('mousedown', handleClickOutside)
@@ -160,7 +171,7 @@ const scrollToSection = (sectionId) => {
                 <!-- Nav Links -->
                 <div class="hidden md:flex gap-1 items-center">
                     <a
-                        href="#"
+                        :href="redirectLink('aboutUs')"
                         class="text-black font-medium hover:text-emerald-500 transition-colors duration-200 no-underline text-sm px-3 py-1.5 rounded-full hover:bg-black/5"
                         @click.prevent="scrollToSection('about-us')"
                     >About Us</a>
@@ -278,7 +289,7 @@ const scrollToSection = (sectionId) => {
                     >Shop</a>
 
                     <a
-                        href="#"
+                        :href="redirectLink('contact')"
                         class="text-black font-medium hover:text-emerald-500 transition-colors duration-200 no-underline text-sm px-3 py-1.5 rounded-full hover:bg-black/5"
                         @click.prevent="scrollToSection('contact')"
                     >Contact</a>
