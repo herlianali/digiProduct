@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TestimonialsController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ProductPlacementController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
@@ -19,6 +20,7 @@ Route::middleware('guest')->group(function () {
 
 Route::get('/', [LandingController::class, 'index']);
 Route::get('/gsap', [LandingController::class, 'gsap'])->name('gsap');
+ROute::get('/product-place', [ProductPlacementController::class, 'index'])->name('ProductPlace.index');
 Route::get('/product-place/detail/{id}', [LandingController::class, 'ProductDetail'])->name('ProductDetail');
 Route::get('/get-in-touch', [LandingController::class, 'GetInTuch'])->name('GetInTuch');
 Route::get('/our-team', [LandingController::class, 'OurTeam'])->name('OurTeam');
