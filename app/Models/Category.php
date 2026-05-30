@@ -2,10 +2,26 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $table = 'categories';
-    protected $guarded = [];
+    use HasFactory;
+
+    protected $fillable = ['name', 'slug', 'is_tag_group'];
+
+    protected $casts = [
+        'is_tag_group' => 'boolean',
+    ];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
+    }
 }

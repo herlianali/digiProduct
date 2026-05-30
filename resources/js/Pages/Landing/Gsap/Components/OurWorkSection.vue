@@ -15,7 +15,7 @@ const works = ref([
     location: 'OKEECHOBEE',
     background: 'bg-[#b41f19]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
-    image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=800&fit=crop'
+    image: '/assets/image/portfolio/porto-1.png'
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ const works = ref([
     category: 'POSTER',
     background: 'bg-[#e5f001]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
-    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&h=800&fit=crop'
+    image: '/assets/image/portfolio/porto-2.jpg'
   },
   {
     id: 3,
@@ -34,7 +34,7 @@ const works = ref([
     category: 'POSTER',
     background: 'bg-[#8b27b7]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
-    image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&h=800&fit=crop'
+    image: '/assets/image/portfolio/porto-3.jpg'
   },
   {
     id: 4,
@@ -43,7 +43,7 @@ const works = ref([
     category: 'FEATURED',
     background: 'bg-[#3d54a4]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
-    image: 'https://images.unsplash.com/photo-1589119908995-c6837fa1483f?w=600&h=800&fit=crop'
+    image: '/assets/image/portfolio/porto-4.jpg'
   },
   {
     id: 5,
@@ -52,7 +52,7 @@ const works = ref([
     category: 'POSTER',
     background: 'bg-[#b4f000]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
-    image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?w=600&h=800&fit=crop'
+    image: '/assets/image/portfolio/porto-5.jpg'
   }
 ])
 
@@ -140,19 +140,25 @@ onUnmounted(() => {
 })
 
 const updateCardsPosition = () => {
+  const total = works.value.length
+
   cardsRef.value.forEach((card, index) => {
     if (!card) return
 
-    const offset = index - currentIndex.value
+    // ✅ Circular offset: cari jalan terpendek mengelilingi array
+    let offset = index - currentIndex.value
+    if (offset > total / 2)  offset -= total
+    if (offset < -total / 2) offset += total
+
     const absOffset = Math.abs(offset)
     const isCenter = offset === 0
 
     const compressionFactor = absOffset === 0 ? 0 : Math.pow(absOffset, 0.75)
     const xPosition = Math.sign(offset) * compressionFactor * (CARD_W + CARD_GAP)
-    const scale = isCenter ? 1.15 : Math.max(0.72, 1 - absOffset * 0.14)
-    const opacity = isCenter ? 1 : Math.max(0.45, 1 - absOffset * 0.22)
-    const zIndex = isCenter ? 30 : 20 - absOffset
-    const brightness = isCenter ? 1 : 0.58
+    const scale      = isCenter ? 1.15 : Math.max(0.72, 1 - absOffset * 0.14)
+    const opacity    = isCenter ? 1    : Math.max(0.45, 1 - absOffset * 0.22)
+    const zIndex     = isCenter ? 30   : 20 - absOffset
+    const brightness = isCenter ? 1    : 0.58
 
     gsap.to(card, {
       x: xPosition, scale, opacity, zIndex,
@@ -178,21 +184,25 @@ const updateCardsPosition = () => {
     }
   })
 }
-
 const snapCardsPosition = () => {
+  const total = works.value.length
+
   cardsRef.value.forEach((card, index) => {
     if (!card) return
-    const offset = index - currentIndex.value
+
+    // ✅ Circular offset
+    let offset = index - currentIndex.value
+    if (offset > total / 2)  offset -= total
+    if (offset < -total / 2) offset += total
+
     const absOffset = Math.abs(offset)
-    const compressionFactor = absOffset === 0 ? 0 : Math.pow(absOffset, 0.75)
-    const xPosition = Math.sign(offset) * compressionFactor * (CARD_W + CARD_GAP)
 
     gsap.set(card, {
-      x: xPosition,
-      scale: offset === 0 ? 1.15 : Math.max(0.72, 1 - absOffset * 0.14),
-      opacity: offset === 0 ? 1 : Math.max(0.45, 1 - absOffset * 0.22),
-      zIndex: offset === 0 ? 30 : 20 - absOffset,
-      filter: `brightness(${offset === 0 ? 1 : 0.58})`,
+      x: Math.sign(offset) * (absOffset === 0 ? 0 : Math.pow(absOffset, 0.75)) * (CARD_W + CARD_GAP),
+      scale:      offset === 0 ? 1.15 : Math.max(0.72, 1 - absOffset * 0.14),
+      opacity:    offset === 0 ? 1    : Math.max(0.45, 1 - absOffset * 0.22),
+      zIndex:     offset === 0 ? 30   : 20 - absOffset,
+      filter:     `brightness(${offset === 0 ? 1 : 0.58})`,
     })
   })
 }
@@ -319,7 +329,7 @@ const handleCardClick = (index) => {
 </script>
 
 <template>
-  <section ref="sectionRef" class="py-20 md:py-32 bg-black overflow-hidden">
+  <section ref="sectionRef" class="py-10 bg-black overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
       <!-- Slider Wrapper — grup untuk trigger hover -->
@@ -381,11 +391,9 @@ const handleCardClick = (index) => {
           class="nav-arrow-left nav-btn absolute top-1/2 -translate-y-1/2 z-40
                  bg-white backdrop-blur-sm rounded-full p-3
                  hover:bg-white/30 hover:scale-110
-                 border border-white/25 transition-all duration-200
-                 disabled:opacity-25 disabled:cursor-not-allowed"
+                 border border-white/25 transition-all duration-200"
           style="left: calc(10% - 400px)"
           @click="slideLeft"
-          :disabled="currentIndex === 0"
         >
           <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
@@ -396,11 +404,9 @@ const handleCardClick = (index) => {
           class="nav-arrow-right nav-btn absolute top-1/2 -translate-y-1/2 z-40
                  bg-white backdrop-blur-sm rounded-full p-3
                  hover:bg-white/30 hover:scale-110
-                 border border-white/25 transition-all duration-200
-                 disabled:opacity-25 disabled:cursor-not-allowed"
+                 border border-white/25 transition-all duration-200"
           style="right: calc(10% - 400px)"
           @click="slideRight"
-          :disabled="currentIndex === works.length - 1"
         >
           <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />

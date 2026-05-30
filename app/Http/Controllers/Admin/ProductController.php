@@ -5,57 +5,75 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Style;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Inertia;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
-    public function index()
+    // ─── Index ────────────────────────────────────────────────────
+    public function index(Request $request)
     {
-        $products = Product::with('category')
-            ->latest()
-            ->get()
-            ->map(function ($product) {
-                // Pastikan semua field ada
-                return [
-                    'id'         => $product->id,
-                    'title'      => $product->title ?? 'No Title',
-                    'category'   => $product->category->name ?? '-',
-                    'price'      => $product->is_free ? 'Free' : 'Rp ' . number_format($product->price ?? 0, 0, ',', '.'),
-                    'status'     => ucfirst($product->status ?? 'draft'),
-                    'created_at' => $product->created_at ? $product->created_at->format('d/m/Y H:i') : '-',
-                ];
-            })
-            ->filter() // Hapus null jika ada
-            ->values() // Reset keys
+        $query = Product::with(['category', 'style', 'tags']);
+
+        if ($request->filled('search')) {
+            $query->where('title', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('style_id')) {
+            $query->where('style_id', $request->style_id);
+        }
+
+        $products = $query->latest()->get()
+            ->map(fn($p) => [
+                'id'         => $p->id,
+                'title'      => $p->title ?? 'No Title',
+                'category'   => $p->category?->name ?? '-',
+                'style'      => $p->style?->name ?? '-',
+                'tags'       => $p->tags->pluck('label')->join(', ') ?: '-',
+                'price'      => $p->is_free ? 'Free' : 'Rp ' . number_format($p->price ?? 0, 0, ',', '.'),
+                'status'     => $p->status ?? 'draft',   // lowercase, badge di Vue yang format
+                'created_at' => $p->created_at?->format('d/m/Y H:i') ?? '-',
+            ])
+            ->values()
             ->toArray();
 
         return Inertia::render('Products/Index', [
             'products' => $products,
-            'filters' => request()->only(['search', 'status']),
-            'meta' => [
-                'total' => count($products),
-            ],
+            'filters'  => $request->only(['search', 'status', 'style_id']),
+            'styles'   => Style::orderBy('name')->get(['id', 'name']),
+            'meta'     => ['total' => count($products)],
         ]);
     }
 
+    // ─── Create ───────────────────────────────────────────────────
     public function create()
     {
         return Inertia::render('Products/Form', [
-            'mode' => 'create',
-            'categories' => Category::all()
+            'mode'       => 'create',
+            'categories' => Category::where('is_tag_group', false)->orderBy('name')->get(['id', 'name']),
+            'styles'     => Style::orderBy('name')->get(['id', 'name']),
+            'tagGroups'  => Category::where('is_tag_group', true)
+                                ->with('tags:id,label,category_id')
+                                ->orderBy('name')
+                                ->get(['id', 'name']),
         ]);
     }
 
+    // ─── Store ────────────────────────────────────────────────────
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title'       => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'nullable|exists:categories,id',
+            'style_id'    => 'nullable|exists:styles,id',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'exists:tags,id',
             'price'       => 'required_if:is_free,false|nullable|numeric|min:0',
             'is_free'     => 'boolean',
             'status'      => 'required|in:draft,published,archived',
@@ -67,173 +85,249 @@ class ProductController extends Controller
         try {
             $product = Product::create([
                 'title'       => $validated['title'],
-                'slug'        => Str::slug($validated['title']),
-                'category_id' => $validated['category_id'],
-                'price'       => $validated['is_free'] ? 0 : ($validated['price'] ?? 0),
+                'slug'        => $this->uniqueSlug($validated['title']),
+                'category_id' => $validated['category_id'] ?? null,
+                'style_id'    => $validated['style_id'] ?? null,
+                'price'       => ($validated['is_free'] ?? false) ? 0 : ($validated['price'] ?? 0),
                 'is_free'     => $validated['is_free'] ?? false,
                 'status'      => $validated['status'],
                 'description' => $validated['description'],
             ]);
 
+            // Sync tags
+            if (!empty($validated['tags'])) {
+                $product->tags()->sync($validated['tags']);
+            }
+
+            // Upload images
             if ($request->hasFile('images')) {
                 $sortOrder = 0;
-                
                 foreach ($request->file('images') as $image) {
-                    // Generate unique filename
-                    $filename = Str::random(20) . '.' . $image->getClientOriginalExtension();
-                    
-                    // Define paths
-                    $folder = 'product-previews';
-                    $path = $image->storeAs($folder, $filename, 'public');
-                    
-                    // Anda juga bisa resize gambar jika perlu
-                    $resizedImage = Image::make($image)->resize(800, 800, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    });
-                    Storage::disk('public')->put($folder . '/' . $filename, $resizedImage->encode());
-                    
-                    // Save to product_previews table
+                    $path = $this->storeImage($image, $product->slug);
                     $product->previews()->create([
-                        'type' => 'image',
-                        'path' => $path,
-                        'sort_order' => $sortOrder,
+                        'type'       => 'image',
+                        'path'       => $path,
+                        'sort_order' => $sortOrder++,
                     ]);
-                    
-                    $sortOrder++;
                 }
-                
-                // Jika ingin set thumbnail di products table (opsional)
-                $firstPreview = $product->previews()->first();
-                if ($firstPreview) {
-                    $product->update([
-                        'thumbnail' => $firstPreview->path
-                    ]);
+
+                if ($first = $product->previews()->orderBy('sort_order')->first()) {
+                    $product->update(['thumbnail' => $first->path]);
                 }
             }
 
-            return redirect()->route('products.index')
-                ->with('success', 'Produk berhasil ditambahkan');
+            return redirect()->route('admin.products.index')
+                ->with('success', "Produk \"{$product->title}\" berhasil ditambahkan.");
 
         } catch (\Exception $e) {
-            return back()
-                ->withErrors(['error' => $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
-
-    public function edit(Product $product)
+    // ─── Show ─────────────────────────────────────────────────────
+    public function show(Product $product)
     {
-        // Load previews dengan URL yang benar
-        $existingImages = $product->previews()->get()->map(function ($preview) {
-            return [
-                'id' => $preview->id,
-                'path' => $preview->path,
-                'url' => asset('storage/' . $preview->path),
-                'filename' => basename($preview->path),
-                'extension' => pathinfo($preview->path, PATHINFO_EXTENSION),
-                'is_primary' => $preview->sort_order === 0,
-                'sort_order' => $preview->sort_order,
-            ];
-        })->toArray();
-
-        return inertia('Products/Form', [
-            'mode' => 'edit',
-            'product' => $product,
-            'existingImages' => $existingImages,
-            'categories' => Category::all(),
+        return Inertia::render('Products/Show', [
+            'product' => $product->load(['category', 'style', 'tags', 'previews', 'files', 'reviews.user']),
         ]);
     }
 
+    // ─── Edit ─────────────────────────────────────────────────────
+    public function edit(Product $product)
+    {
+        $existingImages = $product->previews()
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn($p) => [
+                'id'         => $p->id,
+                'path'       => $p->path,
+                'url'        => asset(Storage::url($p->path)),
+                'filename'   => basename($p->path),
+                'extension'  => pathinfo($p->path, PATHINFO_EXTENSION),
+                'is_primary' => $p->sort_order === 0,
+                'sort_order' => $p->sort_order,
+            ])->toArray();
+
+        return Inertia::render('Products/Form', [
+            'mode'           => 'edit',
+            'productId'      => $product->id, // Add this
+            'product'        => array_merge($product->toArray(), [
+                'tag_ids' => $product->tags->pluck('id')->toArray(),
+            ]),
+            'existingImages' => $existingImages,
+            'categories'     => Category::where('is_tag_group', false)->orderBy('name')->get(['id', 'name']),
+            'styles'         => Style::orderBy('name')->get(['id', 'name']),
+            'tagGroups'      => Category::where('is_tag_group', true)
+                                    ->with('tags:id,label,category_id')
+                                    ->orderBy('name')
+                                    ->get(['id', 'name']),
+        ]);
+    }
+
+    // ─── Update ───────────────────────────────────────────────────
     public function update(Request $request, Product $product)
     {
-        // Untuk update, gambar tidak wajib jika sudah ada
         $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
-            'price'       => 'required_if:is_free,false|nullable|numeric|min:0',
-            'is_free'     => 'boolean',
-            'status'      => 'required|in:draft,published,archived',
-            'description' => 'required|string',
-            'images'      => 'nullable|array',
-            'images.*'    => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
-            'delete_images.*' => 'nullable|exists:product_previews,id',
-        ], [
-            'title.required' => 'Nama produk wajib diisi.',
-            'category_id.required' => 'Tipe produk wajib dipilih.',
-            'category_id.exists' => 'Tipe produk tidak valid.',
-            'price.required_if' => 'Harga wajib diisi untuk produk berbayar.',
-            'price.numeric' => 'Harga harus berupa angka.',
-            'price.min' => 'Harga tidak boleh kurang dari 0.',
-            'status.required' => 'Status produk wajib dipilih.',
-            'status.in' => 'Status produk tidak valid.',
-            'description.required' => 'Deskripsi produk wajib diisi.',
-            'images.array' => 'Format gambar tidak valid.',
-            'images.*.image' => 'File harus berupa gambar.',
-            'images.*.mimes' => 'Format gambar harus: jpeg, png, jpg, gif, atau webp.',
-            'images.*.max' => 'Ukuran gambar maksimal 10MB.',
-            'delete_images.*.exists' => 'Gambar yang akan dihapus tidak ditemukan.',
+            'title'         => 'required|string|max:255',
+            'category_id'   => 'nullable|exists:categories,id',
+            'style_id'      => 'nullable|exists:styles,id',
+            'tags'          => 'nullable|array',
+            'tags.*'        => 'exists:tags,id',
+            'price'         => 'required_if:is_free,false|nullable|numeric|min:0',
+            'is_free'       => 'boolean',
+            'status'        => 'required|in:draft,published,archived',
+            'description'   => 'required|string',
+            'images'        => 'nullable|array',
+            'images.*'      => 'image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+            'delete_images' => 'nullable|string',
+            'image_order'   => 'nullable|string',
         ]);
 
         try {
             $product->update([
                 'title'       => $validated['title'],
-                'slug'        => Str::slug($validated['title']),
-                'category_id' => $validated['category_id'],
-                'price'       => $validated['is_free'] ? 0 : ($validated['price'] ?? 0),
+                'slug'        => $this->uniqueSlug($validated['title'], $product->id),
+                'category_id' => $validated['category_id'] ?? null,
+                'style_id'    => $validated['style_id'] ?? null,
+                'price'       => ($validated['is_free'] ?? false) ? 0 : ($validated['price'] ?? 0),
                 'is_free'     => $validated['is_free'] ?? false,
                 'status'      => $validated['status'],
                 'description' => $validated['description'],
             ]);
 
+            // Sync tags
+            $product->tags()->sync($validated['tags'] ?? []);
 
             // Hapus gambar yang dipilih
             if ($request->filled('delete_images')) {
-                $product->previews()
-                    ->whereIn('id', $request->delete_images)
-                    ->delete();
+                $deleteIds = json_decode($request->delete_images, true) ?? [];
+                if (!empty($deleteIds)) {
+                    $previews = $product->previews()->whereIn('id', $deleteIds)->get();
+                    foreach ($previews as $preview) {
+                        Storage::disk('public')->delete($preview->path);
+                    }
+                    $product->previews()->whereIn('id', $deleteIds)->delete();
+                }
             }
 
             // Upload gambar baru
             if ($request->hasFile('images')) {
-                $order = $product->previews()->max('sort_order') ?? 0;
-
+                $order = $product->previews()->max('sort_order') ?? -1;
                 foreach ($request->file('images') as $file) {
-                    $path = $file->store('products/previews', 'public');
-
+                    $path = $this->storeImage($file, $product->slug);
                     $product->previews()->create([
-                        'type' => 'image',
-                        'path' => $path,
+                        'type'       => 'image',
+                        'path'       => $path,
                         'sort_order' => ++$order,
                     ]);
                 }
             }
-
-            // Update thumbnail jika ada gambar
-            if ($first = $product->previews()->orderBy('sort_order')->first()) {
-                $product->update(['thumbnail' => $first->path]);
+            
+            // Update image order if provided
+            if ($request->filled('image_order')) {
+                $imageOrder = json_decode($request->image_order, true) ?? [];
+                if (!empty($imageOrder)) {
+                    foreach ($imageOrder as $index => $imageId) {
+                        $product->previews()
+                            ->where('id', $imageId)
+                            ->update(['sort_order' => $index]);
+                    }
+                }
             }
 
-            return redirect()
-                ->route('products.index')
-                ->with('success', 'Produk berhasil diperbarui');
-                
+            // Update thumbnail based on sort_order
+            $firstImage = $product->previews()->orderBy('sort_order')->first();
+            if ($firstImage) {
+                $product->update(['thumbnail' => $firstImage->path]);
+            }
+
+            return redirect()->route('admin.products.index')
+                ->with('success', "Produk \"{$product->title}\" berhasil diperbarui.");
+
         } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
     }
 
+    // ─── Destroy ──────────────────────────────────────────────────
     public function destroy(Product $product)
     {
         try {
+            // Hapus semua previews
+            foreach ($product->previews as $preview) {
+                Storage::disk('public')->delete($preview->path);
+            }
+            $product->previews()->delete();
+            
+            $title = $product->title;
             $product->delete();
-            
-            return back()->with('success', 'Produk berhasil dihapus');
-            
+            return back()->with('success', "Produk \"{$title}\" berhasil dihapus.");
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Gagal menghapus produk: ' . $e->getMessage()]);
         }
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────────
+
+    /**
+     * Simpan gambar ke storage/public/product-previews/
+     * Nama file: {slug-produk}_{YYYYMMDD_HHmmss}_{random4}.{ext}
+     * Contoh: autobiography_20240315_143022_a3f1.jpg
+     */
+    private function storeImage(UploadedFile $file, string $productSlug): string
+    {
+        $ext      = strtolower($file->getClientOriginalExtension());
+        $datetime = now()->format('Ymd_His');
+        $rand     = Str::random(4);
+        $filename = "{$productSlug}_{$datetime}_{$rand}.{$ext}";
+        $folder   = 'product-previews';
+
+        // Pastikan folder ada
+        Storage::disk('public')->makeDirectory($folder);
+
+        // Simpan file — storeAs mengembalikan path relatif dari disk
+        $path = $file->storeAs($folder, $filename, 'public');
+
+        return $path; // e.g. "product-previews/autobiography_20240315_143022_a3f1.jpg"
+    }
+
+    private function uniqueSlug(string $title, ?int $exceptId = null): string
+    {
+        $base    = Str::slug($title);
+        $slug    = $base;
+        $counter = 1;
+
+        while (
+            Product::where('slug', $slug)
+                ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
+                ->exists()
+        ) {
+            $slug = "{$base}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    public function reorderImages(Request $request, Product $product)
+    {
+        $request->validate([
+            'image_order' => 'required|array',
+            'image_order.*' => 'exists:product_previews,id'
+        ]);
+        
+        foreach ($request->image_order as $index => $imageId) {
+            $product->previews()
+                ->where('id', $imageId)
+                ->update(['sort_order' => $index]);
+        }
+        
+        // Update thumbnail
+        $firstImage = $product->previews()->orderBy('sort_order')->first();
+        if ($firstImage) {
+            $product->update(['thumbnail' => $firstImage->path]);
+        }
+        
+        return back()->with('success', "Urutan gambar berhasil diperbarui.");
     }
 }

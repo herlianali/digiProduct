@@ -6,6 +6,7 @@ import BannerCards from './Components/BannerCards.vue'
 import OurWorkSection from './Components/OurWorkSection.vue'
 import ProductSection from './Components/ProductSection.vue'
 import RackDivider from './Components/RackDivider.vue'
+import BentoGridSection from './ComponentsV2/BentoGridSection.vue' // ← import component baru
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ShoppingCartIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
@@ -21,7 +22,6 @@ gsap.registerPlugin(ScrollTrigger)
 const bannerRef = ref(null)
 const navbarRef = ref(null)
 const navbarContainerRef = ref(null)
-const bentoGridRef = ref(null)
 const isNavbarVisible = ref(false)
 const sliderTrackRef = ref(null)
 const sliderContainerRef = ref(null)
@@ -29,6 +29,9 @@ const sliderPrevBtn = ref(null)
 const sliderNextBtn = ref(null)
 let isSliderHovered = ref(false)
 let autoScrollInterval = null
+
+const arrowRef = ref(null)
+let arrowAnimation = null
 
 // ─── Product Section ───────────────────────────────────────────────
 const productSectionRef = ref(null)
@@ -79,48 +82,49 @@ const setFilter = (filter) => {
 // ───────────────────────────────────────────────────────────────────
 
 let sliderTween = null
-let hoverAnimations = []
 
 const testimonials = [
-    { id: 1, name: 'Sarah Johnson', role: 'Brand Director', company: 'Luxe Studio', avatar: 'SJ', avatarColor: '#6366f1', text: 'The creativity and attention to detail is absolutely unmatched. Our brand identity has never looked better.', rating: 5 },
-    { id: 2, name: 'Marcus Tan', role: 'Founder', company: 'TanStack Co.', avatar: 'MT', avatarColor: '#10b981', text: 'Working with SUPPLAYBOX was a game changer. Delivery was fast and the results blew us away.', rating: 5 },
-    { id: 3, name: 'Priya Mehta', role: 'CMO', company: 'Spark Agency', avatar: 'PM', avatarColor: '#f59e0b', text: 'From concept to final artwork, the process was seamless. Highly recommend for any packaging project.', rating: 5 },
-    { id: 4, name: 'Lucas Bernard', role: 'Creative Lead', company: 'Neon Works', avatar: 'LB', avatarColor: '#ec4899', text: 'Bold, expressive, and exactly on-brand. They understood our vision immediately.', rating: 5 },
-    { id: 5, name: 'Aiko Nakamura', role: 'Product Designer', company: 'Umami Labs', avatar: 'AN', avatarColor: '#3b82f6', text: "The illustration style is so unique and versatile. We've used it across every touchpoint.", rating: 5 },
-    { id: 6, name: 'Diego Reyes', role: 'CEO', company: 'Brillo Brands', avatar: 'DR', avatarColor: '#f97316', text: 'Exceptional work, tight deadlines, zero stress. This is the team you want on your side.', rating: 5 },
+    { id: 1, name: 'Sarah Johnson', role: 'Brand Director', company: 'Luxe Studio', country: 'United States', flag: '🇺🇸', avatar: 'SJ', avatarColor: '#6366f1', text: 'The creativity and attention to detail is absolutely unmatched. Our brand identity has never looked better.', rating: 5 },
+    { id: 2, name: 'Marcus Tan', role: 'Founder', company: 'TanStack Co.', country: 'Singapore', flag: '🇸🇬', avatar: 'MT', avatarColor: '#10b981', text: 'Working with SUPPLAYBOX was a game changer. Delivery was fast and the results blew us away.', rating: 5 },
+    { id: 3, name: 'Priya Mehta', role: 'CMO', company: 'Spark Agency', country: 'India', flag: '🇮🇳', avatar: 'PM', avatarColor: '#f59e0b', text: 'From concept to final artwork, the process was seamless. Highly recommend for any packaging project.', rating: 5 },
+    { id: 4, name: 'Lucas Bernard', role: 'Creative Lead', company: 'Neon Works', country: 'France', flag: '🇫🇷', avatar: 'LB', avatarColor: '#ec4899', text: 'Bold, expressive, and exactly on-brand. They understood our vision immediately.', rating: 5 },
+    { id: 5, name: 'Aiko Nakamura', role: 'Product Designer', company: 'Umami Labs', country: 'Japan', flag: '🇯🇵', avatar: 'AN', avatarColor: '#3b82f6', text: "The illustration style is so unique and versatile. We've used it across every touchpoint.", rating: 5 },
+    { id: 6, name: 'Diego Reyes', role: 'CEO', company: 'Brillo Brands', country: 'Mexico', flag: '🇲🇽', avatar: 'DR', avatarColor: '#f97316', text: 'Exceptional work, tight deadlines, zero stress. This is the team you want on your side.', rating: 5 },
 ]
 
 onMounted(() => {
     initNavbarAnimation()
     initSectionAnimations()
     initInfiniteSlider()
-    initCardHoverAnimations()
-    initCardEntranceAnimation()
-    initProductSectionAnimation() // ← tambahan
+    initProductSectionAnimation()
+    initArrowAnimation()
 })
 
 onUnmounted(() => {
     if (sliderTween) sliderTween.kill()
+    if (arrowAnimation) arrowAnimation.kill()
     ScrollTrigger.getAll().forEach(t => t.kill())
-
-    hoverAnimations.forEach(({ element, enterHandler, leaveHandler }) => {
-        element.removeEventListener('mouseenter', enterHandler)
-        element.removeEventListener('mouseleave', leaveHandler)
-    })
-
-    if (sliderPrevBtn.value) {
-        sliderPrevBtn.value.removeEventListener('click', () => {})
-    }
-    if (sliderNextBtn.value) {
-        sliderNextBtn.value.removeEventListener('click', () => {})
-    }
 })
+
+// ─── Arrow Animation ───────────────────────────────────────────────
+const initArrowAnimation = () => {
+    if (!arrowRef.value) return
+    
+    // Buat timeline infinite untuk animasi arrow ke kanan-kiri
+    arrowAnimation = gsap.to(arrowRef.value, {
+        x: 8, // bergerak ke kanan 8px
+        duration: 0.6,
+        repeat: -1, // infinite
+        yoyo: true, // bolak-balik
+        ease: "power1.inOut",
+        repeatDelay: 0.1
+    })
+}
 
 // ─── Product Section Animation ─────────────────────────────────────
 const initProductSectionAnimation = () => {
     if (!productSectionRef.value) return
 
-    // Title slides up on scroll
     gsap.from('.shop-title', {
         scrollTrigger: {
             trigger: productSectionRef.value,
@@ -133,7 +137,6 @@ const initProductSectionAnimation = () => {
         ease: 'power3.out',
     })
 
-    // Filter buttons fade in
     gsap.from('.shop-filter-btn', {
         scrollTrigger: {
             trigger: productSectionRef.value,
@@ -148,12 +151,10 @@ const initProductSectionAnimation = () => {
         delay: 0.15,
     })
 
-    // Cards stagger in on scroll
     animateProductCards()
 }
 
 const animateProductCards = () => {
-    // Small delay so v-if renders first
     setTimeout(() => {
         const cards = productSectionRef.value?.querySelectorAll('.product-card')
         if (!cards || !cards.length) return
@@ -175,7 +176,6 @@ const animateProductCards = () => {
             }
         )
 
-        // CTA button entrance
         gsap.from('.shop-cta-btn', {
             scrollTrigger: {
                 trigger: '.shop-cta-btn',
@@ -190,175 +190,11 @@ const animateProductCards = () => {
     }, 50)
 }
 
-// Re-animate cards whenever filter changes
 const onFilterChange = (filter) => {
     setFilter(filter)
     setTimeout(() => animateProductCards(), 80)
 }
 // ───────────────────────────────────────────────────────────────────
-
-const initCardHoverAnimations = () => {
-    const cardSelectors = [
-        '.col-span-3:not(.grid)',
-        '.col-span-2.row-span-2',
-        '.col-span-2:not(.row-span-2):not(.flex-col.gap-3)',
-        '.col-span-3.bg-black',
-        '.col-span-2.row-span-2 > .bg-black',
-        '.bg-white.rounded-2xl.p-3',
-        '.col-span-3.grid .row-span-2',
-        '.col-span-3.grid .bg-white.border',
-        '.col-span-3.grid .bg-gray-200',
-        '.bg-\\[\\#f2ecea\\]',
-        '.col-span-5 .col-span-5.bg-\\[\\#fee100\\]',
-        '.col-span-5 .col-span-7.bg-\\[\\#abdec9\\]'
-    ]
-
-    const allCards = bentoGridRef.value?.querySelectorAll(cardSelectors.join(','))
-
-    if (!allCards) return
-
-    allCards.forEach(card => {
-        if (card._hasHoverAnimation) return
-
-        gsap.set(card, {
-            transformOrigin: 'center center',
-            zIndex: 1
-        })
-
-        const onMouseEnter = () => {
-            const tl = gsap.timeline()
-            tl.to(card, {
-                scale: 1.03,
-                y: -8,
-                boxShadow: '0 30px 40px -20px rgba(0, 0, 0, 0.3), 0 10px 15px -8px rgba(0, 0, 0, 0.15)',
-                duration: 0.35,
-                ease: 'back.out(0.4)',
-                overwrite: true
-            }, 0)
-
-            const images = card.querySelectorAll('img')
-            if (images.length) {
-                tl.to(images, {
-                    scale: 1.08,
-                    duration: 0.4,
-                    ease: 'power2.out',
-                    stagger: 0.02,
-                    overwrite: true
-                }, 0)
-            }
-
-            const texts = card.querySelectorAll('p, h1, h2, h3, h4, span, button')
-            if (texts.length) {
-                tl.to(texts, {
-                    y: -2,
-                    duration: 0.25,
-                    ease: 'power2.out',
-                    stagger: 0.01,
-                    overwrite: true
-                }, 0)
-            }
-
-            if (card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]')) {
-                tl.to(card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]'), {
-                    y: -4,
-                    duration: 0.3,
-                    ease: 'power2.out'
-                }, 0)
-            }
-
-            gsap.to(card, {
-                borderColor: 'rgba(0,0,0,0.2)',
-                duration: 0.2,
-                overwrite: true
-            })
-        }
-
-        const onMouseLeave = () => {
-            const tl = gsap.timeline()
-            tl.to(card, {
-                scale: 1,
-                y: 0,
-                boxShadow: 'none',
-                duration: 0.3,
-                ease: 'power2.in',
-                overwrite: true
-            }, 0)
-
-            const images = card.querySelectorAll('img')
-            if (images.length) {
-                tl.to(images, {
-                    scale: 1,
-                    duration: 0.25,
-                    ease: 'power2.in',
-                    overwrite: true
-                }, 0)
-            }
-
-            const texts = card.querySelectorAll('p, h1, h2, h3, h4, span, button')
-            if (texts.length) {
-                tl.to(texts, {
-                    y: 0,
-                    duration: 0.2,
-                    ease: 'power2.in',
-                    overwrite: true
-                }, 0)
-            }
-
-            if (card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]')) {
-                tl.to(card.querySelector('.rounded-t-2xl.bg-\\[\\#268a00\\]'), {
-                    y: 0,
-                    duration: 0.25,
-                    ease: 'power2.in'
-                }, 0)
-            }
-
-            gsap.to(card, {
-                borderColor: '',
-                duration: 0.2,
-                overwrite: true
-            })
-        }
-
-        card.addEventListener('mouseenter', onMouseEnter)
-        card.addEventListener('mouseleave', onMouseLeave)
-
-        hoverAnimations.push({
-            element: card,
-            enterHandler: onMouseEnter,
-            leaveHandler: onMouseLeave
-        })
-
-        card._hasHoverAnimation = true
-    })
-}
-
-const initCardEntranceAnimation = () => {
-    const cards = bentoGridRef.value?.querySelectorAll('[class*="col-span"]')
-    if (!cards) return
-
-    const validCards = Array.from(cards).filter(card =>
-        !card.classList.contains('grid') ||
-        card.querySelectorAll('[class*="col-span"]').length <= 1
-    )
-
-    gsap.fromTo(validCards,
-        { opacity: 0, y: 40, scale: 0.95 },
-        {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.7,
-            stagger: { each: 0.04, from: 'start', grid: 'auto' },
-            ease: 'back.out(0.3)',
-            scrollTrigger: {
-                trigger: bentoGridRef.value,
-                start: 'top 85%',
-                toggleActions: 'play none none reverse',
-                once: false
-            }
-        }
-    )
-}
 
 const initInfiniteSlider = () => {
     const track = sliderTrackRef.value
@@ -531,7 +367,7 @@ const initNavbarAnimation = () => {
     })
 
     ScrollTrigger.create({
-        trigger: bentoGridRef.value,
+        trigger: '.bento-grid-section',
         start: 'bottom top',
         onEnter: () => {
             if (isNavbarVisible.value) return
@@ -570,10 +406,15 @@ const scrollToSection = (sectionId) => {
         })
     }
 }
+
+const openLink = (url) => {
+    window.open(url, '_blank')
+}
 </script>
 
 <template>
     <LoadingScreen />
+    
     <div ref="navbarContainerRef" class="z-[1000]">
         <nav ref="navbarRef">
             <div class="flex items-center gap-1 py-2.5">
@@ -601,225 +442,10 @@ const scrollToSection = (sectionId) => {
         </nav>
     </div>
 
+    <!-- Bento Grid Section - menggunakan component terpisah -->
+    <BentoGridSection class="bento-grid-section" />
+
     <div class="bg-[#dedede]">
-        <div ref="bentoGridRef" class="mt-6 bg-[#ffffff]">
-            <div class="w-full max-w-[1600px] mx-auto px-4">
-                <div class="grid grid-cols-12 gap-4">
-
-                    <!-- Col 1-3: Welcome -->
-                    <div class="col-span-3 bg-[#fce109] rounded-2xl p-4 flex flex-col relative overflow-hidden h-max-[400px]">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="text-md font-medium text-black/70">Welcome to</p>
-                                <h1 class="font-extrabold text-4xl text-black leading-tight tracking-tighter">SUPPLAYBOX</h1>
-                            </div>
-                            <img src="/public/assets/image/banner/arrow-black-right.svg" class="w-7 h-7" alt="" />
-                        </div>
-                        <p class="text-2xl md:text-3xl font-light text-black mt-1">Hi Robert,</p>
-                        <p class="text-md md:text-sm text-black/80 mt-2 max-w-[55%] leading-relaxed flex-1">Most people freeze at the starting line. Don't hesitate. Just give it a shot.</p>
-                        <div>
-                            <button class="w-fit z-10 bg-[#4dfa03] hover:bg-green-700 border border-black font-extrabold text-2xl rounded-full px-5 flex items-center transition-all whitespace-nowrap">
-                                FREE SKETCH!
-                                <ChevronRightIcon class="w-4 h-4" />
-                            </button>
-                            <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute right-1 -bottom-4 w-[50%] max-w-[300px] object-contain pointer-events-none z-20" />
-                        </div>
-                    </div>
-
-                    <!-- Col 4-5: Design & Illustration Service (row-span-2) -->
-                    <div class="col-span-2 row-span-2 bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden">
-                        <div class="flex justify-center items-center p-6">
-                            <img src="/public/assets/image/banner/card-service-animated2.svg" class="w-full h-full" alt="" />
-                        </div>
-                        <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-                            <h3 class="font-bold text-white px-4 py-1 text-lg">Design Service</h3>
-                            <div class="rounded-t-2xl bg-gray-200">
-                                <p class="text-[9px] md:text-[10px] text-gray-800 leading-relaxed px-4 py-2 text-justify">
-                                    Brand Identity / Logo Design / Poster Design / Packaging Design / Social
-                                    Media Design / Infographic Design / Editorial Design / Book Design
-                                </p>
-                                <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-                                    <h3 class="font-bold text-white px-4 py-1 text-lg">Illustration Service</h3>
-                                    <div class="rounded-t-2xl bg-gray-200">
-                                        <p class="text-[9px] md:text-[10px] text-gray-800 leading-relaxed px-4 pt-2 text-justify">
-                                            2D Illustration / Environmental Design Game Design / Character design /
-                                            Mascot Illustration / Advertising Illustration
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pb-1 flex justify-center p-2">
-                            <img src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" class="w-10 h-10" />
-                        </div>
-                        <div class="flex-1 min-h-[40px] overflow-hidden">
-                            <img src="/public/assets/image/banner/card-service-animated.svg" alt="service illustration" class="w-full h-full object-cover" />
-                        </div>
-                    </div>
-
-                    <!-- Col 6-7: Teepublic -->
-                    <div class="col-span-2 bg-[#4c60d8] rounded-2xl flex flex-col">
-                        <div class="px-6 pt-4 flex justify-between items-center">
-                            <div class="tracking-wider flex items-center gap-1">
-                                <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" class="w-6 h-6" />
-                                <span class="text-white font-bold text-base">TEEPUBLIC</span>
-                            </div>
-                            <img src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-5 h-5" />
-                        </div>
-                        <div class="flex-1 overflow-hidden">
-                            <img src="/public/assets/image/banner/card-teepublic-animated.svg" alt="teepublic" class="w-full h-full object-cover" />
-                        </div>
-                        <div class="px-6 pb-4">
-                            <p class="font-bold text-white text-base">Unlimited<br />Prints.</p>
-                        </div>
-                    </div>
-
-                    <!-- Col 8-10: Behance (col-span-3) -->
-                    <div class="col-span-3 bg-black rounded-2xl flex flex-col overflow-hidden">
-                        <div class="px-6 pt-4 flex justify-between items-start">
-                            <div>
-                                <p class="font-bold text-white text-4xl leading-tight">Bē</p>
-                                <p class="text-[12px] text-white leading-tight">More<br />Professional<br />Portofolio</p>
-                            </div>
-                            <img src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-5 h-5" />
-                        </div>
-                        <div class="flex-1 overflow-hidden">
-                            <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-full object-cover object-left" />
-                        </div>
-                    </div>
-
-                    <!-- Col 11-12: Icons (atas) + Upwork (bawah) + Amidst text -->
-                    <div class="col-span-2 row-span-2 flex flex-col gap-3">
-                        <div class="flex justify-between items-center gap-2 pr-1 pt-1">
-                            <ShoppingCartIcon class="w-8 h-8 text-green-500 cursor-pointer hover:text-green-600 transition-colors" />
-                            <span class="border-2 border-black rounded-full px-4 py-0 text-black text-base font-medium text-center whitespace-nowrap">$100</span>
-                            <div class="w-7 h-7 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center">
-                                <img src="" alt="user" class="w-full h-full object-cover" />
-                            </div>
-                        </div>
-
-                        <div class="bg-black rounded-2xl flex flex-col overflow-hidden">
-                            <div class="px-6 pt-4 relative text-nowrap">
-                                <p class="text-lg text-white">New Seller</p>
-                                <p class="text-white text-lg">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
-                                <img src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-4 right-6 w-5 h-5" />
-                            </div>
-                            <div class="flex-1 flex flex-col justify-end overflow-hidden">
-                                <div class="h-[260px] overflow-hidden">
-                                    <img src="/public/assets/image/banner/card-upwork-animated.svg" alt="upwork" class="w-full h-full object-cover object-bottom" />
-                                </div>
-                                <div class="rounded-t-2xl bg-[#268a00] px-6 py-3 -mt-[60px] relative z-10">
-                                    <p class="text-white text-[16px] font-extrabold leading-tight">Enjoy many Bonuses<br />and Discounts<br />on this Platform!</p>
-                                    <p class="text-[14px] text-white mt-2">Help us<br />to grow even more :)</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-2xl p-3 flex flex-col justify-center text-lg">
-                            <p class="text-[#cccccc]">Amidst</p>
-                            <p class="text-[#b3b3b3] font-medium italic">the noise</p>
-                            <p class="text-[#cccccc]">and</p>
-                            <p class="text-[#b3b3b3] font-medium italic">visual</p>
-                            <p class="text-[#b3b3b3] font-medium italic">disruption.</p>
-                            <p class="text-[#108a00] font-medium">it's not</p>
-                            <p class="text-[#108a00] font-medium">about</p>
-                            <p class="text-[#cccccc] ">being <span class="text-[#108a00] font-medium">fast</span></p>
-                            <p class="text-[#cccccc] ">and <span class="text-[#108a00] font-medium">empty.</span></p>
-                            <p class="text-[#cccccc]  mt-0.5">but...<span class="inline-flex items-center justify-center w-4 h-4 ml-1 align-middle"><img src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Down Arrow" class="w-3 h-3"></span></p>
-                        </div>
-                    </div>
-
-                    <!-- ROW 2 -->
-
-                    <!-- Col 1-3: Pinterest + TikTok + Starter Pack -->
-                    <div class="col-span-3 grid grid-cols-2 grid-rows-2 gap-4 h-[420px]">
-                        <div class="row-span-2 bg-[#E60023] rounded-2xl p-3 flex flex-col relative overflow-hidden">
-                            <div class="flex justify-between items-start pb-2">
-                                <img src="/public/assets/image/banner/card-path-logo.svg" class="w-8 h-8" alt="" />
-                                <img src="/public/assets/image/banner/arrow-white-right.svg" class="w-5 h-5" alt="" />
-                            </div>
-                            <p class="text-white text-sm mt-1 leading-relaxed relative z-10">Let's <b class="font-black italic">CONNECT</b> on Pinterest, Share some pins, and dive into our <b class="font-black italic">Portfolio</b> + inspo boards.</p>
-                            <div class="absolute bottom-0 left-0 right-0 h-[40%] overflow-hidden">
-                                <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="w-full h-full object-cover object-top" />
-                            </div>
-                        </div>
-
-                        <div class="bg-white border border-gray-800 rounded-2xl p-2 relative overflow-hidden">
-                            <div class="flex justify-between items-start px-1 pt-1">
-                                <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="w-8 h-8" alt="TikTok" />
-                                <img src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok" class="w-5 h-5" />
-                            </div>
-                            <p class="text-[9px] max-w-[130px] p-1 font-semibold">Some memes for entertainment, and behind the scenes of our routine.</p>
-                            <div class="absolute -bottom-1 left-0 right-0 h-[45%] overflow-hidden">
-                                <img src="/public/assets/image/banner/card-tiktok-animated.svg" alt="tiktok" class="w-full h-full object-cover object-top" />
-                            </div>
-                        </div>
-
-                        <div class="bg-gray-200 flex flex-col gap-1 rounded-2xl p-3 relative overflow-hidden">
-                            <div>
-                                <p class="text-[10px] font-bold text-black">Starter Pack<br />Design.</p>
-                                <div class="flex items-center pt-2 relative">
-                                    <span class="absolute left-0 w-5 h-5 rounded-full bg-[#34bf72] border border-black"></span>
-                                    <span class="absolute left-2 w-5 h-5 rounded-full bg-[#fec200] border border-black"></span>
-                                    <span class="absolute left-4 w-5 h-5 rounded-full bg-[#3bffff] border border-black"></span>
-                                    <span class="absolute left-6 w-5 h-5 rounded-full bg-[#fa191e] border border-black"></span>
-                                    <span class="absolute left-10 text-[9px] text-gray-400">+2 More</span>
-                                </div>
-                            </div>
-                            <div class="mt-auto">
-                                <p class="text-[9px] leading-relaxed">Canva/<br />Shutterstock/<br />iconscout dll</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Col 4-7: Fiverr + Our Product + Our Team -->
-                    <div class="col-span-5 flex flex-col gap-4">
-                        <div class="bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden h-[150px]">
-                            <div class="flex justify-between items-start gap-2 relative z-10">
-                                <img src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="p-2">
-                                <div class="flex flex-col items-end text-[#0b3117] text-2xl">
-                                    <p class="">Top Rated</p>
-                                    <p class="">Badge on <em class="font-bold">fiverr</em>.</p>
-                                </div>
-                            </div>
-                            <div class="absolute bottom-0 left-0 h-[90%] w-[50%] overflow-hidden">
-                                <img src="/public/assets/image/banner/card-toprated-animated.svg" alt="fiverr" class="w-full h-full object-cover object-top" />
-                            </div>
-                            <img src="/public/assets/image/banner/card-fiver-badge.svg" alt="Fiverr Badge" class="absolute bottom-8 right-32 w-10 h-10" />
-                            <div class="absolute bottom-1 right-2 text-right text-[12px] italic text-[#0b3117]">
-                                <span class="block">For secure</span>
-                                <span class="block">transactions!</span>
-                            </div>
-                        </div>
-
-                        <!-- Our Product + Our Team -->
-                        <div class="grid grid-cols-12 gap-4 flex-1 max-h-[260px]">
-                            <div class="col-span-5 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden">
-                                <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[260px] border-r-[260px] border-b-[90px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
-                                <p class="font-extrabold text-black text-2xl relative z-20 px-2">Our<br />Product</p>
-                                <div class="flex-1 flex items-center justify-center py-1 relative z-10">
-                                    <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-[55%] h-[55%] object-contain" />
-                                </div>
-                                <div class="text-center relative z-10">
-                                    <img src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline w-10 h-10" />
-                                </div>
-                            </div>
-
-                            <div class="col-span-7 bg-[#abdec9] rounded-2xl relative overflow-hidden">
-                                <div class="flex-1 flex items-center justify-center relative">
-                                    <img src="/public/assets/image/banner/card-ourteam-animated.svg" alt="team" class="w-[80%] h-[50%] object-cover" />
-                                </div>
-                                <div class="absolute bottom-6 left-2 right-2">
-                                    <p class="font-['Archivo_Black',sans-serif] text-white text-sm leading-tight">Meet<br />Our Team</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
         <RackDivider
             :color="'#000000'"
             :top-color="'#ffffff'"
@@ -841,11 +467,10 @@ const scrollToSection = (sectionId) => {
         />
     </div>
 
-    <div class="bg-gradient-to-b from-black to-gray-500 text-white">
+    <div class="bg-gradient-to-b from-black to-gray-800 text-white pb-28">
         <div class="px-10 md:px-40 pt-12 pb-10">
-            <h1 class="text-6xl md:text-7xl font-bold leading-tight">Perception</h1>
-            <p class="text-6xl md:text-7xl leading-tight">And <b class="font-bold">Connection.</b></p>
-            <p class="text-gray-400 mt-4 text-lg max-w-xl">We craft visual identities that make people feel something. Real brands. Real stories.</p>
+            <h1 class="text-8xl font-bold">Perception</h1>
+            <p class="text-8xl">And <b class="font-bold">Connection.</b></p>
         </div>
 
         <!-- Slider with Navigation -->
@@ -867,24 +492,52 @@ const scrollToSection = (sectionId) => {
             </button>
 
             <div ref="sliderTrackRef" class="flex gap-5 w-max will-change-transform px-6 py-2 cursor-grab active:cursor-grabbing">
-                <div v-for="item in testimonials" :key="item.id" class="flex-shrink-0 w-[500px] bg-white border border-white/10 rounded-2xl p-6 flex flex-col gap-1 cursor-default transition-all duration-300 hover:border-white/30 hover:-translate-y-1 backdrop-blur-sm">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-black flex-shrink-0" :style="{ backgroundColor: item.avatarColor }">{{ item.avatar }}</div>
-                        <div>
-                            <p class="text-sm font-semibold text-black">{{ item.name }}</p>
-                            <p class="text-xs text-gray-700">{{ item.role }} · {{ item.company }}</p>
+                <div
+                    v-for="item in testimonials"
+                    :key="item.id"
+                    class="flex-shrink-0 w-[500px] bg-white rounded-2xl p-8 flex flex-col gap-3 cursor-default shadow-sm"
+                >
+                    <!-- Header: avatar + name + country -->
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-14 h-14 rounded-full flex items-center justify-center text-md font-bold text-black flex-shrink-0"
+                                :style="{ backgroundColor: item.avatarColor }"
+                            >
+                                {{ item.avatar }}
+                            </div>
+                            <div>
+                                <p class="text-base font-bold text-black leading-tight">{{ item.name }}</p>
+                                <p class="text-md text-gray-500 mt-0.5 flex items-center gap-1">
+                                    <span>{{ item.flag }}</span>
+                                    <span>{{ item.country }}</span>
+                                </p>
+                                <p class="text-md text-gray-500 mt-0.5 flex items-center">{{ item.role }} - {{ item.company }}</p>
+                            </div>
+                        </div>
+                        <!-- three dots -->
+                        <div class="flex flex-col gap-[3px] mt-1">
+                            <span class="w-1 h-1 rounded-full bg-gray-400 block"></span>
+                            <span class="w-1 h-1 rounded-full bg-gray-400 block"></span>
+                            <span class="w-1 h-1 rounded-full bg-gray-400 block"></span>
                         </div>
                     </div>
-                    <div class="flex gap-1 mb-2">
-                        <StarSolid v-for="i in item.rating" :key="i" class="w-4 h-4 text-yellow-400" />
+
+                    <!-- Stars + rating number -->
+                    <div class="flex items-center gap-1 border-t-2 border-gray-100 pt-2">
+                        <StarSolid v-for="i in item.rating" :key="i" class="w-4 h-4 text-black" />
+                        <span class="text-md font-semibold text-black ml-1">{{ item.rating }}</span>
                     </div>
-                    <p class="text-sm text-gray-700 leading-relaxed">"{{ item.text }}"</p>
+
+                    <!-- Review text -->
+                    <p class="text-md text-gray-700 leading-relaxed">{{ item.text }}</p>
                 </div>
             </div>
         </div>
 
-        <div class="px-10 md:px-20 pt-10 pb-14">
-            <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-6 opacity-40">
+        <!-- logo partner -->
+        <div class="px-8 pt-6 pb-14">
+            <div class="flex flex-wrap justify-center items-center gap-x-10 gap-y-4 opacity-80">
                 <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="">
                 <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="">
                 <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="">
@@ -900,182 +553,188 @@ const scrollToSection = (sectionId) => {
             </div>
         </div>
 
-        <!-- featured section -->
-        <div class="bg-white">
-            <div class="bg-black text-white py-12 rounded-3xl rounded-tr-3xl text-center">
-                <div class="mx-auto px-10 justify-between flex gap-6">
-                    <img src="/public/assets/image/our-work.svg" alt="Featured Image" class="">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Featured</h2>
+        
+    </div>
+    <!-- featured section -->
+    <div class="relative z-10 -mt-20 -mb-20 bg-black text-black py-12 rounded-3xl text-center">
+        <div class="mx-auto px-10 justify-between flex gap-6">
+            <img src="/public/assets/image/our-work.svg" alt="Featured Image" class="">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Featured</h2>
+        </div>
+
+        <OurWorkSection />
+
+        <div class="flex justify-end items-center opacity-90 px-10">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2 group cursor-pointer">
+                    <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">More Portfolio</span>
+                    <img src="/public/assets/image/panah-porto.svg" alt="" class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]">
                 </div>
-
-                <OurWorkSection />
-
-                <div class="flex justify-end items-center mt-8 opacity-70 px-10">
-                    <div class="flex items-center gap-6">
-                        <div class="flex items-center gap-2 group cursor-pointer">
-                            <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">More Portfolio</span>
-                            <img src="/public/assets/image/panah-porto.svg" alt="" class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]">
-                        </div>
-                        <div class="bg-[#333333] rounded-lg px-4 flex items-center gap-4">
-                            <div class="social-icon-wrapper group" @click="openLink('https://pin.it/yegYhYpFy')">
-                                <img src="/public/assets/image/pinterest-icon-porto.svg" alt="Pinterest" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
-                            </div>
-                            <div class="social-icon-wrapper group" @click="openLink('https://www.behance.net/supplay_box')">
-                                <img src="/public/assets/image/behance-icon-porto.svg" alt="Behance" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
-                            </div>
-                            <div class="social-icon-wrapper group" @click="openLink('https://www.fiverr.com/user/supplaybox/portfolio')">
-                                <img src="/public/assets/image/fiverr-icon-porto.svg" alt="Fiverr" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
-                            </div>
-                            <div class="social-icon-wrapper group" @click="openLink('https://www.upwork.com/freelancers/~018928f9b657bc5557?p=2002178990555295744')">
-                                <img src="/public/assets/image/upwork-icon-porto.svg" alt="Upwork" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
-                            </div>
-                        </div>
+                <div class="bg-[#333333] rounded-xl flex items-center">
+                    <div class="social-icon-wrapper group" @click="openLink('https://pin.it/yegYhYpFy')">
+                        <img src="/public/assets/image/pinterest-icon-porto.svg" alt="Pinterest" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
+                    </div>
+                    <div class="social-icon-wrapper group" @click="openLink('https://www.behance.net/supplay_box')">
+                        <img src="/public/assets/image/behance-icon-porto.svg" alt="Behance" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
+                    </div>
+                    <div class="social-icon-wrapper group" @click="openLink('https://www.fiverr.com/user/supplaybox/portfolio')">
+                        <img src="/public/assets/image/fiverr-icon-porto.svg" alt="Fiverr" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
+                    </div>
+                    <div class="social-icon-wrapper group" @click="openLink('https://www.upwork.com/freelancers/~018928f9b657bc5557?p=2002178990555295744')">
+                        <img src="/public/assets/image/upwork-icon-porto.svg" alt="Upwork" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="py-8 px-16 text-black">
-                <div class="flex justify-center items-start gap-8">
-                    <div class="flex flex-col flex-shrink-0">
-                        <h1 class="text-6xl font-bold pb-2">Our Services</h1>
-                        <p class="max-w-md">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
+    <!-- Our Services -->
+    <div class="bg-white pt-28 pb-8 px-16 text-black">
+        <div class="flex justify-center items-start gap-8">
+            <div class="flex flex-col flex-shrink-0">
+                <h1 class="text-6xl font-extrabold pb-2">Our <br>Services</h1>
+                <p class="max-w-md">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
+            </div>
+            <div class="flex flex-col px-12">
+                <div class="flex justify-center gap-8">
+                    <div class="flex flex-col flex-1">
+                        <h1 class="text-5xl font-bold pb-2">Design Service</h1>
+                        <p class="leading-relaxed">
+                            <span class="inline-flex flex-wrap gap-x-1 mt-2 text-xl">
+                                <span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Brand Identity</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Logo Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Poster Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Packaging Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Social Media Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Infographic Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Editorial Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Book Design</span>
+                            </span>
+                        </p>
                     </div>
-                    <div class="flex flex-col w-full">
-                        <div class="flex justify-center gap-8">
-                            <div class="flex flex-col flex-1">
-                                <h1 class="text-4xl font-bold pb-2">Design Service</h1>
-                                <p class="leading-relaxed">
-                                    <span class="bg-[#b4f000] rounded-full border border-black text-black px-3 py-1 inline-block whitespace-nowrap">Brand Identity</span>
-                                    <span class="inline-flex flex-wrap gap-x-1 mt-2">
-                                        <span><b class="text-yellow-500">/</b> Logo Design</span>
-                                        <span><b class="text-yellow-500">/</b> Poster Design</span>
-                                        <span><b class="text-yellow-500">/</b> Packaging Design</span>
-                                        <span><b class="text-yellow-500">/</b> Social Media Design</span>
-                                        <span><b class="text-yellow-500">/</b> Infographic Design</span>
-                                        <span><b class="text-yellow-500">/</b> Editorial Design</span>
-                                        <span><b class="text-yellow-500">/</b> Book Design</span>
-                                    </span>
-                                </p>
-                            </div>
-                            <div class="flex flex-col flex-1">
-                                <h1 class="text-4xl font-bold pb-2">Illustration Service</h1>
-                                <p class="leading-relaxed">
-                                    <span class="inline-flex flex-wrap gap-x-1">
-                                        <span>2D Illustration</span>
-                                        <span><b class="text-yellow-500">/</b> Environmental Design</span>
-                                        <span><b class="text-yellow-500">/</b> Game Design</span>
-                                        <span><b class="text-yellow-500">/</b> Character design</span>
-                                        <span><b class="text-yellow-500">/</b> Mascot Illustration</span>
-                                        <span><b class="text-yellow-500">/</b> Advertising Illustration</span>
-                                    </span>
-                                </p>
-                            </div>
+                    <div class="flex flex-col flex-1">
+                        <h1 class="text-5xl font-bold pb-2">Illustration Service</h1>
+                        <p class="leading-relaxed">
+                            <span class="inline-flex flex-wrap gap-x-1 mt-2 text-xl">
+                                <span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">2D Illustration</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Environmental Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Game Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Character design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Mascot Illustration</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Advertising Illustration</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="flex justify-start items-center mt-6 w-full">
+                    <div class="flex items-center w-full">
+                        <div class="bg-[#e6e6e6] rounded-r-full py-2 pl-4 pr-2 flex items-center justify-between flex-1">
+                            <span class="text-2xl">Claim coupon <b class="text-black">10% off</b> for your first order</span>
+                            <button class="bg-black text-white px-16 py-1 rounded-full uppercase text-2xl font-medium whitespace-nowrap ml-4 transition-all duration-300 ease-out hover:bg-[#b4f000] hover:text-black">
+                                claim!
+                            </button>
                         </div>
-                        <div class="flex justify-center items-center mt-6">
-                            <div class="flex items-center gap-0">
-                                <div class="bg-[#e6e6e6] rounded-r-full py-2 pl-4 pr-2">
-                                    <span class="text-lg">Claim coupon <b class="text-black">10% off</b> for your first order</span>
-                                    <button class="bg-black text-white px-6 py-1 rounded-full uppercase text-lg font-medium whitespace-nowrap ml-1">claim!</button>
-                                </div>
-                            </div>
-                            <div class="bg-[#ff6600] p-2 rounded-full ml-4">
-                                <img src="/public/assets/image/banner/arrow-white-bottom.svg" alt="" class="rotate-90 -scale-100 w-5 h-5">
-                            </div>
+                        <div ref="arrowRef" class="bg-[#ff6600] p-2 rounded-full ml-4 flex-shrink-0">
+                            <img
+                                src="/public/assets/image/banner/arrow-white-bottom.svg" 
+                                alt="" 
+                                class="rotate-90 -scale-100 w-6 h-6"
+                            >
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="bg-[#cfcfcf]">
-            <RackDivider
-                :color="'#e6e6e6'"
-                :top-color="'#ffffff'"
-                :mid-radius="40"
-                :height="40"
-                :tab-height="34"
-                :notch-depth="34"
-                :tab-width="40"
-                :radius="10"
-                :responsive="true"
-                :manual-positions="[
-                    { xPct: 25, type: 'out' },
-                    { xPct: 30, type: 'in' },
-                    { xPct: 90, type: 'out' },
-                ]"
-            />
-        </div>
+    <div class="bg-[#cfcfcf]">
+        <RackDivider
+            :color="'#e6e6e6'"
+            :top-color="'#ffffff'"
+            :mid-radius="40"
+            :height="40"
+            :tab-height="34"
+            :notch-depth="34"
+            :tab-width="40"
+            :radius="10"
+            :responsive="true"
+            :manual-positions="[
+                { xPct: 25, type: 'out' },
+                { xPct: 30, type: 'in' },
+                { xPct: 90, type: 'out' },
+            ]"
+        />
+    </div>
 
-        <!-- ============================================================ -->
-        <!-- product placement                                            -->
-        <!-- ============================================================ -->
-        <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-14 px-16 text-black">
+    <!-- ============================================================ -->
+    <!-- product placement                                            -->
+    <!-- ============================================================ -->
+    <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-14 px-16 text-black">
 
-            <!-- Header row: title + filter tabs -->
-            <div class="flex justify-between items-end mb-10">
-                <h1 class="shop-title text-6xl font-bold leading-tight">
-                    Official<br />Supplaybox Shop
-                </h1>
+        <!-- Header row: title + filter tabs -->
+        <div class="flex justify-between items-end mb-10">
+            <h1 class="shop-title text-6xl font-bold leading-tight">
+                Official<br />Supplaybox Shop
+            </h1>
 
-                <!-- Filter tabs: wrapped in a single pill container -->
-                <div class="shop-filter-wrap">
-                    <button
-                        class="shop-filter-btn"
-                        :class="activeFilter === 'artwork' ? 'shop-filter-active' : 'shop-filter-inactive'"
-                        @click="onFilterChange('artwork')"
-                    >
-                        <span class="filter-dot" :class="activeFilter === 'artwork' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
-                        Artwork
-                    </button>
-                    <button
-                        class="shop-filter-btn"
-                        :class="activeFilter === 'font' ? 'shop-filter-active' : 'shop-filter-inactive'"
-                        @click="onFilterChange('font')"
-                    >
-                        <span class="filter-dot" :class="activeFilter === 'font' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
-                        Font
-                    </button>
-                </div>
-            </div>
-
-            <!-- Product grid -->
-            <div class="grid grid-cols-4 mb-10">
-                <div
-                    v-for="product in filteredProducts()"
-                    :key="product.id"
-                    class="product-card group bg-white overflow-hidden cursor-pointer border border-black/10 transition-all duration-300 ease-out"
-                    :style="{ outlineColor: activeProductId === product.id ? '#b4f000' : 'transparent' }"
-                    @click="redirectToProduct(product.id)"
+            <!-- Filter tabs: wrapped in a single pill container -->
+            <div class="shop-filter-wrap">
+                <button
+                    class="shop-filter-btn"
+                    :class="activeFilter === 'artwork' ? 'shop-filter-active' : 'shop-filter-inactive'"
+                    @click="onFilterChange('artwork')"
                 >
-                    <!-- Artwork image wrapper - rounded top corners -->
-                    <div class="overflow-hidden aspect-[3/4] w-full bg-[#d0d0d0] rounded-t-2xl" >
+                    <span class="filter-dot" :class="activeFilter === 'artwork' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
+                    Artwork
+                </button>
+                <button
+                    class="shop-filter-btn"
+                    :class="activeFilter === 'font' ? 'shop-filter-active' : 'shop-filter-inactive'"
+                    @click="onFilterChange('font')"
+                >
+                    <span class="filter-dot" :class="activeFilter === 'font' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
+                    Font
+                </button>
+            </div>
+        </div>
+
+        <!-- Product grid -->
+        <div class="grid grid-cols-4 mb-10 gap-4">
+            <div
+                v-for="product in filteredProducts()"
+                :key="product.id"
+                class="product-card group cursor-pointer border border-black/10 transition-all duration-300 ease-out rounded-2xl overflow-hidden"
+                @click="redirectToProduct(product.id)"
+            >
+                <!-- Artwork image wrapper dengan padding -->
+                <div class="product-card-image-wrap p-12 pb-0 transition-colors duration-300">
+                    <div class="overflow-hidden aspect-[3/4] w-full rounded-xl">
                         <img
                             :src="product.image"
                             :alt="product.name"
-                            class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05] rounded-t-2xl"
+                            class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
                         />
                     </div>
+                </div>
 
-                    <!-- Card footer - rounded bottom corners -->
-                    <div class="px-4 py-3 border-t border-black/10 flex items-center justify-center bg-[#d0d0d0]">
-                        <span class="text-lg font-semibold text-black">{{ product.name }}</span>
-                    </div>
+                <!-- Card footer -->
+                <div class="product-card-footer px-4 py-3 flex items-center justify-center transition-colors duration-300">
+                    <span class="text-2xl font-semibold text-black">{{ product.name }}</span>
                 </div>
             </div>
-
-            <!-- CTA button -->
-            <div class="flex justify-center">
-                <button class="shop-cta-btn group relative overflow-hidden bg-black text-white font-bold text-sm tracking-widest uppercase px-12 py-4 rounded-full transition-all duration-300 hover:tracking-[0.18em]">
-                    <!-- Green fill slides in from left on hover -->
-                    <span class="absolute inset-0 bg-[#b4f000] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-350 ease-out rounded-full"></span>
-                    <span class="relative z-10 group-hover:text-black transition-colors duration-200">View All Product</span>
-                </button>
-            </div>
-
         </div>
-        <!-- ============================================================ -->
+
+        <!-- CTA button -->
+        <div class="flex justify-center">
+            <button class="shop-cta-btn group relative overflow-hidden bg-black text-white font-bold text-sm tracking-widest uppercase px-12 py-4 rounded-full transition-all duration-300 hover:tracking-[0.18em]">
+                <!-- Green fill slides in from left on hover -->
+                <span class="absolute inset-0 bg-[#b4f000] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-350 ease-out rounded-full"></span>
+                <span class="relative z-10 group-hover:text-black transition-colors duration-200">View All Product</span>
+            </button>
+        </div>
 
     </div>
+    <!-- ============================================================ -->
 
     <FooterSection />
 
@@ -1088,8 +747,8 @@ const scrollToSection = (sectionId) => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
+  padding: 0.6rem;
+  border-radius: 0.775rem;
 }
 
 .social-icon-wrapper:hover {
@@ -1099,36 +758,6 @@ const scrollToSection = (sectionId) => {
 
 .social-icon-wrapper:hover img {
   filter: brightness(0) saturate(100%);
-}
-
-[class*="col-span"] {
-    transition: box-shadow 0.2s ease;
-    will-change: transform, box-shadow;
-    cursor: pointer;
-    backface-visibility: hidden;
-    -webkit-font-smoothing: subpixel-antialiased;
-}
-
-[class*="col-span"]:hover {
-    z-index: 20;
-}
-
-img {
-    transition: transform 0.3s ease;
-    will-change: transform;
-}
-
-p, h1, h2, h3, h4, span, button {
-    backface-visibility: hidden;
-    -webkit-font-smoothing: subpixel-antialiased;
-}
-
-.overflow-hidden {
-    -webkit-mask-image: -webkit-radial-gradient(white, black);
-}
-
-button:active {
-    transform: scale(0.97);
 }
 
 /* Filter pill container */
@@ -1156,13 +785,11 @@ button:active {
     line-height: 1;
 }
 
-/* Active: green-yellow background, black text */
 .shop-filter-active {
     background: #b4f000;
     color: #111;
 }
 
-/* Inactive: transparent, muted text */
 .shop-filter-inactive {
     background: transparent;
     color: #666;
@@ -1172,7 +799,6 @@ button:active {
     color: #111;
 }
 
-/* Dot — filled black circle when active */
 .filter-dot {
     display: inline-block;
     width: 8px;
@@ -1187,45 +813,45 @@ button:active {
     border: none;
 }
 
-/* Hollow circle when inactive */
 .filter-dot-inactive {
     background: transparent;
     border: 1.5px solid #999;
 }
 
-/* Product card hover — background changes to #b4f000, no outline, image original */
 .product-card {
+    background-color: #ffffff;
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 background-color 0.3s ease-out;
     will-change: transform, box-shadow;
-    border-radius: 1rem;
+}
+
+.product-card-image-wrap {
+    background-color: #d0d0d0;
+    transition: background-color 0.3s ease-out;
+}
+
+.product-card-footer {
+    background-color: #d0d0d0;
+    transition: background-color 0.3s ease-out;
 }
 
 .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.18);
-    background-color: #b4f000 !important;
+    background-color: #b4f000;
     z-index: 10;
 }
 
-/* Override child background on hover */
-.product-card:hover .bg-[#d0d0d0] {
-    background-color: #b4f000 !important;
+.product-card:hover .product-card-image-wrap {
+    background-color: #b4f000;
 }
 
-/* Keep image original colors - no filter or blend mode */
-.product-card:hover img {
-    filter: none;
+.product-card:hover .product-card-footer {
+    background-color: #b4f000;
+    border-top-color: rgba(0,0,0,0.1);
 }
 
-/* Image container styling */
-.product-card .overflow-hidden {
-    border-radius: 1rem 1rem 0 0;
-}
-
-
-/* CTA button fill animation */
 .shop-cta-btn .absolute {
     transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
 }

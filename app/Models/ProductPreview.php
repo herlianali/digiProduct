@@ -2,15 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductPreview extends Model
 {
-    protected $table = 'product_previews';
-    protected $guarded = [];
+    use HasFactory;
 
-    public function product(): BelongsTo
+    protected $fillable = [
+        'product_id',
+        'type',
+        'path',
+        'sort_order',
+    ];
+
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }

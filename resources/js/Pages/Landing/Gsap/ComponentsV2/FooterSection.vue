@@ -4,18 +4,13 @@
     @mouseenter="hovered = true"
     @mouseleave="hovered = false"
   >
-    <!-- ── Layer 1: Animated gradient background (always behind) ── -->
     <div class="footer-gradient" :class="{ active: hovered }" />
 
-    <!-- ── Layer 2: Dark overlay that CONVERGES into oval on hover ── -->
     <div class="dark-overlay" :class="{ converged: hovered }" />
 
-    <!-- ── Layer 3: Main area (always on top of overlay) ── -->
     <div class="footer-body">
 
-      <!-- Floating social icon badges with INDIVIDUAL LINKS (visible on hover) -->
       <div class="floating-icons" :class="{ visible: hovered }">
-        <!-- Masing-masing badge sekarang adalah <a> dengan link sendiri -->
         <a :href="iconLinks.pinterest" target="_blank" rel="noopener noreferrer" class="fi fi-1" title="Pinterest">
           <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
         </a>
@@ -41,90 +36,13 @@
         </a>
       </div>
 
-      <!-- ── "Get in Touch" pill dengan HYPERLINK (seluruh area klikable) ── -->
-      <!-- 
-        ============================================================
-        🔧 CUSTOMIZATION COMMENT:
-        
-        1. UNTUK MENGUBAH LINK:
-           Ganti nilai 'getInTouchUrl' di bagian <script setup>
-           Bisa pakai external URL (https://...) atau mailto:email@gmail.com
-        
-        2. UNTUK MENGGANTI MASCOT DENGAN GAMBAR CUSTOM:
-           - Cari comment "REPLACE THIS BLOCK WITH CUSTOM IMAGE" di bawah
-           - Ganti seluruh elemen <svg class="mascot-svg" ...> dengan:
-             <img class="mascot-svg" src="/path/to/your-image.svg" alt="Mascot">
-           - Atau jika pakai gambar PNG/JPG: 
-             <img class="mascot-svg" src="/images/mascot.png" alt="Mascot">
-           - Class "mascot-svg" tetap dipertahankan untuk styling (ukuran & animasi)
-           - Pastikan gambar memiliki background transparan agar cocok dengan tema
-        
-        3. UNTUK MENGGANTI TEKS "Get in" dan "Touch":
-           - Edit langsung di baris 146 dan 242 (tag <span class="git-text">)
-           - Teks baru akan otomatis menyesuaikan ukuran (clamp responsive)
-        
-        4. STRUKTUR PILL:
-           - Seluruh area (Get in + Mascot + Touch) terbungkus tag <a class="pill-link">
-           - Jadi link akan tetap utuh meskipun Anda mengganti konten di dalamnya
-        ============================================================
-      -->
-      <a :href="getInTouchUrl" target="_blank" rel="noopener noreferrer" class="pill-link">
+      <a @click="getInTouchUrl" target="_blank" rel="noopener noreferrer" class="pill-link">
         <div class="pill-wrapper">
-          <span class="git-text">Get in</span>
 
-          <!-- MASCOT SECTION - REPLACE THIS BLOCK WITH CUSTOM IMAGE IF NEEDED -->
-          <div class="mascot-wrap">
-            <!-- 
-              🔁 UNTUK MENGGANTI DENGAN GAMBAR CUSTOM:
-              Hapus tag <svg> di bawah ini dan ganti dengan:
-              <img class="mascot-svg" src="your-image.svg" alt="Mascot Illustration">
-            -->
-            <svg class="mascot-svg" viewBox="0 0 120 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M60 155 Q85 165 90 150 Q95 135 80 128 Q72 124 68 130 Q65 138 60 155Z" fill="#c0392b" stroke="#1a1a1a" stroke-width="1.5"/>
-              <path d="M62 147 Q80 152 82 142 Q84 133 74 130" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
-              <rect x="46" y="130" width="14" height="32" rx="7" fill="#3498db"/>
-              <rect x="62" y="130" width="14" height="32" rx="7" fill="#3498db"/>
-              <ellipse cx="53" cy="162" rx="9" ry="5" fill="#1a1a1a"/>
-              <ellipse cx="69" cy="162" rx="9" ry="5" fill="#1a1a1a"/>
-              <rect x="38" y="90" width="44" height="48" rx="10" fill="#f0f0f0"/>
-              <rect x="38" y="90" width="44" height="10" rx="5" fill="#c0392b"/>
-              <rect x="44" y="104" width="32" height="28" rx="4" fill="#e8e8e8"/>
-              <text x="60" y="116" text-anchor="middle" font-size="5" fill="#333" font-family="sans-serif" font-weight="bold">Graphic</text>
-              <text x="60" y="123" text-anchor="middle" font-size="5" fill="#333" font-family="sans-serif">Design is</text>
-              <text x="60" y="130" text-anchor="middle" font-size="5" fill="#c0392b" font-family="sans-serif" font-weight="bold">my Passion</text>
-              <path d="M38 100 Q22 108 20 118 Q19 124 24 126 Q30 128 34 120 Q38 112 40 106Z" fill="#c0392b"/>
-              <path d="M82 100 Q98 108 100 118 Q101 124 96 126 Q90 128 86 120 Q82 112 80 106Z" fill="#c0392b"/>
-              <path d="M96 116 L108 114 Q112 113 112 116 Q112 119 108 119 L96 119Z" fill="#f5cba7"/>
-              <ellipse cx="60" cy="64" rx="28" ry="28" fill="#c0392b"/>
-              <circle cx="34" cy="44" r="10" fill="#c0392b"/>
-              <circle cx="86" cy="44" r="10" fill="#c0392b"/>
-              <circle cx="34" cy="44" r="5" fill="#e8a0a0"/>
-              <circle cx="86" cy="44" r="5" fill="#e8a0a0"/>
-              <ellipse cx="60" cy="70" rx="18" ry="16" fill="#f9e4d4"/>
-              <circle cx="52" cy="60" r="5" fill="white"/>
-              <circle cx="68" cy="60" r="5" fill="white"/>
-              <circle cx="53" cy="61" r="3" fill="#1a1a1a"/>
-              <circle cx="69" cy="61" r="3" fill="#1a1a1a"/>
-              <circle cx="54" cy="60" r="1" fill="white"/>
-              <circle cx="70" cy="60" r="1" fill="white"/>
-              <ellipse cx="60" cy="70" rx="4" ry="3" fill="#c0392b"/>
-              <ellipse cx="60" cy="70" rx="2.5" ry="1.8" fill="#a93226"/>
-              <path d="M52 76 Q60 83 68 76" stroke="#a93226" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-              <ellipse cx="46" cy="68" rx="5" ry="3" fill="#e8a0a0" opacity="0.6"/>
-              <ellipse cx="74" cy="68" rx="5" ry="3" fill="#e8a0a0" opacity="0.6"/>
-              <path d="M35 55 Q60 45 85 55" stroke="#1a1a1a" stroke-width="2" fill="none"/>
-            </svg>
-          </div>
-          <!-- END OF MASCOT SECTION - REPLACE ABOVE BLOCK WITH CUSTOM IMAGE -->
-
-          <span class="git-text">Touch</span>
+          <img src="/public/assets/image/footer.png" alt="">
         </div>
       </a>
 
-      <!-- Contact -->
-      <p class="contact-line">
-        <strong>Contact :</strong> supplaybox999@gmail.com
-      </p>
     </div>
 
     <!-- ── Bottom bar ── -->
@@ -169,18 +87,13 @@
                 </svg>
             </a>
         </div>
-      <!-- <div class="socials">
-        <span class="follow-label">Follow</span>
-        <a v-for="s in socials" :key="s.name" :href="s.url" target="_blank" rel="noopener noreferrer" :aria-label="s.name" class="social-icon">
-          <span v-html="s.svg"></span>
-        </a>
-      </div> -->
     </div>
   </footer>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { route } from 'ziggy-js'
 
 const hovered = ref(false)
 
@@ -196,18 +109,12 @@ const iconLinks = {
   threads: 'https://www.threads.net/@supplaybox'
 }
 
-// ============================================================
-// 🔗 LINK UNTUK "GET IN TOUCH" BUTTON (seluruh area pill)
-// Ganti sesuai kebutuhan:
-// - Pakai URL: 'https://supplaybox.com/contact'
-// - Pakai Email: 'mailto:supplaybox999@gmail.com'
-// - Pakai WhatsApp: 'https://wa.me/62xxxxxxxxxx'
-// ============================================================
-const getInTouchUrl = 'https://supplaybox.com/contact' // Ganti dengan link yang diinginkan
+const getInTouchUrl = () => {
+  return window.location = route('GetInTuch\0')
+}
 </script>
 
 <style scoped>
-/* ── semua CSS tetap sama seperti kode asli Anda ── */
 .footer-root {
   position: relative;
   overflow: hidden;
@@ -246,7 +153,6 @@ const getInTouchUrl = 'https://supplaybox.com/contact' // Ganti dengan link yang
   gap: 12px;
 }
 
-/* Style untuk pill link (agar tidak ada underline default) */
 .pill-link {
   text-decoration: none;
   display: block;
@@ -319,12 +225,12 @@ const getInTouchUrl = 'https://supplaybox.com/contact' // Ganti dengan link yang
   transform: scale(0.4) translateY(20px);
   transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   pointer-events: none;
-  text-decoration: none; /* hilangkan underline pada link */
+  text-decoration: none;
 }
 .floating-icons.visible .fi {
   opacity: 1;
   transform: scale(1) translateY(0);
-  pointer-events: auto; /* aktifkan klik saat visible */
+  pointer-events: auto;
 }
 .fi svg { width: 18px; height: 18px; }
 

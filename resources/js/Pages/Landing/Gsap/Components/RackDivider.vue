@@ -26,7 +26,7 @@ const viewportWidth = ref(1200)
 
 const getViewportWidth = () => {
     if (typeof window === 'undefined') return 1200
-    return window.innerWidth
+    return document.documentElement.clientWidth
 }
 
 const getResponsiveTabCount = () => {
@@ -55,6 +55,24 @@ const getResponsiveTabWidth = () => {
 const updateViewport = () => {
     viewportWidth.value = getViewportWidth()
 }
+
+let resizeObserver = null
+
+onMounted(() => {
+    updateViewport()
+    window.addEventListener('resize', updateViewport)
+    
+    // ✅ ResizeObserver untuk akurasi lebih baik (handle sidebar, zoom, dll)
+    if (typeof ResizeObserver !== 'undefined') {
+        resizeObserver = new ResizeObserver(() => updateViewport())
+        resizeObserver.observe(document.documentElement)
+    }
+})
+
+onUnmounted(() => {
+    window.removeEventListener('resize', updateViewport)
+    if (resizeObserver) resizeObserver.disconnect()
+})
 
 // Watch for resize
 if (typeof window !== 'undefined') {
@@ -151,21 +169,22 @@ const buildTopPath = () => {
             `A${mr.value},${mr.value} 0 0 1 ${VW.value - mr.value},${barY.value} ` +
             `L${mr.value},${barY.value} ` +
             `A${mr.value},${mr.value} 0 0 1 0,${barY.value - mr.value} ` +
-            `Z `
+            `Z`
         )
     } else {
-        d = `M0,0 L${VW.value},0 L${VW.value},${barY.value} L0,${barY.value} Z `
+        d = `M0,0 L${VW.value},0 L${VW.value},${barY.value} L0,${barY.value} Z`
     }
-
+    
     tabs.value.forEach(({ xl, xr, type }) => {
         if (type === 'in') {
             const nY = notchEndY.value
-            const x1 = xl - 1, x2 = xr + 1
-            const y1 = barY.value - 1
-            const y2 = isDown.value ? nY + 1 : nY - 1
-            d += `M${x1},${y1} L${x2},${y1} L${x2},${y2} L${x1},${y2} Z `
+            d += `M${xl - r.value},${barY.value} ` +
+                 `L${xr + r.value},${barY.value} ` +
+                 `L${xr + r.value},${nY} ` +
+                 `L${xl - r.value},${nY} Z `
         }
     })
+
     return d
 }
 

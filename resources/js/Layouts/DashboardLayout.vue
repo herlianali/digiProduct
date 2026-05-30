@@ -36,14 +36,14 @@
         <ul class="space-y-1">
           <li class="relative">
             <div
-              v-if="isActive('/dashboard')"
+              v-if="isActive('admin.dashboard')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/dashboard"
+              href="/admin/dashboard"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/dashboard')
+              :class="isActive('admin.dashboard')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -54,14 +54,32 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/products')"
+              v-if="isActive('admin.catalog')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/products"
+              href="/admin/catalog"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/products')
+              :class="isActive('admin.catalog')
+                ? 'bg-brand-50 text-brand-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <ListBulletIcon class="w-5 h-5 flex-shrink-0"/>
+              <span class="truncate">Catalog</span>
+            </Link>
+          </li>
+
+          <li class="relative">
+            <div
+              v-if="isActive('admin.products')"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
+            ></div>
+
+            <Link
+              href="/admin/products"
+              class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
+              :class="isActive('admin.products')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -72,14 +90,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/order')"
+              v-if="isActive('admin.orders')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/orders"
+              href="/admin/orders"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/order')
+              :class="isActive('admin.orders')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -90,14 +108,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/articles')"
+              v-if="isActive('admin.articles')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/articles"
+              href="/admin/articles"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/articles')
+              :class="isActive('admin.articles')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -108,14 +126,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/analytic')"
+              v-if="isActive('admin.analytics')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
-              href="/analytic"
+              href="/admin/analytics"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/analytic')
+              :class="isActive('admin.analytics')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -126,14 +144,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('/setting')"
+              v-if="isActive('admin.settings')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <button
               @click="settingOpen = !settingOpen"
               class="flex items-center justify-between w-full gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('/setting')
+              :class="isActive('admin.settings')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -167,9 +185,9 @@
               >
                 <li>
                   <Link
-                    href="/settings/content"
+                    href="/admin/settings/content"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/settings/content')
+                    :class="isActive('admin.settings.content')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -179,9 +197,9 @@
 
                 <li>
                   <Link
-                    href="/settings/slider-home"
+                    href="/admin/settings/slider-home"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/settings/slider-home')
+                    :class="isActive('admin.settings.slider-home')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -191,9 +209,9 @@
 
                 <li>
                   <Link
-                    href="/settings/slider-company"
+                    href="/admin/settings/slider-company"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/settings/slider-company')
+                    :class="isActive('admin.settings.slider-company')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -203,9 +221,9 @@
 
                 <li>
                   <Link
-                    href="/settings/testimoni-user"
+                    href="/admin/settings/testimoni-user"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('/settings/testimoni-user')
+                    :class="isActive('admin.settings.testimoni-user')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -373,7 +391,8 @@ import {
   ShoppingCartIcon,
   BookOpenIcon,
   Cog6ToothIcon,
-  ChartBarSquareIcon
+  ChartBarSquareIcon,
+  ListBulletIcon
 } from '@heroicons/vue/24/outline'
 
 const sidebarOpen = ref(false)
@@ -403,17 +422,18 @@ const closeDropdowns = () => {
 
 const handleLogout = () => {
   closeDropdowns()
-  router.post(route('logout'))
+  router.post(route('admin.logout'))
 }
 
 const getPageTitle = () => {
   const path = page.url
 
-  if (path.startsWith('/dashboard')) return 'Dashboard'
-  if (path.startsWith('/products')) return 'Products'
-  if (path.startsWith('/order')) return 'Orders'
-  if (path.startsWith('/articles')) return 'Articles'
-  if (path.startsWith('/setting')) return 'Settings'
+  if (path.startsWith('admin/dashboard')) return 'Dashboard'
+  if (path.startsWith('admin/catalog')) return 'Catalog'
+  if (path.startsWith('admin/products')) return 'Products'
+  if (path.startsWith('admin/order')) return 'Orders'
+  if (path.startsWith('admin/articles')) return 'Articles'
+  if (path.startsWith('admin/setting')) return 'Settings'
 
   return 'Dashboard'
 }
@@ -421,16 +441,17 @@ const getPageTitle = () => {
 const getPageDescription = () => {
   const path = page.url
 
-  if (path.startsWith('/dashboard')) return 'Overview of your store performance'
-  if (path.startsWith('/products')) return 'Manage your digital products'
-  if (path.startsWith('/order')) return 'View and manage customer orders'
-  if (path.startsWith('/articles')) return 'Manage blog articles and content'
-  if (path.startsWith('/setting')) return 'Configure your store settings'
+  if (path.startsWith('admin/dashboard')) return 'Overview of your store performance'
+  if (path.startsWith('admin/catalog')) return 'Manage product categories and tags'
+  if (path.startsWith('admin/products')) return 'Manage your digital products'
+  if (path.startsWith('admin/order')) return 'View and manage customer orders'
+  if (path.startsWith('admin/articles')) return 'Manage blog articles and content'
+  if (path.startsWith('admin/setting')) return 'Configure your store settings'
 
   return 'Admin dashboard'
 }
 
-if (page.url.startsWith('/setting')) {
+if (page.url.startsWith('admin/setting')) {
   settingOpen.value = true
 }
 
