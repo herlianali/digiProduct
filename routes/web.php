@@ -19,13 +19,16 @@ use App\Http\Controllers\Admin\ContentSettingController;
 use App\Http\Controllers\Admin\TestimonialsController;
 use App\Http\Controllers\Admin\HomeSlidersController;
 use App\Http\Controllers\Admin\CompanySlidersController;
+use App\Http\Controllers\Admin\ProjectInquiryController;
+use App\Http\Controllers\Admin\VoucherController;
+use App\Http\Controllers\PublicInquiryController;
 
 // ══════════════════════════════════════════════════════════════════
 // GUEST
 // ══════════════════════════════════════════════════════════════════
 
 Route::middleware('guest')->group(function () {
-    Route::get ('/login', [LoginController::class, 'show'] )->name('login');
+    Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 });
 
@@ -36,8 +39,9 @@ Route::middleware('guest')->group(function () {
 Route::get('/',                         [LandingController::class, 'index']);
 Route::get('/gsap',                     [LandingController::class, 'gsap'])->name('gsap');
 Route::get('/product-place',            [ProductPlacementController::class, 'index'])->name('ProductPlace.index');
-Route::get('/product-place/detail/{id}',[ProductPlacementController::class, 'show'])->name('ProductPlace.show');
-Route::get('/get-in-touch',             [LandingController::class, 'GetInTuch'])->name('GetInTuch');
+Route::get('/product-place/detail/{id}', [ProductPlacementController::class, 'show'])->name('ProductPlace.show');
+Route::get('/get-in-touch',             [PublicInquiryController::class, 'index'])->name('GetInTuch');
+Route::post('/get-in-touch/store',      [PublicInquiryController::class, 'store'])->name('GetInTuch.store');
 Route::get('/our-team',                 [LandingController::class, 'OurTeam'])->name('OurTeam');
 Route::get('/portfolio/detail/{id}',    [LandingController::class, 'PortfolioDetail'])->name('PortfolioDetail');
 
@@ -66,31 +70,35 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::delete('/{product}',             [ProductController::class, 'destroy'])->name('destroy');
         Route::post('{product}/reorder-images', [ProductController::class, 'reorderImages'])->name('reorder-images');
     });
-    
+
     // ── Admin: Catalog (styles, tags, tag groups) ─────────────────────
     Route::prefix('catalog')->name('catalog.')->middleware(['auth'])->group(function () {
         Route::get('/', [CatalogController::class, 'index'])->name('index');
-    
+
         // Styles
         Route::post('/styles',          [CatalogController::class, 'storeStyle'])->name('styles.store');
         Route::put('/styles/{style}',   [CatalogController::class, 'updateStyle'])->name('styles.update');
-        Route::delete('/styles/{style}',[CatalogController::class, 'destroyStyle'])->name('styles.destroy');
-    
+        Route::delete('/styles/{style}', [CatalogController::class, 'destroyStyle'])->name('styles.destroy');
+
         // Product categories
         Route::post('/categories',              [CatalogController::class, 'storeCategory'])->name('categories.store');
         Route::put('/categories/{category}',    [CatalogController::class, 'updateCategory'])->name('categories.update');
         Route::delete('/categories/{category}', [CatalogController::class, 'destroyCategory'])->name('categories.destroy');
-    
+
         // Tag groups
         Route::post('/tag-groups',               [CatalogController::class, 'storeTagGroup'])->name('tag-groups.store');
         Route::put('/tag-groups/{tagGroup}',     [CatalogController::class, 'updateTagGroup'])->name('tag-groups.update');
         Route::delete('/tag-groups/{tagGroup}',  [CatalogController::class, 'destroyTagGroup'])->name('tag-groups.destroy');
-    
+
         // Tags
         Route::post('/tags',        [CatalogController::class, 'storeTag'])->name('tags.store');
         Route::put('/tags/{tag}',   [CatalogController::class, 'updateTag'])->name('tags.update');
-        Route::delete('/tags/{tag}',[CatalogController::class, 'destroyTag'])->name('tags.destroy');
+        Route::delete('/tags/{tag}', [CatalogController::class, 'destroyTag'])->name('tags.destroy');
     });
+
+    Route::resource('vouchers', VoucherController::class);
+    Route::resource('inquiries', ProjectInquiryController::class);
+
 
     // ── Settings ──────────────────────────────────────────────────
     Route::prefix('settings')->name('settings.')->group(function () {
