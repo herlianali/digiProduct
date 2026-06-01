@@ -36,8 +36,8 @@ class ProductController extends Controller
                 'category'   => $p->category?->name ?? '-',
                 'style'      => $p->style?->name ?? '-',
                 'tags'       => $p->tags->pluck('label')->join(', ') ?: '-',
-                'price'      => $p->is_free ? 'Free' : 'Rp ' . number_format($p->price ?? 0, 0, ',', '.'),
-                'status'     => $p->status ?? 'draft',   // lowercase, badge di Vue yang format
+                'price'      => $p->is_free ? 'Free' : '$ ' . number_format($p->price ?? 0, 0, ',', '.'),
+                'status'     => $p->status ?? 'draft',
                 'created_at' => $p->created_at?->format('d/m/Y H:i') ?? '-',
             ])
             ->values()
@@ -59,9 +59,9 @@ class ProductController extends Controller
             'categories' => Category::where('is_tag_group', false)->orderBy('name')->get(['id', 'name']),
             'styles'     => Style::orderBy('name')->get(['id', 'name']),
             'tagGroups'  => Category::where('is_tag_group', true)
-                                ->with('tags:id,label,category_id')
-                                ->orderBy('name')
-                                ->get(['id', 'name']),
+                ->with('tags:id,label,category_id')
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 
@@ -118,7 +118,6 @@ class ProductController extends Controller
 
             return redirect()->route('admin.products.index')
                 ->with('success', "Produk \"{$product->title}\" berhasil ditambahkan.");
-
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => $e->getMessage()]);
         }
@@ -158,9 +157,9 @@ class ProductController extends Controller
             'categories'     => Category::where('is_tag_group', false)->orderBy('name')->get(['id', 'name']),
             'styles'         => Style::orderBy('name')->get(['id', 'name']),
             'tagGroups'      => Category::where('is_tag_group', true)
-                                    ->with('tags:id,label,category_id')
-                                    ->orderBy('name')
-                                    ->get(['id', 'name']),
+                ->with('tags:id,label,category_id')
+                ->orderBy('name')
+                ->get(['id', 'name']),
         ]);
     }
 
@@ -222,7 +221,7 @@ class ProductController extends Controller
                     ]);
                 }
             }
-            
+
             // Update image order if provided
             if ($request->filled('image_order')) {
                 $imageOrder = json_decode($request->image_order, true) ?? [];
@@ -243,7 +242,6 @@ class ProductController extends Controller
 
             return redirect()->route('admin.products.index')
                 ->with('success', "Produk \"{$product->title}\" berhasil diperbarui.");
-
         } catch (\Exception $e) {
             return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
@@ -258,7 +256,7 @@ class ProductController extends Controller
                 Storage::disk('public')->delete($preview->path);
             }
             $product->previews()->delete();
-            
+
             $title = $product->title;
             $product->delete();
             return back()->with('success', "Produk \"{$title}\" berhasil dihapus.");
@@ -299,8 +297,8 @@ class ProductController extends Controller
 
         while (
             Product::where('slug', $slug)
-                ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
-                ->exists()
+            ->when($exceptId, fn($q) => $q->where('id', '!=', $exceptId))
+            ->exists()
         ) {
             $slug = "{$base}-{$counter}";
             $counter++;
@@ -315,19 +313,19 @@ class ProductController extends Controller
             'image_order' => 'required|array',
             'image_order.*' => 'exists:product_previews,id'
         ]);
-        
+
         foreach ($request->image_order as $index => $imageId) {
             $product->previews()
                 ->where('id', $imageId)
                 ->update(['sort_order' => $index]);
         }
-        
+
         // Update thumbnail
         $firstImage = $product->previews()->orderBy('sort_order')->first();
         if ($firstImage) {
             $product->update(['thumbnail' => $firstImage->path]);
         }
-        
+
         return back()->with('success', "Urutan gambar berhasil diperbarui.");
     }
 }

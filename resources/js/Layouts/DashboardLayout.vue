@@ -36,14 +36,14 @@
         <ul class="space-y-1">
           <li class="relative">
             <div
-              v-if="isActive('admin.dashboard')"
+              v-if="isActive('/admin/dashboard')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/admin/dashboard"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.dashboard')
+              :class="isActive('/admin/dashboard')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -54,14 +54,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('admin.catalog')"
+              v-if="isActive('/admin/catalog')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/admin/catalog"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.catalog')
+              :class="isActive('/admin/catalog')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -72,14 +72,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('admin.products')"
+              v-if="isActive('/admin/products')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/admin/products"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.products')
+              :class="isActive('/admin/products')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -90,14 +90,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('admin.orders')"
+              v-if="isActive('/admin/orders')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/admin/orders"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.orders')
+              :class="isActive('/admin/orders')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -108,14 +108,50 @@
 
           <li class="relative">
             <div
-              v-if="isActive('admin.articles')"
+              v-if="isActive('/admin/inquiries')"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
+            ></div>
+
+            <Link
+              href="/admin/inquiries"
+              class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
+              :class="isActive('/admin/inquiries')
+                ? 'bg-brand-50 text-brand-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <ChatBubbleLeftRightIcon class="w-5 h-5 flex-shrink-0"/>
+              <span class="truncate">Inquiries Projects</span>
+            </Link>
+          </li>
+
+          <li class="relative">
+            <div
+              v-if="isActive('/admin/vouchers')"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
+            ></div>
+
+            <Link
+              href="/admin/vouchers"
+              class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
+              :class="isActive('/admin/vouchers')
+                ? 'bg-brand-50 text-brand-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <TagIcon class="w-5 h-5 flex-shrink-0"/>
+              <span class="truncate">Vouchers</span>
+            </Link>
+          </li>
+
+          <li class="relative">
+            <div
+              v-if="isActive('/admin/articles')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/admin/articles"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.articles')
+              :class="isActive('/admin/articles')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -126,14 +162,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('admin.analytics')"
+              v-if="isActive('/admin/analytics')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <Link
               href="/admin/analytics"
               class="flex items-center gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.analytics')
+              :class="isActive('/admin/analytics')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -144,14 +180,14 @@
 
           <li class="relative">
             <div
-              v-if="isActive('admin.settings')"
+              v-if="isActive('/admin/settings')"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-10 lg:h-12 bg-brand-600 rounded-r-lg"
             ></div>
 
             <button
               @click="settingOpen = !settingOpen"
               class="flex items-center justify-between w-full gap-3 p-3 rounded-lg transition-all duration-200"
-              :class="isActive('admin.settings')
+              :class="isActive('/admin/settings')
                 ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'"
             >
@@ -187,7 +223,7 @@
                   <Link
                     href="/admin/settings/content"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('admin.settings.content')
+                    :class="isActive('/admin/settings/content')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -199,7 +235,7 @@
                   <Link
                     href="/admin/settings/slider-home"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('admin.settings.slider-home')
+                    :class="isActive('/admin/settings/slider-home')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -211,7 +247,7 @@
                   <Link
                     href="/admin/settings/slider-company"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('admin.settings.slider-company')
+                    :class="isActive('/admin/settings/slider-company')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -221,9 +257,9 @@
 
                 <li>
                   <Link
-                    href="/admin/settings/testimoni-user"
+                    href="/admin/settings/testimonials"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors"
-                    :class="isActive('admin.settings.testimoni-user')
+                    :class="isActive('/admin/settings/testimonials')
                       ? 'bg-brand-100 text-brand-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-100'"
                   >
@@ -392,7 +428,9 @@ import {
   BookOpenIcon,
   Cog6ToothIcon,
   ChartBarSquareIcon,
-  ListBulletIcon
+  ListBulletIcon,
+  ChatBubbleLeftRightIcon,
+  TagIcon
 } from '@heroicons/vue/24/outline'
 
 const sidebarOpen = ref(false)
@@ -407,8 +445,8 @@ const userInitial = computed(() =>
   user.value?.name?.charAt(0).toUpperCase() ?? 'U'
 )
 
-const isActive = (url) => {
-  return page.url.startsWith(url)
+const isActive = (routePath) => {
+  return page.url.startsWith(routePath)
 }
 
 const toggleProfileDropdown = () => {
@@ -428,12 +466,14 @@ const handleLogout = () => {
 const getPageTitle = () => {
   const path = page.url
 
-  if (path.startsWith('admin/dashboard')) return 'Dashboard'
-  if (path.startsWith('admin/catalog')) return 'Catalog'
-  if (path.startsWith('admin/products')) return 'Products'
-  if (path.startsWith('admin/order')) return 'Orders'
-  if (path.startsWith('admin/articles')) return 'Articles'
-  if (path.startsWith('admin/setting')) return 'Settings'
+  if (path.startsWith('/admin/dashboard')) return 'Dashboard'
+  if (path.startsWith('/admin/catalog')) return 'Catalog'
+  if (path.startsWith('/admin/products')) return 'Products'
+  if (path.startsWith('/admin/order')) return 'Orders'
+  if (path.startsWith('/admin/inquiries')) return 'Inquiries Projects'
+  if (path.startsWith('/admin/vouchers')) return 'Vouchers'
+  if (path.startsWith('/admin/articles')) return 'Articles'
+  if (path.startsWith('/admin/setting')) return 'Settings'
 
   return 'Dashboard'
 }
@@ -441,17 +481,19 @@ const getPageTitle = () => {
 const getPageDescription = () => {
   const path = page.url
 
-  if (path.startsWith('admin/dashboard')) return 'Overview of your store performance'
-  if (path.startsWith('admin/catalog')) return 'Manage product categories and tags'
-  if (path.startsWith('admin/products')) return 'Manage your digital products'
-  if (path.startsWith('admin/order')) return 'View and manage customer orders'
-  if (path.startsWith('admin/articles')) return 'Manage blog articles and content'
-  if (path.startsWith('admin/setting')) return 'Configure your store settings'
+  if (path.startsWith('/admin/dashboard')) return 'Overview of your store performance'
+  if (path.startsWith('/admin/catalog')) return 'Manage product categories and tags'
+  if (path.startsWith('/admin/products')) return 'Manage your digital products'
+  if (path.startsWith('/admin/order')) return 'View and manage customer orders'
+  if (path.startsWith('/admin/inquiries')) return 'Manage inquiry projects'
+  if (path.startsWith('/admin/vouchers')) return 'Manage vouchers'
+  if (path.startsWith('/admin/articles')) return 'Manage blog articles and content'
+  if (path.startsWith('/admin/setting')) return 'Configure your store settings'
 
   return 'Admin dashboard'
 }
 
-if (page.url.startsWith('admin/setting')) {
+if (page.url.startsWith('/admin/setting')) {
   settingOpen.value = true
 }
 

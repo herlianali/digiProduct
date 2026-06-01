@@ -1,8 +1,17 @@
+<!-- ComponentsV2/NavbarFloating.vue -->
+<!-- PERUBAHAN dari versi sebelumnya:
+     1. Import & inject useCart()
+     2. ShoppingCartIcon sekarang menampilkan badge count
+     3. @cart-click membuka CartSidebar via emit
+     4. CartSidebar di-mount di sini (atau bisa di parent - lihat catatan)
+-->
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ShoppingCartIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
+import { useCart } from '@/Composables/useCart'
+import CartSidebar from './CartSidebar.vue'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -15,14 +24,16 @@ const props = defineProps({
 
 const emit = defineEmits(['nav-click', 'cart-click', 'cta-click'])
 
+const cart = useCart()
+
 const navbarContainerRef = ref(null)
 const isNavbarVisible    = ref(false)
 const platformOpen       = ref(false)
-const wrapperRef         = ref(null)   // wrapper luar yang jadi anchor dropdown
-const platformWrapperRef = ref(null)
-const platformBtnRef = ref(null)
-const dropdownLeft   = ref(0)
-const dropdownTop    = ref(0)
+const wrapperRef         = ref(null)
+const platformBtnRef     = ref(null)
+const dropdownLeft       = ref(0)
+const dropdownTop        = ref(0)
+const cartOpen           = ref(false)
 
 const platformMenu = [
     {
@@ -75,6 +86,11 @@ const redirectLink = (section) => {
         case 'contact': return window.location.origin + '/get-in-touch'
         default:        return '#'
     }
+}
+
+const handleCartClick = () => {
+    cartOpen.value = true
+    emit('cart-click')
 }
 
 onMounted(() => {
@@ -140,7 +156,6 @@ const scrollToSection = (sectionId) => {
                                 @click.prevent="scrollToSection('about-us')"
                             >About Us</a>
 
-                            <!-- Tombol Platform SAJA di sini, tanpa wrapper dropdown -->
                             <button
                                 ref="platformBtnRef"
                                 class="font-bold text-black text-sm px-3 py-1.5 rounded-full bg-[#fee100] hover:bg-yellow-300 transition-colors duration-200 flex items-center gap-1 select-none"
@@ -180,10 +195,23 @@ const scrollToSection = (sectionId) => {
                                 <ChevronRightIcon class="w-3.5 h-3.5 text-black inline-block" />
                             </button>
 
-                            <ShoppingCartIcon
-                                class="w-5 h-5 text-black cursor-pointer hover:text-green-600 transition-colors"
-                                @click="emit('cart-click')"
-                            />
+                            <!-- ── CART BUTTON dengan badge ── -->
+                            <button
+                                class="relative p-1 hover:text-green-600 transition-colors"
+                                @click="handleCartClick"
+                            >
+                                <ShoppingCartIcon class="w-5 h-5 text-black" />
+
+                                <!-- Badge -->
+                                <Transition name="badge">
+                                    <span
+                                        v-if="cart.count.value > 0"
+                                        class="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] bg-[#4dfa03] text-black text-[10px] font-black rounded-full flex items-center justify-center px-[3px] shadow-sm"
+                                    >
+                                        {{ cart.count.value > 99 ? '99+' : cart.count.value }}
+                                    </span>
+                                </Transition>
+                            </button>
 
                             <span class="hidden md:inline-block border border-gray-200 rounded-full px-3 py-1 text-black text-sm font-medium">
                                 {{ balance }}
@@ -198,7 +226,7 @@ const scrollToSection = (sectionId) => {
             </div>
             <!-- ── END NAVBAR PILL ── -->
 
-            <!-- ── DROPDOWN — di luar navbar pill, sibling-nya ── -->
+            <!-- ── PLATFORM DROPDOWN ── -->
             <Transition
                 enter-active-class="transition duration-200 ease-out"
                 enter-from-class="opacity-0 scale-y-95 origin-top"
@@ -218,7 +246,6 @@ const scrollToSection = (sectionId) => {
                     }"
                 >
                     <div class="grid grid-cols-2 gap-x-6">
-                        <!-- Left: Service + Portofolio -->
                         <div class="flex flex-col">
                             <template v-for="group in platformMenu.slice(0, 2)" :key="group.group">
                                 <div class="flex items-center gap-2 mb-1 mt-3 first:mt-0">
@@ -233,7 +260,6 @@ const scrollToSection = (sectionId) => {
                                 </a>
                             </template>
                         </div>
-                        <!-- Right: Microstock -->
                         <div class="flex flex-col">
                             <template v-for="group in platformMenu.slice(2)" :key="group.group">
                                 <div class="flex items-center gap-2 mb-1">
@@ -251,18 +277,20 @@ const scrollToSection = (sectionId) => {
                     </div>
                 </div>
             </Transition>
-            <!-- ── END DROPDOWN ── -->
-
         </div>
     </div>
+
+    <!-- ── CART SIDEBAR (Teleport ke body agar tidak terpotong stacking context) ── -->
+    <Teleport to="body">
+        <CartSidebar :open="cartOpen" @close="cartOpen = false" />
+    </Teleport>
 </template>
 
 <style scoped>
 .dropdown-panel {
-    border-radius: 0 0 16px 16px;  /* ← ubah: kiri-atas DAN kanan-atas = 0 */
+    border-radius: 0 0 16px 16px;
 }
 
-/* Concave corner KIRI atas */
 .dropdown-panel::before {
     content: '';
     position: absolute;
@@ -276,7 +304,6 @@ const scrollToSection = (sectionId) => {
     pointer-events: none;
 }
 
-/* Concave corner KANAN atas */
 .dropdown-panel::after {
     content: '';
     position: absolute;
@@ -285,8 +312,24 @@ const scrollToSection = (sectionId) => {
     width: 16px;
     height: 16px;
     background: transparent;
-    box-shadow: 4px 4px 0 4px rgb(255 255 255 / 0.95);  /* ← arah box-shadow dibalik */
+    box-shadow: 4px 4px 0 4px rgb(255 255 255 / 0.95);
     border-bottom-right-radius: 16px;
     pointer-events: none;
+}
+
+/* Badge pop animation */
+.badge-enter-active {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.badge-leave-active {
+    transition: all 0.15s ease-in;
+}
+.badge-enter-from {
+    opacity: 0;
+    transform: scale(0.3);
+}
+.badge-leave-to {
+    opacity: 0;
+    transform: scale(0.5);
 }
 </style>

@@ -123,7 +123,7 @@
                                 label="Harga"
                                 type="number"
                                 placeholder="0"
-                                prefix="Rp"
+                                prefix="$"
                                 :disabled="form.is_free"
                                 :min="0"
                                 :error="form.errors.price"
@@ -408,14 +408,14 @@ const removeImage = (index) => {
 const setPrimaryImage = async (index) => {
     const [selectedImage] = imagePreviews.value.splice(index, 1)
     imagePreviews.value.unshift(selectedImage)
-    
+
     imagePreviews.value.forEach((img, idx) => {
         img.isPrimary = idx === 0
     })
-    
+
     if (props.mode === 'edit' && props.productId) {
         const order = imagePreviews.value.map(img => img.id).filter(id => id)
-        
+
         try {
             await router.post(`/admin/products/${props.productId}/reorder-images`, {
                 image_order: order
@@ -495,8 +495,8 @@ const submit = async () => {
     fd.append('status',      form.status)
 
     form.tags.forEach((id, i)     => fd.append(`tags[${i}]`, id))
-    form.images.forEach((file, i) => { 
-        if (file instanceof File) fd.append(`images[${i}]`, file) 
+    form.images.forEach((file, i) => {
+        if (file instanceof File) fd.append(`images[${i}]`, file)
     })
 
     if (form.delete_images.length) {
@@ -509,7 +509,7 @@ const submit = async () => {
             'Sukses'
         )
     }
-    
+
     const onError = (errors) => {
         console.error('Error:', errors)
         const msg = errors.error ?? errors.message ?? Object.values(errors)[0] ?? 'Terjadi kesalahan.'

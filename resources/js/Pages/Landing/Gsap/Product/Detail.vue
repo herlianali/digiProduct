@@ -1,3 +1,5 @@
+<!-- Product/Detail.vue -->
+<!-- PERUBAHAN: import useCart, tombol Add to Cart sekarang fungsional + feedback animasi -->
 <template>
   <LoadingScreen />
   <div class="bg-[#0d0d0d] min-h-screen flex flex-col font-sans">
@@ -11,7 +13,6 @@
           balance="$100"
           avatar-url=""
           @nav-click="(id) => console.log('navigated to', id)"
-          @cart-click="() => console.log('cart clicked')"
           @cta-click="() => console.log('free sketch clicked')"
         />
       </div>
@@ -22,7 +23,6 @@
 
           <!-- LEFT: Image + Thumbnail Tabs -->
           <div class="flex flex-col gap-0">
-            <!-- Main Image -->
             <div class="rounded-t-xl overflow-hidden bg-[#111] aspect-square flex items-center justify-center">
               <img
                 :src="activeImage"
@@ -31,7 +31,6 @@
               />
             </div>
 
-            <!-- Thumbnail Tabs — dari previews database -->
             <div
               v-if="product.previews && product.previews.length"
               :class="`grid grid-cols-${Math.min(product.previews.length, 4)} rounded-b-xl overflow-hidden border-t border-white/10`"
@@ -39,7 +38,7 @@
               <button
                 v-for="(preview, index) in product.previews.slice(0, 4)"
                 :key="preview.id"
-                @click="activeImage = preview.url; activeIndex = index"
+                @click="activeImageUrl = preview.url; activeIndex = index"
                 :class="[
                   'relative overflow-hidden py-0 px-0 text-center hover:brightness-110 transition-all',
                   activeIndex === index ? 'ring-2 ring-inset ring-[#4dfa03]' : '',
@@ -47,13 +46,7 @@
                 ]"
                 style="aspect-ratio: 1/1;"
               >
-                <!-- Thumbnail image -->
-                <img
-                  :src="preview.url"
-                  :alt="preview.label || `Preview ${index + 1}`"
-                  class="w-full h-full object-cover"
-                />
-                <!-- Label overlay -->
+                <img :src="preview.url" :alt="preview.label || `Preview ${index + 1}`" class="w-full h-full object-cover" />
                 <span
                   v-if="preview.label"
                   class="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] font-bold py-1 px-1 leading-tight text-center"
@@ -63,7 +56,6 @@
               </button>
             </div>
 
-            <!-- Fallback tabs (jika tidak ada previews) -->
             <div v-else class="rounded-b-xl overflow-hidden border-t border-white/10 bg-[#111] py-4 text-center">
               <span class="text-white/30 text-xs">No preview images</span>
             </div>
@@ -71,24 +63,20 @@
 
           <!-- RIGHT: Info -->
           <div class="flex flex-col gap-5 pt-2">
-            <!-- Breadcrumb -->
             <p class="text-white/50 text-sm tracking-wide">
               Shop
               <span v-if="product.category"> / {{ product.category }}</span>
               <span v-if="product.style"> / {{ product.style }}</span>
             </p>
 
-            <!-- Title -->
             <h2 class="text-white text-6xl font-black leading-tight tracking-tight">
               {{ product.name }}
             </h2>
 
-            <!-- Price -->
             <p class="text-[#4dfa03] text-5xl font-black">
               {{ product.is_free ? 'Free' : product.price }}
             </p>
 
-            <!-- Tags -->
             <div v-if="product.tags && product.tags.length" class="flex flex-wrap gap-2">
               <span
                 v-for="tag in product.tags"
@@ -99,12 +87,10 @@
               </span>
             </div>
 
-            <!-- Description -->
             <div class="text-white/70 text-sm leading-relaxed max-w-xl whitespace-pre-line">
               {{ product.description }}
             </div>
 
-            <!-- File Formats — dari files database -->
             <div v-if="product.files && product.files.length" class="flex items-center gap-3 mt-1">
               <a
                 v-for="file in product.files"
@@ -122,30 +108,45 @@
               </a>
             </div>
 
-            <!-- Add to Cart -->
+            <!-- ── Add to Cart Button ── -->
             <button
-              class="mt-2 flex items-center gap-3 bg-[#f5d020] hover:bg-yellow-300 text-black font-black text-lg px-8 py-4 rounded-full w-fit transition-all active:scale-95 shadow-lg shadow-yellow-500/20"
+              @click="handleAddToCart"
+              :disabled="addedFeedback"
+              class="mt-2 flex items-center gap-3 font-black text-lg px-8 py-4 rounded-full w-fit transition-all active:scale-95 shadow-lg"
+              :class="addedFeedback
+                ? 'bg-[#4dfa03] text-black shadow-green-500/30 scale-105'
+                : 'bg-[#f5d020] hover:bg-yellow-300 text-black shadow-yellow-500/20'"
             >
-              {{ product.is_free ? 'Download Free' : 'Add to Cart' }}
-              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path
-                  v-if="product.is_free"
-                  stroke-linecap="round" stroke-linejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-                <path
-                  v-else
-                  stroke-linecap="round" stroke-linejoin="round"
-                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
-                />
-              </svg>
+              <!-- Added feedback state -->
+              <template v-if="addedFeedback">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Added to Cart!
+              </template>
+
+              <!-- Default state -->
+              <template v-else>
+                {{ product.is_free ? 'Download Free' : 'Add to Cart' }}
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path
+                    v-if="product.is_free"
+                    stroke-linecap="round" stroke-linejoin="round"
+                    d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
+                  />
+                  <path
+                    v-else
+                    stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+                  />
+                </svg>
+              </template>
             </button>
           </div>
         </div>
       </main>
     </div>
 
-    <!-- ── FOOTER ── -->
     <FooterSection />
   </div>
 </template>
@@ -153,8 +154,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import NavbarFloating from '../ComponentsV2/NavbarFloating.vue'
-import FooterSection from '../ComponentsV2/FooterSection.vue'
-import LoadingScreen from '../ComponentsV2/LoadingScreen.vue'
+import FooterSection  from '../ComponentsV2/FooterSection.vue'
+import LoadingScreen  from '../ComponentsV2/LoadingScreen.vue'
+import { useCart }    from '@/Composables/useCart'
 
 const props = defineProps({
   product: {
@@ -174,13 +176,32 @@ const props = defineProps({
   },
 })
 
-const activeIndex = ref(0)
+const cart         = useCart()
+const activeIndex  = ref(0)
+const activeImageUrl = ref(null)
+const addedFeedback = ref(false)
 
-const activeImage = computed(() =>
-  props.product?.previews?.length
-    ? props.product.previews[activeIndex.value]?.url
-    : (props.product?.thumbnail ?? 'https://placehold.co/420x420/111111/ffffff?text=No+Image')
-)
+const activeImage = computed(() => {
+  if (activeImageUrl.value) return activeImageUrl.value
+  if (props.product?.previews?.length) return props.product.previews[0]?.url
+  return props.product?.thumbnail ?? 'https://placehold.co/420x420/111111/ffffff?text=No+Image'
+})
 
 const tabBg = ['bg-[#1a1a1a]', 'bg-[#1e1e1e]', 'bg-[#222]', 'bg-[#252525]']
+
+const handleAddToCart = () => {
+  cart.add({
+    id:          props.product.id,
+    name:        props.product.name,
+    price:       props.product.final_price ?? props.product.price ?? 0,
+    is_free:     props.product.is_free,
+    thumbnail:   props.product.thumbnail
+                  ?? props.product.previews?.[0]?.url
+                  ?? null,
+  })
+
+  // Feedback visual
+  addedFeedback.value = true
+  setTimeout(() => { addedFeedback.value = false }, 1500)
+}
 </script>

@@ -43,6 +43,17 @@
                 <!-- RIGHT FORM -->
                 <section class="flex flex-col justify-between h-full">
 
+                    <div
+                        v-if="showSuccessToast"
+                        class="fixed top-24 right-10 z-50 animate-slide-down"
+                    >
+                        <div class="bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="font-medium">{{ toastMessage }}</span>
+                        </div>
+                    </div>
                     <!-- Flash Message -->
                     <div
                         v-if="flash.success"
@@ -304,13 +315,17 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useForm, usePage } from '@inertiajs/vue3'
 import NavbarFloating from '../ComponentsV2/NavbarFloating.vue'
 import LoadingScreen  from '../ComponentsV2/LoadingScreen.vue'
 
 const page  = usePage()
 const flash = computed(() => page.props.flash ?? {})
+
+// State untuk notifikasi toast
+const showSuccessToast = ref(false)
+const toastMessage = ref('')
 
 const form = useForm({
     full_name:           '',
@@ -326,7 +341,25 @@ const form = useForm({
 const submit = () => {
     form.post('/get-in-touch/store', {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset()
+            // Tampilkan notifikasi sukses
+            showSuccessToast.value = true
+            toastMessage.value = '✓ Pesanan berhasil dikirim!'
+
+            // Sembunyikan notifikasi setelah 3 detik
+            setTimeout(() => {
+                showSuccessToast.value = false
+            }, 3000)
+        },
+        onError: () => {
+            // Optional: tampilkan error toast jika perlu
+            showSuccessToast.value = true
+            toastMessage.value = '✗ Gagal mengirim pesanan. Silakan coba lagi.'
+            setTimeout(() => {
+                showSuccessToast.value = false
+            }, 3000)
+        }
     })
 }
 
@@ -353,4 +386,34 @@ const openLink = (url) => window.open(url, '_blank')
 .custom-scroll::-webkit-scrollbar { width: 8px; }
 .custom-scroll::-webkit-scrollbar-track { background: transparent; }
 .custom-scroll::-webkit-scrollbar-thumb { background: #cfcfcf; border-radius: 20px; }
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+}
+
+.toast-exit {
+    animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
 </style>

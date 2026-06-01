@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\HomeSlidersController;
 use App\Http\Controllers\Admin\CompanySlidersController;
 use App\Http\Controllers\Admin\ProjectInquiryController;
 use App\Http\Controllers\Admin\VoucherController;
+use App\Http\Controllers\GuestOrderController;
 use App\Http\Controllers\PublicInquiryController;
 
 // ══════════════════════════════════════════════════════════════════
@@ -36,14 +37,16 @@ Route::middleware('guest')->group(function () {
 // PUBLIC
 // ══════════════════════════════════════════════════════════════════
 
-Route::get('/',                         [LandingController::class, 'index']);
-Route::get('/gsap',                     [LandingController::class, 'gsap'])->name('gsap');
-Route::get('/product-place',            [ProductPlacementController::class, 'index'])->name('ProductPlace.index');
+Route::get('/',                          [LandingController::class, 'index']);
+Route::get('/gsap',                      [LandingController::class, 'gsap'])->name('gsap');
+Route::get('/our-team',                  [LandingController::class, 'OurTeam'])->name('OurTeam');
+Route::get('/portfolio/detail/{id}',     [LandingController::class, 'PortfolioDetail'])->name('PortfolioDetail');
+Route::get('/product-place',             [ProductPlacementController::class, 'index'])->name('ProductPlace.index');
 Route::get('/product-place/detail/{id}', [ProductPlacementController::class, 'show'])->name('ProductPlace.show');
-Route::get('/get-in-touch',             [PublicInquiryController::class, 'index'])->name('GetInTuch');
-Route::post('/get-in-touch/store',      [PublicInquiryController::class, 'store'])->name('GetInTuch.store');
-Route::get('/our-team',                 [LandingController::class, 'OurTeam'])->name('OurTeam');
-Route::get('/portfolio/detail/{id}',    [LandingController::class, 'PortfolioDetail'])->name('PortfolioDetail');
+Route::get('/get-in-touch',              [PublicInquiryController::class, 'index'])->name('GetInTuch');
+Route::post('/get-in-touch/store',       [PublicInquiryController::class, 'store'])->name('GetInTuch.store');
+Route::post('/orders/guest',             [GuestOrderController::class, 'store'])->name('orders.guest.store');
+Route::post('/vouchers/validate',        [GuestOrderController::class, 'validateVoucher'])->name('vouchers.validate');
 
 // ══════════════════════════════════════════════════════════════════
 // ADMIN
@@ -96,7 +99,10 @@ Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
         Route::delete('/tags/{tag}', [CatalogController::class, 'destroyTag'])->name('tags.destroy');
     });
 
+    // ── Vouchers  ─────────────────────────────────────────
     Route::resource('vouchers', VoucherController::class);
+
+    // ── Project Inquiries  ─────────────────────────────────────────
     Route::resource('inquiries', ProjectInquiryController::class);
 
 

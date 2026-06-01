@@ -90,7 +90,7 @@ class ProductPlacementController extends Controller
                 'id'          => $product->id,
                 'name'        => $product->title,
                 'description' => $product->description,
-                'price'       => $product->is_free ? 'Free' : 'Rp ' . number_format($product->price, 0, ',', '.'),
+                'price'       => $product->is_free ? 'Free' : '$ ' . number_format($product->price, 0, ',', '.'),
                 'is_free'     => $product->is_free,
                 'style'       => $product->style?->name,
                 'category'    => $product->category?->name,

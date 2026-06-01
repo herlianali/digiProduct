@@ -10,7 +10,6 @@ class Orders extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'order_number',
         'subtotal',
         'discount',
@@ -23,18 +22,18 @@ class Orders extends Model
     protected $casts = [
         'subtotal' => 'decimal:2',
         'discount' => 'decimal:2',
-        'total' => 'decimal:2',
-        'paid_at' => 'datetime',
+        'total'    => 'decimal:2',
+        'paid_at'  => 'datetime',
     ];
 
-    public function user()
+    public function customer()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOne(OrderCustomer::class, 'order_id');
     }
 
     public function items()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
 
     public function scopePending($query)
