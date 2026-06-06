@@ -15,7 +15,6 @@ export function createCart() {
         items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
     )
 
-    // Strip karakter non-numerik: "$25.00" → 25, "Rp 25.000" → 25, "25.00" → 25
     const parsePrice = (val) => {
         if (val === null || val === undefined) return 0
         const cleaned = String(val).replace(/[^0-9.]/g, '')

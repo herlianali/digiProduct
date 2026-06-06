@@ -10,7 +10,6 @@
                 </h1>
                 <NavbarFloating
                     static-mode
-                    balance="$100"
                     avatar-url=""
                     @nav-click="(id) => console.log(id)"
                     @cart-click="() => console.log('cart')"
@@ -25,16 +24,16 @@
 
                 <!-- LEFT CARD -->
                 <aside class="bg-black rounded-3xl px-8 py-8 min-h-[610px] relative overflow-hidden">
-                    <div class="space-y-2">
+                    <div class="absolute top-8 left-8 right-0 z-10 space-y-2">
                         <h2 class="text-[#baff00] text-6xl font-black leading-none">24/7</h2>
                         <p class="text-white text-4xl leading-tight font-light">
                             We always <br />do our best!
                         </p>
                     </div>
-                    <div class="absolute bottom-0 left-0 right-0 h-[360px] flex items-end justify-center">
+                    <div class="absolute bottom-0 left-0 right-0 z-0 h-[100px] flex items-end justify-center">
                         <img
-                            src="https://placehold.co/280x340/000000/ffffff?text=Illustration"
-                            class="object-contain w-[85%]"
+                            src="/public/assets/image/get-in-touch.png"
+                            class="object-contain "
                             alt=""
                         />
                     </div>

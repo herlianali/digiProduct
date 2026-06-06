@@ -10,7 +10,6 @@
         <h1 class="font-black text-white text-3xl tracking-widest uppercase">Supplaybox</h1>
         <NavbarFloating
           static-mode
-          balance="$100"
           avatar-url=""
           @nav-click="(id) => console.log('navigated to', id)"
           @cta-click="() => console.log('free sketch clicked')"

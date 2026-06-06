@@ -15,7 +15,6 @@ import LoadingScreen from '../ComponentsV2/LoadingScreen.vue'
         <h1 class="font-black text-white text-3xl tracking-widest uppercase">Supplaybox</h1>
         <NavbarFloating
           static-mode
-          balance="$100"
           avatar-url=""
           @nav-click="(id) => console.log('navigated to', id)"
           @cart-click="() => console.log('cart clicked')"

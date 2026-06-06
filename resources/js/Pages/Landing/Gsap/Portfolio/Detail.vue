@@ -22,7 +22,6 @@ import LoadingScreen from '../ComponentsV2/LoadingScreen.vue'
 
         <NavbarFloating
           static-mode
-          balance="$100"
           avatar-url=""
           @nav-click="(id) => console.log('navigated to', id)"
           @cart-click="() => console.log('cart clicked')"
@@ -64,7 +63,7 @@ import LoadingScreen from '../ComponentsV2/LoadingScreen.vue'
       </div>
 
       <!-- ── IMAGE GRID 2 col ── -->
-      <div class="grid grid-cols-2 gap-0 mb-16">
+      <div class="grid grid-cols-2 gap-4 mb-16">
         <div
           v-for="(img, i) in project.images"
           :key="i"
@@ -144,7 +143,7 @@ import LoadingScreen from '../ComponentsV2/LoadingScreen.vue'
         <button
           class="absolute left-6 text-white text-3xl font-black hover:text-white/60"
           @click="prevLight"
-        >‹</button>
+        ><</button>
 
         <img
           :src="project.images[lightboxIndex].src"
@@ -155,7 +154,7 @@ import LoadingScreen from '../ComponentsV2/LoadingScreen.vue'
         <button
           class="absolute right-6 text-white text-3xl font-black hover:text-white/60"
           @click="nextLight"
-        >›</button>
+        >></button>
       </div>
     </transition>
 
@@ -237,12 +236,12 @@ export default {
 </script>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.25s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.25s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

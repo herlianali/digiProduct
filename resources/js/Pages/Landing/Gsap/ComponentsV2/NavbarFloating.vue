@@ -1,10 +1,3 @@
-<!-- ComponentsV2/NavbarFloating.vue -->
-<!-- PERUBAHAN dari versi sebelumnya:
-     1. Import & inject useCart()
-     2. ShoppingCartIcon sekarang menampilkan badge count
-     3. @cart-click membuka CartSidebar via emit
-     4. CartSidebar di-mount di sini (atau bisa di parent - lihat catatan)
--->
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import gsap from '@/plugins/gsap'
@@ -17,7 +10,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 const props = defineProps({
     triggerEl:  { type: [Object, String], default: null },
-    balance:    { type: String,  default: '$100' },
+    balance:    { type: String,  default: '' },
     avatarUrl:  { type: String,  default: '' },
     staticMode: { type: Boolean, default: false },
 })

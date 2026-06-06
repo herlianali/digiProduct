@@ -1,5 +1,3 @@
-<!-- Product/Index.vue -->
-<!-- PERUBAHAN: tambah tombol Add to Cart di setiap card, inject useCart -->
 <template>
     <LoadingScreen />
     <div class="p-4 bg-[#e6e6e6] min-h-screen font-sans">
@@ -9,7 +7,6 @@
             <h1 class="font-extrabold text-4xl tracking-widest uppercase w-5">Official Supplaybox Shop</h1>
             <NavbarFloating
                 static-mode
-                balance="$100"
                 avatar-url=""
                 @nav-click="(id) => console.log('navigated to', id)"
                 @cta-click="() => console.log('free sketch clicked')"
@@ -164,13 +161,13 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router }       from '@inertiajs/vue3'
 import LoadingScreen    from '../ComponentsV2/LoadingScreen.vue'
 import NavbarFloating   from '../ComponentsV2/NavbarFloating.vue'
 import DropDownCategory from '../ComponentsV2/DropDownCategory.vue'
 import FooterSection    from '../ComponentsV2/FooterSection.vue'
 import gsap             from '@/plugins/gsap'
-import { useCart }      from '@/composables/useCart'
+import { useCart }      from '@/Composables/useCart'
 
 // ─── Props dari Inertia ───────────────────────────────────────────
 const props = defineProps({
@@ -182,7 +179,7 @@ const props = defineProps({
 
 // ─── Cart ─────────────────────────────────────────────────────────
 const cart    = useCart()
-const addedIds = ref(new Set())   // Set product IDs yang baru di-add (untuk feedback)
+const addedIds = ref(new Set())
 
 const handleAddToCart = (product) => {
     cart.add({
