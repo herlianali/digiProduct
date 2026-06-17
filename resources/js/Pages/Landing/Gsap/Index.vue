@@ -5,7 +5,7 @@ import LoadingScreen from './ComponentsV2/LoadingScreen.vue'
 import BannerCards from './Components/BannerCards.vue'
 import OurWorkSection from './Components/OurWorkSection.vue'
 import ProductSection from './Components/ProductSection.vue'
-import RackDivider from './Components/RackDivider.vue'
+import RackDivider from './ComponentsV2/RackDivider.vue'
 import BentoGridSection from './ComponentsV2/BentoGridSection.vue' // ← import component baru
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'

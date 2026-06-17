@@ -160,7 +160,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- ✅ FIX 1: Design & Illustration (row-span-2) — ditambahkan `relative` -->
+        <!-- Design & Illustration (row-span-2) -->
         <div class="bento-card col-span-2 row-span-2 bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden cursor-pointer relative">
           <div class="flex justify-center items-center p-4 h-[14em]">
             <img src="/public/assets/image/banner/card-service-animated2.svg" class="w-full h-full" alt="" />
@@ -184,7 +184,6 @@ onUnmounted(() => {
           <div class="pb-1 flex justify-center p-2">
             <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" class="w-8 h-8" />
           </div>
-          <!-- ✅ FIX 2: tambahkan `relative` dan `min-h-[6rem]` agar absolute image terkandung di sini -->
           <div class="flex-1 overflow-hidden relative min-h-[6rem]">
             <img src="/public/assets/image/banner/card-service-animated.svg" alt="service illustration" class="absolute -bottom-9 left-6 w-[16em] h-[16em] object-center z-20" />
           </div>
@@ -307,7 +306,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- ✅ FIX 3: Fiverr + Our Product + Our Team — explicit height sinkron dengan row-2 Pinterest -->
+        <!-- Fiverr + Our Product + Our Team -->
         <div class="col-span-5 flex flex-col gap-3 h-[380px] xl:h-[420px]">
           <div class="bento-card bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden flex-shrink-0 h-[130px] xl:h-[140px] cursor-pointer">
             <div class="flex justify-between items-start gap-2 relative z-10">
@@ -327,7 +326,6 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <!-- ✅ FIX 4: inner grid pakai flex-1 min-h-0 — hapus max-h agar mengisi sisa ruang -->
           <div class="grid grid-cols-12 gap-3 flex-1 min-h-0">
             <div class="bento-card col-span-5 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer">
               <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[240px] border-r-[240px] border-b-[90px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
@@ -353,212 +351,186 @@ onUnmounted(() => {
 
       </div>
 
-      <!-- ===================== MOBILE GRID (< md) ===================== -->
-      <div class="md:hidden flex flex-col gap-3">
-
-        <!-- Row 1: Welcome -->
-        <div class="bento-card bg-[#fce109] rounded-2xl p-4 flex flex-col relative overflow-hidden cursor-pointer min-h-[130px]">
+      <!-- ===================== MOBILE LAYOUT (FLEX) ===================== -->
+      <div class="md:hidden grid grid-cols-3 gap-3 w-full auto-rows-auto">
+        <div class="bento-card col-span-2 bg-[#fce109] rounded-2xl p-3 relative overflow-hidden cursor-pointer min-h-[140px]">
           <div class="flex justify-between items-start">
             <div>
-              <p class="text-xs font-medium text-black/70">Welcome to</p>
-              <h1 class="font-extrabold text-3xl text-black leading-tight tracking-tighter">SUPPLAYBOX</h1>
+              <p class="text-[10px] font-medium text-black/70">Welcome to</p>
+              <h1 class="font-extrabold text-2xl text-black leading-tight tracking-tighter">SUPPLAYBOX</h1>
             </div>
-            <img data-arrow="top-right" src="/public/assets/image/banner/arrow-black-right.svg" class="w-5 h-5" alt="" />
+            <img data-arrow="top-right" src="/public/assets/image/banner/arrow-black-right.svg" class="w-4 h-4" alt="" />
           </div>
-          <p class="text-xl font-light text-black mt-1">Hi Robert,</p>
-          <p class="text-xs text-black/80 mt-1 max-w-[55%] leading-relaxed">Most people freeze at the starting line. Don't hesitate. Just give it a shot.</p>
-          <button class="mt-2 w-fit z-10 bg-[#4dfa03] border border-black font-extrabold text-lg rounded-full px-4 py-0.5 flex items-center whitespace-nowrap">
+          <p class="text-lg font-light text-black mt-0.5">Hi Robert,</p>
+          <p class="text-[9px] text-black/80 mt-1 max-w-[55%] leading-relaxed">Most people freeze at the starting line. Don't hesitate. Just give it a shot.</p>
+          <button class="mt-2 z-10 bg-[#4dfa03] border border-black font-extrabold text-sm rounded-full px-4 py-0.5 whitespace-nowrap">
             FREE SKETCH!
           </button>
-          <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute right-1 -bottom-3 w-[45%] max-w-[200px] object-contain pointer-events-none z-20" />
+          <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute right-0 -bottom-3 w-[45%] max-w-[180px] object-contain pointer-events-none z-20" />
         </div>
 
-        <!-- Row 2: Cart + $100 + Avatar -->
-        <div class="flex justify-between items-center px-1">
-          <ShoppingCartIcon class="w-7 h-7 text-green-500" />
-          <span class="border-2 border-black rounded-full px-4 py-0.5 text-black text-sm font-medium">$100</span>
-          <div class="w-7 h-7 rounded-full bg-gray-200 border border-gray-300 overflow-hidden">
-            <img src="" alt="user" class="w-full h-full object-cover" />
+        <div class="bento-card col-span-1 row-span-3">
+          <div class="col-span-3 flex justify-end items-center gap-3 py-1 pr-1">
+            <ShoppingCartIcon class="w-6 h-6 text-green-500" />
+            <span class="border-[1.5px] border-black rounded-full px-3 py-0.5 text-black text-[11px] font-medium whitespace-nowrap">$100</span>
+            <div class="w-6 h-6 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center">
+              <img src="" alt="user" class="w-full h-full object-cover" />
+            </div>
           </div>
-        </div>
-
-        <!-- Row 3: 2 columns — Design Service | Teepublic + Behance -->
-        <div class="grid grid-cols-2 gap-3">
-          <!-- ✅ FIX mobile: tambah relative -->
-          <div class="bento-card bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden cursor-pointer relative">
-            <div class="flex justify-center items-center p-3">
-              <img src="/public/assets/image/banner/card-service-animated2.svg" class="w-full" alt="" />
+          <div class="row-span-2 bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden cursor-pointer relative min-h-[220px]">
+            <div class="flex justify-center items-center p-4 ">
+              <img src="/public/assets/image/banner/card-service-animated2.svg" class="w-full h-full" alt="" />
             </div>
             <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-              <h3 class="font-bold text-white px-3 py-1 text-sm">Design Service</h3>
-              <div class="rounded-t-2xl bg-gray-200">
-                <p class="text-[8px] text-gray-800 leading-relaxed px-3 py-2">
+              <h3 class="font-bold text-white px-2 py-1 text-[11px]">Design Service</h3>
+              <div class="bg-gray-200">
+                <p class="text-[9px] text-gray-800 leading-tight p-2">
                   Brand Identity / Logo / Poster / Packaging / Social Media / Infographic
                 </p>
-                <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-                  <h3 class="font-bold text-white px-3 py-1 text-sm">Illustration</h3>
-                  <div class="rounded-t-2xl bg-gray-200">
-                    <p class="text-[8px] text-gray-800 leading-relaxed px-3 pt-2 pb-2">
-                      2D Illustration / Game Design / Character / Mascot / Advertising
+                <div class="bg-black">
+                  <h3 class="font-bold text-white px-2 py-1 text-[11px]">Illustration</h3>
+                  <div class="bg-gray-200">
+                    <p class="text-[9px] text-gray-800 leading-tight px-2 pt-1 pb-1">
+                      2D / Game / Character / Mascot
                     </p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="flex justify-center py-1">
-              <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" class="w-6 h-6" />
+              <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" class="w-4 h-4" />
             </div>
-            <div class="overflow-hidden h-16 relative">
-              <img src="/public/assets/image/banner/card-service-animated.svg" alt="" class="w-full h-full object-cover" />
+            <div class="overflow-hidden relative flex-1 min-h-[140px]">
+              <img src="/public/assets/image/banner/card-service-animated.svg" alt="service illustration" class="absolute -bottom-2 -left-0.5 w-full object-contain z-20" />
             </div>
           </div>
+        </div>
+        
+        <div class="bento-card col-span-1 row-span-2 bg-[#E60023] rounded-2xl p-2 flex flex-col relative overflow-hidden cursor-pointer min-h-[220px]">
+          <div class="flex justify-between items-start">
+            <img src="/public/assets/image/banner/card-path-logo.svg" class="w-6 h-6" alt="" />
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" class="w-3 h-3" alt="" />
+          </div>
+          <p class="text-white text-[8px] mt-2 leading-relaxed relative z-10">Let's <b class="italic">CONNECT</b> on Pinterest, share some pins, and dive into our <b class="italic">Portfolio</b> + inspo boards.</p>
+          <div class="absolute bottom-0 left-0 right-0 h-[40%] overflow-hidden">
+            <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="w-full h-full object-cover object-top" />
+          </div>
+        </div>
+        
+        <div class="bento-card col-span-1 bg-white border border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[105px]">
+          <div class="flex justify-between items-start">
+            <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="w-6 h-6" alt="TikTok" />
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok" class="w-3 h-3" />
+          </div>
+          <p class="text-[8px] mt-1 font-semibold leading-tight">Memes & behind the scenes.</p>
+          <div class="absolute -bottom-1 left-0 right-0 h-[35%] overflow-hidden">
+            <img src="/public/assets/image/banner/card-tiktok-animated.svg" alt="tiktok" class="w-full h-full object-cover object-top" />
+          </div>
+        </div>
 
-          <!-- Teepublic + Behance stacked -->
-          <div class="flex flex-col gap-3">
-            <div class="bento-card bg-[#4c60d8] rounded-2xl flex flex-col overflow-hidden cursor-pointer">
-              <div class="px-3 pt-3 flex justify-between items-center">
-                <div class="flex items-center gap-1">
-                  <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" class="w-4 h-4" />
-                  <span class="text-white font-bold text-xs">TEEPUBLIC</span>
-                </div>
-                <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-4 h-4" />
-              </div>
-              <div class="overflow-hidden h-20">
-                <img src="/public/assets/image/banner/card-teepublic-animated.svg" alt="teepublic" class="w-full h-full object-cover" />
-              </div>
-              <div class="px-3 pb-3">
-                <p class="font-bold text-white text-xs">Unlimited Prints.</p>
-              </div>
+        <div class="bento-card col-span-1 bg-gray-200 rounded-2xl p-2 flex flex-col cursor-pointer min-h-[105px]">
+          <p class="text-[9px] font-bold text-black leading-tight">Starter Pack Design.</p>
+          <div class="relative h-3 mt-1.5">
+            <span class="absolute left-0 w-3 h-3 rounded-full bg-[#34bf72] border border-black"></span>
+            <span class="absolute left-1.5 w-3 h-3 rounded-full bg-[#fec200] border border-black"></span>
+            <span class="absolute left-3 w-3 h-3 rounded-full bg-[#3bffff] border border-black"></span>
+          </div>
+          <div class="mt-auto">
+            <p class="text-[6.5px] text-gray-600 leading-tight">Canva/Shutterstock dll</p>
+          </div>
+        </div>
+
+        <div class="bento-card col-span-1 bg-[#4c60d8] rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[120px]">
+          <div class="px-1.5 pt-1.5 flex justify-between items-center">
+            <div class="flex items-center gap-0.5">
+              <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" class="w-3 h-3" />
+              <span class="text-white font-bold text-[7.5px]">TEEPUBLIC</span>
             </div>
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-2.5 h-2.5" />
+          </div>
+          <div class="overflow-hidden my-auto">
+            <img src="/public/assets/image/banner/card-teepublic-animated.svg" alt="teepublic" class="w-full h-auto" />
+          </div>
+          <div class="px-1.5 pb-1.5">
+            <p class="font-bold text-white text-[8px] leading-tight">Unlimited Prints.</p>
+          </div>
+        </div>
+        
+        <div class="bento-card col-span-1 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[120px]">
+          <div class="px-1.5 pt-1.5 flex justify-between items-start">
+            <div>
+              <p class="font-bold text-white text-xl leading-none">Bē</p>
+              <p class="text-[7.5px] text-white leading-tight mt-0.5">More Professional</p>
+            </div>
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-2.5 h-2.5" />
+          </div>
+          <div class="overflow-hidden mt-auto w-full">
+            <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-auto object-cover" />
+          </div>
+        </div>
 
-            <div class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer">
-              <div class="px-3 pt-3 flex justify-between items-start">
-                <div>
-                  <p class="font-bold text-white text-2xl leading-tight">Bē</p>
-                  <p class="text-[10px] text-white leading-tight">More<br />Professional</p>
-                </div>
-                <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-4 h-4" />
-              </div>
-              <div class="overflow-hidden h-16">
-                <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-full object-cover object-left" />
-              </div>
+        <div class="bento-card col-span-1 row-span-2 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[220px]">
+          <div class="px-2 pt-2 relative">
+            <p class="text-[9px] text-white leading-none">New Seller</p>
+            <p class="text-white text-[9px] leading-tight">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-2 right-2 w-2.5 h-2.5" />
+          </div>
+          <div class="overflow-hidden mt-1 flex-1 flex flex-col justify-end">
+            <img src="/public/assets/image/banner/card-upwork-animated.svg" alt="upwork" class="w-full h-auto object-cover" />
+            <div class="bg-[#268a00] px-2 py-1.5 relative z-10 rounded-t-xl -mt-4">
+              <p class="text-white text-[7.5px] font-extrabold leading-tight">Enjoy many Bonuses and Discounts!</p>
             </div>
           </div>
         </div>
 
-        <!-- Row 4: Pinterest + TikTok + Starter Pack -->
-        <div class="grid grid-cols-3 gap-3">
-          <div class="bento-card col-span-1 bg-[#E60023] rounded-2xl p-2 flex flex-col relative overflow-hidden cursor-pointer min-h-[160px]">
-            <div class="flex justify-between items-start">
-              <img src="/public/assets/image/banner/card-path-logo.svg" class="w-6 h-6" alt="" />
-              <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" class="w-3 h-3" alt="" />
-            </div>
-            <p class="text-white text-[9px] mt-1 leading-relaxed relative z-10">Let's <b class="italic">CONNECT</b> on Pinterest + inspo boards.</p>
-            <div class="absolute bottom-0 left-0 right-0 h-[40%] overflow-hidden">
-              <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="w-full h-full object-cover object-top" />
-            </div>
-          </div>
-
-          <div class="bento-card col-span-1 bg-white border border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[160px]">
-            <div class="flex justify-between items-start">
-              <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="w-6 h-6" alt="" />
-              <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="" class="w-3 h-3" />
-            </div>
-            <p class="text-[8px] mt-1 font-semibold">Memes & behind the scenes.</p>
-            <div class="absolute -bottom-1 left-0 right-0 h-[45%] overflow-hidden">
-              <img src="/public/assets/image/banner/card-tiktok-animated.svg" alt="tiktok" class="w-full h-full object-cover object-top" />
-            </div>
-          </div>
-
-          <div class="bento-card col-span-1 bg-gray-200 rounded-2xl p-2 flex flex-col gap-1 relative overflow-hidden cursor-pointer min-h-[160px]">
-            <p class="text-[9px] font-bold text-black">Starter Pack<br />Design.</p>
-            <div class="relative h-5">
-              <span class="absolute left-0 w-4 h-4 rounded-full bg-[#34bf72] border border-black"></span>
-              <span class="absolute left-2 w-4 h-4 rounded-full bg-[#fec200] border border-black"></span>
-              <span class="absolute left-4 w-4 h-4 rounded-full bg-[#3bffff] border border-black"></span>
-              <span class="absolute left-6 w-4 h-4 rounded-full bg-[#fa191e] border border-black"></span>
-            </div>
-            <div class="mt-auto">
-              <p class="text-[8px] leading-relaxed">Canva/<br />Shutterstock/<br />iconscout</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Row 5: Fiverr -->
-        <div class="bento-card bg-[#f2ecea] rounded-2xl p-3 relative overflow-hidden h-[120px] cursor-pointer">
-          <div class="flex justify-between items-start gap-2 relative z-10">
-            <img data-arrow="left" src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="p-1 w-8 h-8">
-            <div class="flex flex-col items-end text-[#0b3117] text-base">
+        <div class="bento-card col-span-2 bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[90px]">
+          <div class="flex justify-between items-center relative z-10">
+            <img data-arrow="left" src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="w-5 h-5 p-0.5">
+            <div class="flex flex-col items-end text-[#0b3117] text-[10px] leading-tight">
               <p>Top Rated</p>
               <p>Badge on <em class="font-bold">fiverr</em>.</p>
             </div>
           </div>
-          <div class="absolute bottom-0 left-0 h-[85%] w-[45%] overflow-hidden">
+          <div class="absolute bottom-0 left-0 h-[80%] w-[45%] overflow-hidden">
             <img src="/public/assets/image/banner/card-toprated-animated.svg" alt="fiverr" class="w-full h-full object-cover object-top" />
           </div>
-          <div class="absolute bottom-1 right-2 text-right text-[10px] italic text-[#0b3117]">
-            <span class="block">For secure</span>
-            <span class="block">transactions!</span>
+          <div class="absolute bottom-1 right-2 text-right text-[7px] italic text-[#0b3117]">
+            <span>For secure transactions!</span>
           </div>
         </div>
 
-        <!-- Row 6: Upwork Card -->
-        <div class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer">
-          <div class="px-4 pt-4 relative">
-            <p class="text-base text-white">New Seller</p>
-            <p class="text-white text-base">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
-            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-4 right-4 w-4 h-4" />
+        <div class="bento-card col-span-1 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[120px] flex flex-col justify-between">
+          <p class="font-extrabold text-black text-[11px] leading-tight z-20">Our<br>Product</p>
+          <div class="flex items-center justify-center relative z-10 flex-1">
+            <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-10 object-contain" />
           </div>
-          <div class="flex flex-col justify-end overflow-hidden">
-            <div class="h-[180px] overflow-hidden">
-              <img src="/public/assets/image/banner/card-upwork-animated.svg" alt="upwork" class="w-full h-full object-cover object-bottom" />
-            </div>
-            <div class="rounded-t-2xl bg-[#268a00] px-4 py-3 -mt-[50px] relative z-10">
-              <p class="text-white text-sm font-extrabold leading-tight">Enjoy many Bonuses<br />and Discounts on this Platform!</p>
-              <p class="text-xs text-white mt-1">Help us to grow even more :)</p>
-            </div>
+          <div class="text-center z-10">
+            <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline w-4 h-4" />
+          </div>
+          <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[80px] border-r-[80px] border-b-[40px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
+        </div>
+        
+        <div class="bento-card col-span-1 bg-[#abdec9] rounded-2xl relative overflow-hidden cursor-pointer min-h-[120px] flex flex-col justify-between p-2">
+          <div class="flex items-center justify-center flex-1">
+            <img src="/public/assets/image/banner/card-ourteam-animated.png" alt="team" class="w-14" />
+          </div>
+          <div class="mt-auto">
+            <p class="font-['Archivo_Black',sans-serif] text-white text-[9px] leading-tight">Meet<br>Our Team</p>
           </div>
         </div>
 
-        <!-- Row 7: Our Product + Our Team -->
-        <div class="grid grid-cols-5 gap-3">
-          <div class="bento-card col-span-2 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[140px]">
-            <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[200px] border-r-[200px] border-b-[70px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
-            <p class="font-extrabold text-black text-lg relative z-20 px-1">Our<br />Product</p>
-            <div class="flex items-center justify-center py-2 relative z-10">
-              <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-[60%] object-contain" />
-            </div>
-            <div class="text-center relative z-10">
-              <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline w-7 h-7" />
-            </div>
-          </div>
-
-          <div class="bento-card col-span-3 bg-[#abdec9] rounded-2xl relative overflow-hidden cursor-pointer min-h-[140px]">
-            <div class="flex items-center justify-center h-full">
-              <img src="/public/assets/image/banner/card-ourteam-animated.png" alt="team" class="w-[80%]" />
-            </div>
-            <div class="absolute bottom-3 left-2">
-              <p class="font-['Archivo_Black',sans-serif] text-white text-sm leading-tight">Meet<br />Our Team</p>
-            </div>
-          </div>
+        <div class="bento-card col-span-1 bg-white rounded-2xl p-2 cursor-pointer border border-gray-100 flex flex-col justify-center min-h-[120px]">
+          <p class="text-[#cccccc] text-[7.5px] leading-none">Amidst</p>
+          <p class="text-[#b3b3b3] font-medium italic text-[7.5px] leading-none">the noise</p>
+          <p class="text-[#cccccc] text-[7.5px] leading-none">and visual</p>
+          <p class="text-[#b3b3b3] font-medium italic text-[7.5px] leading-none">disruption.</p>
+          <p class="text-[#108a00] font-medium text-[7.5px] leading-none mt-1">it's not</p>
+          <p class="text-[#108a00] font-medium text-[7.5px] leading-none">about</p>
+          <p class="text-[#cccccc] text-[7.5px] leading-none">being <span class="text-[#108a00] font-medium">fast</span></p>
+          <p class="text-[#cccccc] text-[7.5px] leading-none">and <span class="text-[#108a00] font-medium">empty.</span></p>
+          <p class="text-[#cccccc] text-[7.5px] mt-1">but...<img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" class="w-2 h-2 inline ml-0.5 align-middle"></p>
         </div>
-
-        <!-- Row 8: Amidst text card -->
-        <div class="bento-card bg-white rounded-2xl p-4 flex flex-col justify-center text-base cursor-pointer border border-gray-100">
-          <p class="text-[#cccccc]">Amidst</p>
-          <p class="text-[#b3b3b3] font-medium italic">the noise</p>
-          <p class="text-[#cccccc]">and</p>
-          <p class="text-[#b3b3b3] font-medium italic">visual</p>
-          <p class="text-[#b3b3b3] font-medium italic">disruption.</p>
-          <p class="text-[#108a00] font-medium">it's not</p>
-          <p class="text-[#108a00] font-medium">about</p>
-          <p class="text-[#cccccc]">being <span class="text-[#108a00] font-medium">fast</span></p>
-          <p class="text-[#cccccc]">and <span class="text-[#108a00] font-medium">empty.</span></p>
-          <p class="text-[#cccccc] mt-0.5">but...<span class="inline-flex items-center justify-center w-4 h-4 ml-1 align-middle">
-            <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Down Arrow" class="w-3 h-3">
-          </span></p>
-        </div>
-
+        
       </div>
     </div>
   </div>
