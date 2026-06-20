@@ -457,104 +457,122 @@ const openLink = (url) => {
             :radius="10"
             :responsive="true"
             :manual-positions="[
-                { xPct: 3, type: 'out' },
+                { xPct: 3,  type: 'out' },
                 { xPct: 27, type: 'out' },
                 { xPct: 30, type: 'in' },
                 { xPct: 40, type: 'out' },
                 { xPct: 43, type: 'in' },
                 { xPct: 95, type: 'out' }
             ]"
+            :manual-positions-mobile="[
+                { xPct: 12, type: 'out' },
+                { xPct: 35, type: 'out' },
+                { xPct: 62, type: 'in' },
+                { xPct: 80, type: 'out' }
+            ]"
+            :tab-width-mobile="28"
         />
     </div>
 
     <div class="bg-gradient-to-b from-black to-gray-800 text-white pb-28">
-        <div class="px-10 md:px-40 pt-12 pb-10">
-            <h1 class="text-8xl font-bold">Perception</h1>
-            <p class="text-8xl">And <b class="font-bold">Connection.</b></p>
+        <!-- Bagian Perception - sudah diresposivekan -->
+        <div class="px-6 sm:px-10 md:px-20 lg:px-40 pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10">
+            <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight">
+                Perception
+            </h1>
+            <p class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-tight">
+                And <b class="font-bold">Connection.</b>
+            </p>
         </div>
 
-        <!-- Slider with Navigation -->
+        <!-- Slider dengan Navigation -->
         <div ref="sliderContainerRef" class="relative w-full overflow-hidden py-4 group">
-            <button
-                ref="sliderPrevBtn"
-                class="absolute left-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-white rounded-full p-3 shadow-lg hover:bg-green-700 transition-all duration-300 opacity-0 -translate-x-5 scale-90 hidden"
-                style="display: none;"
-            >
-                <ChevronLeftIcon class="w-6 h-6" />
-            </button>
+        <!-- Tombol navigasi kiri -->
+        <button
+            ref="sliderPrevBtn"
+            class="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-black rounded-full p-2 sm:p-2.5 md:p-3 shadow-lg hover:bg-green-400 transition-all duration-300 opacity-0 -translate-x-5 scale-90 hidden"
+            style="display: none;"
+        >
+            <ChevronLeftIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+        </button>
 
-            <button
-                ref="sliderNextBtn"
-                class="absolute right-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-white rounded-full p-3 shadow-lg hover:bg-green transition-all duration-300 opacity-0 translate-x-5 scale-90 hidden"
-                style="display: none;"
-            >
-                <ChevronRightIcon class="w-6 h-6" />
-            </button>
+        <!-- Tombol navigasi kanan -->
+        <button
+            ref="sliderNextBtn"
+            class="absolute right-2 sm:right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-black rounded-full p-2 sm:p-2.5 md:p-3 shadow-lg hover:bg-green-400 transition-all duration-300 opacity-0 translate-x-5 scale-90 hidden"
+            style="display: none;"
+        >
+            <ChevronRightIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+        </button>
 
-            <div ref="sliderTrackRef" class="flex gap-5 w-max will-change-transform px-6 py-2 cursor-grab active:cursor-grabbing">
-                <div
-                    v-for="item in testimonials"
-                    :key="item.id"
-                    class="flex-shrink-0 w-[500px] bg-white rounded-2xl p-8 flex flex-col gap-3 cursor-default shadow-sm"
-                >
-                    <!-- Header: avatar + name + country -->
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-14 h-14 rounded-full flex items-center justify-center text-md font-bold text-black flex-shrink-0"
-                                :style="{ backgroundColor: item.avatarColor }"
-                            >
-                                {{ item.avatar }}
-                            </div>
-                            <div>
-                                <p class="text-base font-bold text-black leading-tight">{{ item.name }}</p>
-                                <p class="text-md text-gray-500 mt-0.5 flex items-center gap-1">
-                                    <span>{{ item.flag }}</span>
-                                    <span>{{ item.country }}</span>
-                                </p>
-                                <p class="text-md text-gray-500 mt-0.5 flex items-center">{{ item.role }} - {{ item.company }}</p>
-                            </div>
+        <!-- Track slider -->
+        <div ref="sliderTrackRef" class="flex gap-3 sm:gap-4 md:gap-5 w-max will-change-transform px-3 sm:px-4 md:px-6 py-2 cursor-grab active:cursor-grabbing">
+            <div
+                v-for="item in testimonials"
+                :key="item.id"
+                class="flex-shrink-0 w-[280px] sm:w-[350px] md:w-[420px] lg:w-[500px] bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 flex flex-col gap-2 sm:gap-3 cursor-default shadow-sm"
+            >
+                <!-- Header: avatar + name + country -->
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div
+                            class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xs sm:text-sm md:text-md font-bold text-black flex-shrink-0"
+                            :style="{ backgroundColor: item.avatarColor }"
+                        >
+                            {{ item.avatar }}
                         </div>
-                        <!-- three dots -->
-                        <div class="flex flex-col gap-[3px] mt-1">
-                            <span class="w-1 h-1 rounded-full bg-gray-400 block"></span>
-                            <span class="w-1 h-1 rounded-full bg-gray-400 block"></span>
-                            <span class="w-1 h-1 rounded-full bg-gray-400 block"></span>
+                        <div>
+                            <p class="text-sm sm:text-base font-bold text-black leading-tight">{{ item.name }}</p>
+                            <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center gap-1">
+                                <span>{{ item.flag }}</span>
+                                <span class="hidden sm:inline">{{ item.country }}</span>
+                            </p>
+                            <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center truncate max-w-[120px] sm:max-w-[180px] md:max-w-[220px]">
+                                {{ item.role }} - {{ item.company }}
+                            </p>
                         </div>
                     </div>
-
-                    <!-- Stars + rating number -->
-                    <div class="flex items-center gap-1 border-t-2 border-gray-100 pt-2">
-                        <StarSolid v-for="i in item.rating" :key="i" class="w-4 h-4 text-black" />
-                        <span class="text-md font-semibold text-black ml-1">{{ item.rating }}</span>
+                    <!-- three dots -->
+                    <div class="flex flex-col gap-[2px] sm:gap-[3px] mt-1 flex-shrink-0">
+                        <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
+                        <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
+                        <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
                     </div>
-
-                    <!-- Review text -->
-                    <p class="text-md text-gray-700 leading-relaxed">{{ item.text }}</p>
                 </div>
+
+                <!-- Stars + rating number -->
+                <div class="flex items-center gap-1 border-t-2 border-gray-100 pt-2">
+                    <StarSolid v-for="i in item.rating" :key="i" class="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-black" />
+                    <span class="text-xs sm:text-sm md:text-md font-semibold text-black ml-1">{{ item.rating }}</span>
+                </div>
+
+                <!-- Review text -->
+                <p class="text-xs sm:text-sm md:text-md text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-4">
+                    {{ item.text }}
+                </p>
             </div>
         </div>
-
-        <!-- logo partner -->
-        <div class="px-8 pt-6 pb-14">
-            <div class="flex flex-wrap justify-center items-center gap-x-10 gap-y-4 opacity-80">
-                <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="">
-                <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="">
-                <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="">
-                <img src="/public/assets/icons/brand-partner/04_resurock.png" alt="">
-                <img src="/public/assets/icons/brand-partner/05_ufo_logo.png" alt="">
-                <img src="/public/assets/icons/brand-partner/06_balkun_brothers.png" alt="">
-                <img src="/public/assets/icons/brand-partner/07_fuego.png" alt="">
-                <img src="/public/assets/icons/brand-partner/08_p_logo.png" alt="">
-                <img src="/public/assets/icons/brand-partner/09_pigdon_street_film_festival.png" alt="">
-                <img src="/public/assets/icons/brand-partner/10_atliens.png" alt="">
-                <img src="/public/assets/icons/brand-partner/11_showdown.png" alt="">
-                <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="">
-            </div>
         </div>
 
-        
+        <!-- Logo partner -->
+        <div class="px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-8 sm:pb-10 md:pb-14">
+            <div class="flex flex-wrap justify-center items-center gap-x-6 sm:gap-x-8 md:gap-x-10 gap-y-3 sm:gap-y-4 opacity-80">
+                <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="Monster Energy" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="Brian Antonion" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="Kastel Oil" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/04_resurock.png" alt="Resurock" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/05_ufo_logo.png" alt="UFO Logo" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/06_balkun_brothers.png" alt="Balkun Brothers" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/07_fuego.png" alt="Fuego" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/08_p_logo.png" alt="P Logo" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/09_pigdon_street_film_festival.png" alt="Pigdon Street Film Festival" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/10_atliens.png" alt="Atliens" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/11_showdown.png" alt="Showdown" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+                <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="Cheung Kuong" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+            </div>
+        </div>
     </div>
+
     <!-- featured section -->
     <div class="relative z-10 -mt-20 -mb-20 bg-black text-black py-12 rounded-3xl text-center">
         <div class="mx-auto px-10 justify-between flex gap-6">
@@ -663,6 +681,12 @@ const openLink = (url) => {
                 { xPct: 30, type: 'in' },
                 { xPct: 90, type: 'out' },
             ]"
+            :manual-positions-mobile="[
+                { xPct: 15, type: 'out' },
+                { xPct: 35, type: 'in' },
+                { xPct: 75, type: 'out' }
+            ]"
+            :tab-width-mobile="28"
         />
     </div>
 
@@ -858,4 +882,24 @@ const openLink = (url) => {
 
 .cursor-grab  { cursor: grab; }
 .cursor-grabbing { cursor: grabbing; }
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .line-clamp-3 {
+    -webkit-line-clamp: 2;
+  }
+}
 </style>

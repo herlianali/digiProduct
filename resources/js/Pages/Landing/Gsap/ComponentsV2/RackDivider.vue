@@ -18,7 +18,10 @@ const props = defineProps({
     responsive: { type: Boolean, default: true },
     minTabWidth: { type: Number, default: 30 },
     maxTabCount: { type: Number, default: 12 },
-    manualPositions: { type: Array, default: null }
+    manualPositions: { type: Array, default: null },
+    manualPositionsMobile: { type: Array,  default: null },
+    mobileBreakpoint:      { type: Number, default: 768 },
+    tabWidthMobile:        { type: Number, default: null },
 })
 
 // Responsive detection
@@ -47,6 +50,16 @@ const getResponsiveTabWidth = () => {
     if (!props.responsive) return props.tabWidth
 
     const width = viewportWidth.value
+    const usingMobileLayout = !!(props.manualPositionsMobile && width < props.mobileBreakpoint)
+
+    if (usingMobileLayout) {
+        return props.tabWidthMobile ?? props.tabWidth
+    }
+
+    if (props.manualPositions) {
+        return props.tabWidth
+    }
+
     const count = getResponsiveTabCount()
     const maxWidth = (width - 48) / count - 8
     return Math.min(props.tabWidth, Math.max(props.minTabWidth, maxWidth))
@@ -97,7 +110,7 @@ const seededRandom = (seed) => {
 }
 
 const mr = computed(() => props.midRadius)
-const r = computed(() => props.radius)
+const r = computed(() => Math.max(1, Math.min(props.radius, tw.value / 2 - 1)))
 const tw = computed(() => currentTabWidth.value)
 const barY = computed(() => Math.max(mr.value, props.tabHeight) + props.tabHeight + 4)
 const barBottom = computed(() => barY.value + props.height)
@@ -127,9 +140,16 @@ const generateTabs = () => {
     })
 }
 
+const activeManualPositions = computed(() => {
+    if (props.manualPositionsMobile && VW.value < props.mobileBreakpoint) {
+        return props.manualPositionsMobile
+    }
+    return props.manualPositions
+})
+
 const tabs = computed(() => {
-    if (props.manualPositions) {
-        return props.manualPositions.map(t => ({
+    if (activeManualPositions.value) {
+        return activeManualPositions.value.map(t => ({
             xl: Math.round((t.xPct / 100) * VW.value),
             xr: Math.round((t.xPct / 100) * VW.value) + tw.value,
             type: t.type
@@ -264,7 +284,7 @@ const transform = computed(() => props.flip ? `scale(1,-1) translate(0,-${totalH
 /* Responsive media queries for container */
 @media (max-width: 640px) {
     .rack-divider-wrapper {
-        transform: scaleY(0.9);
+        /* transform: scaleY(0.9); */
     }
 }
 </style>
