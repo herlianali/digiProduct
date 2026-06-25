@@ -328,19 +328,19 @@ onUnmounted(() => {
 
           <div class="grid grid-cols-12 gap-3 flex-1 min-h-0">
             <div class="bento-card col-span-5 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer">
-              <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[240px] border-r-[240px] border-b-[90px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
+              <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[200px] border-r-[200px] border-b-[120px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
               <p class="font-extrabold text-black text-xl xl:text-2xl relative z-20 px-2">Our<br />Product</p>
               <div class="flex-1 flex items-center justify-center py-1 relative z-10">
-                <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-[45%] h-[45%] object-contain" />
+                <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-[40%] h-[40%] object-contain" />
               </div>
-              <div class="text-center relative z-10 absolute bottom-3 left-0 right-0">
+              <div class="text-center relative z-10 absolute -bottom-1 left-0 right-0">
                 <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline w-8 h-8" />
               </div>
             </div>
 
             <div class="bento-card col-span-7 bg-[#abdec9] rounded-2xl relative overflow-hidden cursor-pointer">
               <div class="flex-1 flex items-center justify-center relative h-full">
-                <img src="/public/assets/image/banner/card-ourteam-animated.png" alt="team" class="w-[80%] h-[50%]" />
+                <img src="/public/assets/image/banner/card-ourteam-animated.png" alt="team" class="w-full h-full px-4" />
               </div>
               <div class="absolute bottom-4 left-2 right-2">
                 <p class="font-['Archivo_Black',sans-serif] text-white text-2xl font-bold leading-tight">Meet<br />Our Team</p>
@@ -363,10 +363,10 @@ onUnmounted(() => {
           </div>
           <p class="text-lg font-light text-black mt-0.5">Hi Robert,</p>
           <p class="text-[9px] text-black/80 mt-1 max-w-[55%] leading-relaxed">Most people freeze at the starting line. Don't hesitate. Just give it a shot.</p>
-          <button class="mt-2 z-10 bg-[#4dfa03] border border-black font-extrabold text-sm rounded-full px-4 py-0.5 whitespace-nowrap">
+          <button class="mt-4 z-10 bg-[#4dfa03] border border-black font-extrabold text-sm rounded-full px-2 py-0.5 whitespace-nowrap">
             FREE SKETCH!
           </button>
-          <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute right-0 -bottom-3 w-[45%] max-w-[180px] object-contain pointer-events-none z-20" />
+          <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute -right-2 -bottom-2 w-[60%] max-w-[180px] object-contain pointer-events-none z-20" />
         </div>
 
         <div class="bento-card col-span-1 row-span-3">
@@ -381,17 +381,17 @@ onUnmounted(() => {
             <div class="flex justify-center items-center p-4 ">
               <img src="/public/assets/image/banner/card-service-animated2.svg" class="w-full h-full" alt="" />
             </div>
-            <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-              <h3 class="font-bold text-white px-2 py-1 text-[11px]">Design Service</h3>
-              <div class="bg-gray-200">
+            <div class="bg-black rounded-tl-xl rounded-tr-xl">
+              <h3 class="font-bold text-white px-3 py-1 text-[11px]">Design Service</h3>
+              <div class="bg-gray-200 rounded-tl-xl rounded-tr-xl">
                 <p class="text-[9px] text-gray-800 leading-tight p-2">
-                  Brand Identity / Logo / Poster / Packaging / Social Media / Infographic
+                  Brand Identity / Logo Design / Poster Design / Packaging Design / Social Media Design / Infographic Design / Editorial Design / Book Design
                 </p>
-                <div class="bg-black">
-                  <h3 class="font-bold text-white px-2 py-1 text-[11px]">Illustration</h3>
-                  <div class="bg-gray-200">
-                    <p class="text-[9px] text-gray-800 leading-tight px-2 pt-1 pb-1">
-                      2D / Game / Character / Mascot
+                <div class="bg-black rounded-tl-xl rounded-tr-xl">
+                  <h3 class="font-bold text-white px-3 py-1 text-[9px]">Illustration Service</h3>
+                  <div class="bg-gray-200 rounded-tl-xl rounded-tr-xl">
+                    <p class="text-[9px] text-gray-800 leading-tight px-2 pt-2 pb-1">
+                      2D Illustration / Environmental Design / Game Design / Character design / Mascot Illustration / Advertising Illustration
                     </p>
                   </div>
                 </div>
@@ -406,37 +406,38 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <div class="bento-card col-span-1 row-span-2 bg-[#E60023] rounded-2xl p-2 flex flex-col relative overflow-hidden cursor-pointer min-h-[220px]">
+        <div class="bento-card col-span-1 row-span-2 bg-[#E60023] rounded-2xl p-3 flex flex-col relative overflow-hidden cursor-pointer min-h-[220px]">
           <div class="flex justify-between items-start">
             <img src="/public/assets/image/banner/card-path-logo.svg" class="w-6 h-6" alt="" />
             <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" class="w-3 h-3" alt="" />
           </div>
           <p class="text-white text-[8px] mt-2 leading-relaxed relative z-10">Let's <b class="italic">CONNECT</b> on Pinterest, share some pins, and dive into our <b class="italic">Portfolio</b> + inspo boards.</p>
-          <div class="absolute bottom-0 left-0 right-0 h-[40%] overflow-hidden">
+          <div class="absolute bottom-0 left-0 right-0 h-[50%] overflow-hidden">
             <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="w-full h-full object-cover object-top" />
           </div>
         </div>
         
-        <div class="bento-card col-span-1 bg-white border border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[105px]">
+        <div class="bento-card col-span-1 bg-white border-[1.5px] border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[105px]">
           <div class="flex justify-between items-start">
             <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="w-6 h-6" alt="TikTok" />
             <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok" class="w-3 h-3" />
           </div>
-          <p class="text-[8px] mt-1 font-semibold leading-tight">Memes & behind the scenes.</p>
-          <div class="absolute -bottom-1 left-0 right-0 h-[35%] overflow-hidden">
+          <p class="text-[8px] mt-1 font-semibold leading-tight">Some memes for entertainment, and behind the scenes of our routine.</p>
+          <div class="absolute bottom-0 left-0 right-1 h-[40%] overflow-hidden">
             <img src="/public/assets/image/banner/card-tiktok-animated.svg" alt="tiktok" class="w-full h-full object-cover object-top" />
           </div>
         </div>
 
         <div class="bento-card col-span-1 bg-gray-200 rounded-2xl p-2 flex flex-col cursor-pointer min-h-[105px]">
-          <p class="text-[9px] font-bold text-black leading-tight">Starter Pack Design.</p>
+          <p class="text-[9px] font-bold text-black leading-tight">Starter Pack <br> Design.</p>
           <div class="relative h-3 mt-1.5">
             <span class="absolute left-0 w-3 h-3 rounded-full bg-[#34bf72] border border-black"></span>
             <span class="absolute left-1.5 w-3 h-3 rounded-full bg-[#fec200] border border-black"></span>
             <span class="absolute left-3 w-3 h-3 rounded-full bg-[#3bffff] border border-black"></span>
+            <span class="absolute left-[18px] w-3 h-3 rounded-full bg-[#FF222A] border border-black"></span>
           </div>
           <div class="mt-auto">
-            <p class="text-[6.5px] text-gray-600 leading-tight">Canva/Shutterstock dll</p>
+            <p class="text-[6.5px] text-gray-600 leading-tight">Canva/<br />Shutterstock/<br />iconscout dll</p>
           </div>
         </div>
 
@@ -457,7 +458,7 @@ onUnmounted(() => {
         </div>
         
         <div class="bento-card col-span-1 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[120px]">
-          <div class="px-1.5 pt-1.5 flex justify-between items-start">
+          <div class="px-2 pt-2 flex justify-between items-start">
             <div>
               <p class="font-bold text-white text-xl leading-none">Bē</p>
               <p class="text-[7.5px] text-white leading-tight mt-0.5">More Professional</p>
@@ -465,20 +466,20 @@ onUnmounted(() => {
             <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-2.5 h-2.5" />
           </div>
           <div class="overflow-hidden mt-auto w-full">
-            <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-auto object-cover" />
+            <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-full object-cover" />
           </div>
         </div>
 
         <div class="bento-card col-span-1 row-span-2 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[220px]">
-          <div class="px-2 pt-2 relative">
+          <div class="px-3 pt-3 relative">
             <p class="text-[9px] text-white leading-none">New Seller</p>
             <p class="text-white text-[9px] leading-tight">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
-            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-2 right-2 w-2.5 h-2.5" />
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-3 right-3 w-2.5 h-2.5" />
           </div>
           <div class="overflow-hidden mt-1 flex-1 flex flex-col justify-end">
             <img src="/public/assets/image/banner/card-upwork-animated.svg" alt="upwork" class="w-full h-auto object-cover" />
             <div class="bg-[#268a00] px-2 py-1.5 relative z-10 rounded-t-xl -mt-4">
-              <p class="text-white text-[7.5px] font-extrabold leading-tight">Enjoy many Bonuses and Discounts!</p>
+              <p class="text-white text-[7.5px] font-extrabold leading-tight">Enjoy many Bonuses<br />and Discounts<br />on this Platform!</p>
             </div>
           </div>
         </div>
