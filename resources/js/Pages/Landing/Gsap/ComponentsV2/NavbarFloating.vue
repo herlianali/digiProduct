@@ -24,51 +24,48 @@ const isNavbarVisible    = ref(false)
 const platformOpen       = ref(false)
 const wrapperRef         = ref(null)
 const platformBtnRef     = ref(null)
-const dropdownLeft       = ref(0)
-const dropdownTop        = ref(0)
+const dropdownRef        = ref(null)
 const cartOpen           = ref(false)
 
 const platformMenu = [
     {
         group: 'Service',
         items: [
-            { label: 'Fiverr',    href: 'https://fiverr.com',    highlight: true  },
-            { label: 'Upwork',    href: 'https://upwork.com',    highlight: false },
+            { label: 'Fiverr',    href: 'https://fiverr.com', active: true },
+            { label: 'Upwork',    href: 'https://upwork.com' },
         ],
     },
     {
         group: 'Portofolio',
         items: [
-            { label: 'Behance',   href: 'https://behance.net',   highlight: false },
-            { label: 'Pinterest', href: 'https://pinterest.com', highlight: false },
+            { label: 'Behance',   href: 'https://behance.net' },
+            { label: 'Pinterest', href: 'https://pinterest.com' },
         ],
     },
     {
         group: 'Microstock',
         items: [
-            { label: 'Canva',        href: 'https://canva.com',        highlight: false },
-            { label: 'Shutterstock', href: 'https://shutterstock.com', highlight: false },
-            { label: 'Freepik',      href: 'https://freepik.com',      highlight: false },
+            { label: 'Canva',        href: 'https://canva.com' },
+            { label: 'Shutterstock', href: 'https://shutterstock.com' },
+            { label: 'Freepik',      href: 'https://freepik.com' },
         ],
     },
 ]
 
 const togglePlatform = () => {
-    if (!platformOpen.value && platformBtnRef.value) {
-        const btnRect = platformBtnRef.value.getBoundingClientRect()
-        dropdownLeft.value = btnRect.left
-        dropdownTop.value  = btnRect.bottom + 6
-    }
     platformOpen.value = !platformOpen.value
 }
 
-const closePlatform      = () => { platformOpen.value = false }
+const closePlatform = () => { 
+    platformOpen.value = false 
+}
 
 const handleClickOutside = (e) => {
-    if (
-        platformBtnRef.value && !platformBtnRef.value.contains(e.target) &&
-        !e.target.closest('.dropdown-panel')
-    ) {
+    const target = e.target
+    const isPlatformBtn = platformBtnRef.value && platformBtnRef.value.contains(target)
+    const isDropdown = dropdownRef.value && dropdownRef.value.contains(target)
+    
+    if (!isPlatformBtn && !isDropdown) {
         closePlatform()
     }
 }
@@ -88,12 +85,12 @@ const handleCartClick = () => {
 
 onMounted(() => {
     if (!props.staticMode) initNavbarAnimation()
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
     ScrollTrigger.getAll().forEach(t => t.kill())
-    document.removeEventListener('mousedown', handleClickOutside)
+    document.removeEventListener('click', handleClickOutside)
 })
 
 const initNavbarAnimation = () => {
@@ -139,7 +136,7 @@ const scrollToSection = (sectionId) => {
         <div ref="wrapperRef" class="relative" style="overflow: visible;">
 
             <!-- ── NAVBAR PILL ── -->
-            <div class="bg-white/95 backdrop-blur-sm border border-black/10 shadow-md rounded-full">
+            <div class="bg-white backdrop-blur-sm  rounded-full relative z-20">
                 <nav>
                     <div class="flex items-center gap-1 py-2.5 px-4">
                         <div class="hidden md:flex gap-1 items-center">
@@ -152,7 +149,7 @@ const scrollToSection = (sectionId) => {
                             <button
                                 ref="platformBtnRef"
                                 class="font-bold text-black text-sm px-3 py-1.5 rounded-full bg-[#fee100] hover:bg-yellow-300 transition-colors duration-200 flex items-center gap-1 select-none"
-                                @click="togglePlatform"
+                                @click.stop="togglePlatform"
                             >
                                 Platform
                                 <svg
@@ -188,14 +185,11 @@ const scrollToSection = (sectionId) => {
                                 <ChevronRightIcon class="w-3.5 h-3.5 text-black inline-block" />
                             </button>
 
-                            <!-- ── CART BUTTON dengan badge ── -->
                             <button
                                 class="relative p-1 hover:text-green-600 transition-colors"
                                 @click="handleCartClick"
                             >
                                 <ShoppingCartIcon class="w-5 h-5 text-black" />
-
-                                <!-- Badge -->
                                 <Transition name="badge">
                                     <span
                                         v-if="cart.count.value > 0"
@@ -217,97 +211,141 @@ const scrollToSection = (sectionId) => {
                     </div>
                 </nav>
             </div>
-            <!-- ── END NAVBAR PILL ── -->
-
-            <!-- ── PLATFORM DROPDOWN ── -->
-            <Transition
-                enter-active-class="transition duration-200 ease-out"
-                enter-from-class="opacity-0 scale-y-95 origin-top"
-                enter-to-class="opacity-100 scale-y-100 origin-top"
-                leave-active-class="transition duration-150 ease-in"
-                leave-from-class="opacity-100 scale-y-100 origin-top"
-                leave-to-class="opacity-0 scale-y-95 origin-top"
+            <!-- ── DROPDOWN ── -->
+            <div
+                v-if="platformOpen"
+                ref="dropdownRef"
+                class="dropdown-curved absolute left-[290px] -translate-x-1/2 top-full mt-0 bg-white backdrop-blur-sm py-5 px-5 z-10"
+                style="width: 380px;"
             >
-                <div
-                    v-if="platformOpen"
-                    class="dropdown-panel bg-white/95 backdrop-blur-sm border border-black/10 py-4 px-4 min-w-[340px]"
-                    :style="{
-                        position: 'fixed',
-                        left: dropdownLeft + 'px',
-                        top:  dropdownTop  + 'px',
-                        zIndex: 9999,
-                    }"
-                >
-                    <div class="grid grid-cols-2 gap-x-6">
-                        <div class="flex flex-col">
-                            <template v-for="group in platformMenu.slice(0, 2)" :key="group.group">
-                                <div class="flex items-center gap-2 mb-1 mt-3 first:mt-0">
-                                    <span class="text-[10px] text-gray-400 font-medium italic tracking-widest">{{ group.group }}</span>
-                                    <div class="flex-1 h-px bg-gray-200"></div>
-                                </div>
-                                <a v-for="item in group.items" :key="item.label" :href="item.href" target="_blank" rel="noopener noreferrer" class="no-underline" @click="closePlatform">
-                                    <div :class="['flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-base text-black transition-all duration-150', item.highlight ? 'bg-[#fee100] hover:bg-yellow-300' : 'hover:bg-black/5']">
-                                        <span v-if="item.highlight" class="font-black">→</span>
-                                        {{ item.label }}
-                                    </div>
-                                </a>
-                            </template>
-                        </div>
-                        <div class="flex flex-col">
-                            <template v-for="group in platformMenu.slice(2)" :key="group.group">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-[10px] text-gray-400 font-medium italic tracking-widest">{{ group.group }}</span>
-                                    <div class="flex-1 h-px bg-gray-200"></div>
-                                </div>
-                                <a v-for="item in group.items" :key="item.label" :href="item.href" target="_blank" rel="noopener noreferrer" class="no-underline" @click="closePlatform">
-                                    <div :class="['flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-base text-black transition-all duration-150', item.highlight ? 'bg-[#fee100] hover:bg-yellow-300' : 'hover:bg-black/5']">
-                                        <span v-if="item.highlight" class="font-black">→</span>
-                                        {{ item.label }}
-                                    </div>
-                                </a>
-                            </template>
-                        </div>
+                <div class="flex gap-6">
+                    <!-- Kolom 1: Service + Portofolio -->
+                    <div class="flex flex-col flex-1">
+                        <!-- Service -->
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">Service</span>
+                        <hr class="border-gray-200 my-1">
+                        <a 
+                            v-for="item in platformMenu[0].items" 
+                            :key="item.label"
+                            :href="item.href" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 hover:bg-black/5 transition-all"
+                            :class="item.active ? 'bg-[#fee100] hover:bg-yellow-300 -ml-2 pl-4' : ''"
+                            @click="closePlatform"
+                        >
+                            <span v-if="item.active" class="text-xs">→</span>
+                            {{ item.label }}
+                        </a>
+                        
+                        <!-- Portofolio -->
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em] mt-3">Portofolio</span>
+                        <hr class="border-gray-200 my-1">
+                        <a 
+                            v-for="item in platformMenu[1].items" 
+                            :key="item.label"
+                            :href="item.href" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 hover:bg-black/5 transition-all"
+                            @click="closePlatform"
+                        >
+                            {{ item.label }}
+                        </a>
+                    </div>
+                    
+                    <!-- Kolom 2: Microstock -->
+                    <div class="flex flex-col flex-1">
+                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">Microstock</span>
+                        <hr class="border-gray-200 my-1">
+                        <a 
+                            v-for="item in platformMenu[2].items" 
+                            :key="item.label"
+                            :href="item.href" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 hover:bg-black/5 transition-all"
+                            @click="closePlatform"
+                        >
+                            {{ item.label }}
+                        </a>
                     </div>
                 </div>
-            </Transition>
+            </div>
+            <!-- ── END NAVBAR PILL ── -->
         </div>
     </div>
 
-    <!-- ── CART SIDEBAR (Teleport ke body agar tidak terpotong stacking context) ── -->
+    <!-- ── CART SIDEBAR ── -->
     <Teleport to="body">
         <CartSidebar :open="cartOpen" @close="cartOpen = false" />
     </Teleport>
 </template>
 
 <style scoped>
-.dropdown-panel {
-    border-radius: 0 0 16px 16px;
+/* ─── DROPDOWN DENGAN LENGKUNGAN KIRI-KANAN ─── */
+.dropdown-curved {
+    border-radius: 0 0 20px 20px;
+    position: relative;
+    animation: dropdownFade 0.25s ease-out;
+    transform-origin: top center;
+    box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.2);
 }
 
-.dropdown-panel::before {
+/* Lengkungan Sisi Kiri */
+.dropdown-curved::before {
     content: '';
     position: absolute;
-    top: -4px;
-    left: -8px;
-    width: 16px;
-    height: 16px;
-    background: transparent;
-    box-shadow: -4px 4px 0 4px rgb(255 255 255 / 0.95);
-    border-bottom-left-radius: 16px;
+    top: 0px;
+    left: -20px;
+    width: 20px;
+    height: 30px;
+    background-color: transparent;
+    border-top-right-radius: 15px;
+    box-shadow: 6px -6px 0 0 rgba(255, 255, 255, 1);
     pointer-events: none;
+    z-index: 1;
 }
 
-.dropdown-panel::after {
+/* Lengkungan Sisi Kanan */
+.dropdown-curved::after {
     content: '';
     position: absolute;
-    top: -4px;
-    right: -8px;
-    width: 16px;
-    height: 16px;
-    background: transparent;
-    box-shadow: 4px 4px 0 4px rgb(255 255 255 / 0.95);
-    border-bottom-right-radius: 16px;
+    top: 0;
+    right: -20px;
+    width: 20px;
+    height: 30px;
+    background-color: transparent;
+    border-top-left-radius: 15px;
+    box-shadow: -6px -6px 0 0 rgba(255, 255, 255, 1);
     pointer-events: none;
+    z-index: 1;
+}
+
+/* HR line */
+hr {
+    border: none;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Menu item active dengan background kuning */
+.menu-item.bg-\\[\\#fee100\\] {
+    background-color: #fee100;
+}
+
+.menu-item.bg-\\[\\#fee100\\]:hover {
+    background-color: #e6c900;
+}
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.95) translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) scale(1) translateY(0);
+    }
 }
 
 /* Badge pop animation */

@@ -176,7 +176,7 @@ const getInTouchUrl = () => {
   font-weight: 900;
   line-height: 1;
   letter-spacing: -0.03em;
-  font-family: 'Arial Black', 'Helvetica Neue', sans-serif;
+  /* font-family: 'Arial Black', 'Helvetica Neue', sans-serif; */
   white-space: nowrap;
   text-transform: capitalize;
   user-select: none;

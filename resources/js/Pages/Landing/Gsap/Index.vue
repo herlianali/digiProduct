@@ -2,15 +2,16 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import FooterSection from './ComponentsV2/FooterSection.vue'
 import LoadingScreen from './ComponentsV2/LoadingScreen.vue'
-import BannerCards from './Components/BannerCards.vue'
-import OurWorkSection from './Components/OurWorkSection.vue'
-import ProductSection from './Components/ProductSection.vue'
+import BannerCards from './ComponentsV2/BannerCards.vue'
+import OurWorkSection from './ComponentsV2/OurWorkSection.vue'
+import ProductSection from './ComponentsV2/ProductSection.vue'
 import RackDivider from './ComponentsV2/RackDivider.vue'
-import BentoGridSection from './ComponentsV2/BentoGridSection.vue' // ← import component baru
+import BentoGridSection from './ComponentsV2/BentoGridSection.vue'
+import NavbarFloating from './ComponentsV2/NavbarFloating.vue'
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ShoppingCartIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
-
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
+import { useCart } from '@/Composables/useCart'
 import {
     StarIcon as StarSolid,
     ArrowUpRightIcon as ArrowUpRightSolid,
@@ -20,9 +21,6 @@ import {
 gsap.registerPlugin(ScrollTrigger)
 
 const bannerRef = ref(null)
-const navbarRef = ref(null)
-const navbarContainerRef = ref(null)
-const isNavbarVisible = ref(false)
 const sliderTrackRef = ref(null)
 const sliderContainerRef = ref(null)
 const sliderPrevBtn = ref(null)
@@ -33,22 +31,40 @@ let autoScrollInterval = null
 const arrowRef = ref(null)
 let arrowAnimation = null
 
+const cart = useCart()
+const addedIds = ref(new Set())
 // ─── Product Section ───────────────────────────────────────────────
 const productSectionRef = ref(null)
 const activeFilter = ref('artwork')
 const activeProductId = ref(2)
 
+const handleAddToCart = (product) => {
+    cart.add({
+        id:        product.id,
+        name:      product.name,
+        price:     product.is_free ? 0 : (parseFloat(product.price) || 0),
+        is_free:   product.is_free ?? false,
+        thumbnail: product.image ?? null,
+    })
+    addedIds.value = new Set(addedIds.value).add(product.id)
+    setTimeout(() => {
+        const next = new Set(addedIds.value)
+        next.delete(product.id)
+        addedIds.value = next
+    }, 1500)
+}
+
 const products = [
-    { id: 1,  name: 'Autobiography',      category: 'artwork', image: '/assets/image/shop/product-1.png' },
-    { id: 2,  name: 'Incarnation',        category: 'artwork', image: '/assets/image/shop/product-2.png' },
-    { id: 3,  name: 'Everything is Evil', category: 'artwork', image: '/assets/image/shop/product-3.png' },
-    { id: 4,  name: 'Drunk',              category: 'artwork', image: '/assets/image/shop/product-4.png' },
-    { id: 5,  name: 'Minor Threat',       category: 'artwork', image: '/assets/image/shop/product-5.png' },
-    { id: 6,  name: 'Simple',             category: 'artwork', image: '/assets/image/shop/product-6.png' },
-    { id: 7,  name: 'Rest in Happy',      category: 'artwork', image: '/assets/image/shop/product-7.png' },
-    { id: 8,  name: 'Enemy',              category: 'artwork', image: '/assets/image/shop/product-8.png' },
-    { id: 9,  name: 'Grotesk Bold',       category: 'font',    image: '/assets/image/shop/product-4.png' },
-    { id: 10, name: 'Display Noir',       category: 'font',    image: '/assets/image/shop/product-6.png' },
+    { id: 1,  name: 'Autobiography',      category: 'artwork', image: '/assets/image/shop/product-1.png', tags: ['Illustration', 'Dark'], price: 15, is_free: false },
+    { id: 2,  name: 'Incarnation',        category: 'artwork', image: '/assets/image/shop/product-2.png', tags: ['Illustration', 'Bold'], price: 20, is_free: false },
+    { id: 3,  name: 'Everything is Evil', category: 'artwork', image: '/assets/image/shop/product-3.png', tags: ['Poster', 'Dark'],       price: 18, is_free: false },
+    { id: 4,  name: 'Drunk',              category: 'artwork', image: '/assets/image/shop/product-4.png', tags: ['Illustration'],         price: 12, is_free: false },
+    { id: 5,  name: 'Minor Threat',       category: 'artwork', image: '/assets/image/shop/product-5.png', tags: ['Poster', 'Bold'],       price: 0,  is_free: true  },
+    { id: 6,  name: 'Simple',             category: 'artwork', image: '/assets/image/shop/product-6.png', tags: ['Minimal'],              price: 10, is_free: false },
+    { id: 7,  name: 'Rest in Happy',      category: 'artwork', image: '/assets/image/shop/product-7.png', tags: ['Illustration'],         price: 15, is_free: false },
+    { id: 8,  name: 'Enemy',              category: 'artwork', image: '/assets/image/shop/product-8.png', tags: ['Dark', 'Bold'],         price: 22, is_free: false },
+    { id: 9,  name: 'Grotesk Bold',       category: 'font',    image: '/assets/image/shop/product-4.png', tags: ['Sans-Serif', 'Bold'],   price: 30, is_free: false },
+    { id: 10, name: 'Display Noir',       category: 'font',    image: '/assets/image/shop/product-6.png', tags: ['Display', 'Dark'],      price: 25, is_free: false },
 ]
 
 const redirectToProduct = (id) => {
@@ -59,7 +75,13 @@ const redirectToAboutUs = () => {
     window.location.href = `/our-team`
 }
 
-const filteredProducts = () => products.filter(p => p.category === activeFilter.value)
+const filteredProducts = () => {
+  const filtered = products.filter(p => p.category === activeFilter.value)
+  return filtered.map((product, index) => ({
+    ...product,
+    index: index
+  }))
+}
 
 const setFilter = (filter) => {
     if (activeFilter.value === filter) return
@@ -93,7 +115,6 @@ const testimonials = [
 ]
 
 onMounted(() => {
-    initNavbarAnimation()
     initSectionAnimations()
     initInfiniteSlider()
     initProductSectionAnimation()
@@ -110,12 +131,11 @@ onUnmounted(() => {
 const initArrowAnimation = () => {
     if (!arrowRef.value) return
     
-    // Buat timeline infinite untuk animasi arrow ke kanan-kiri
     arrowAnimation = gsap.to(arrowRef.value, {
-        x: 8, // bergerak ke kanan 8px
+        x: 8,
         duration: 0.6,
-        repeat: -1, // infinite
-        yoyo: true, // bolak-balik
+        repeat: -1,
+        yoyo: true,
         ease: "power1.inOut",
         repeatDelay: 0.1
     })
@@ -347,41 +367,6 @@ const hideNavigationButtons = () => {
     }
 }
 
-const initNavbarAnimation = () => {
-    gsap.set(navbarContainerRef.value, {
-        opacity: 0,
-        y: -16,
-        pointerEvents: 'none',
-        position: 'fixed',
-        top: '16px',
-        right: '16px',
-        left: 'auto',
-        width: 'auto',
-        zIndex: 1000,
-        borderRadius: '50px',
-        backgroundColor: 'rgba(255,255,255,0.97)',
-        backdropFilter: 'blur(12px)',
-        padding: '0 16px',
-        border: '1px solid rgba(0,0,0,0.08)',
-        boxShadow: '0 8px 24px -4px rgba(0,0,0,0.12)',
-    })
-
-    ScrollTrigger.create({
-        trigger: '.bento-grid-section',
-        start: 'bottom top',
-        onEnter: () => {
-            if (isNavbarVisible.value) return
-            isNavbarVisible.value = true
-            gsap.to(navbarContainerRef.value, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.45, ease: 'power3.out' })
-        },
-        onLeaveBack: () => {
-            if (!isNavbarVisible.value) return
-            isNavbarVisible.value = false
-            gsap.to(navbarContainerRef.value, { opacity: 0, y: -16, pointerEvents: 'none', duration: 0.3, ease: 'power2.in' })
-        },
-    })
-}
-
 const initSectionAnimations = () => {
     gsap.from('.section-title', {
         scrollTrigger: {
@@ -396,17 +381,6 @@ const initSectionAnimations = () => {
     })
 }
 
-const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId)
-    if (element) {
-        const offset = isNavbarVisible.value ? 80 : 0
-        window.scrollTo({
-            top: element.getBoundingClientRect().top + window.scrollY - offset,
-            behavior: 'smooth',
-        })
-    }
-}
-
 const openLink = (url) => {
     window.open(url, '_blank')
 }
@@ -414,35 +388,14 @@ const openLink = (url) => {
 
 <template>
     <LoadingScreen />
-    
-    <div ref="navbarContainerRef" class="z-[1000]">
-        <nav ref="navbarRef">
-            <div class="flex items-center gap-1 py-2.5">
-                <div class="hidden md:flex gap-1 items-center">
-                    <a href="#" class="text-black font-medium hover:text-emerald-500 transition-colors duration-200 no-underline text-sm px-3 py-1.5 rounded-full hover:bg-black/5" @click.prevent="scrollToSection('about-us')">About Us</a>
-                    <a href="#" class="font-bold text-black text-sm px-3 py-1.5 rounded-full bg-[#fee100] hover:bg-yellow-300 transition-colors duration-200 no-underline" @click.prevent="scrollToSection('platform')">Platform ▾</a>
-                    <a href="#" class="text-black font-medium hover:text-emerald-500 transition-colors duration-200 no-underline text-sm px-3 py-1.5 rounded-full hover:bg-black/5" @click.prevent="scrollToSection('shop')">Shop</a>
-                    <a href="#" class="text-black font-medium hover:text-emerald-500 transition-colors duration-200 no-underline text-sm px-3 py-1.5 rounded-full hover:bg-black/5" @click.prevent="scrollToSection('contact')">Contact</a>
-                </div>
 
-                <div class="hidden md:block w-px h-5 bg-gray-200 mx-1"></div>
+    <NavbarFloating
+        trigger-el=".bento-grid-section"
+        balance="$100"
+        avatar-url=""
+        @cta-click="() => {}"
+    />
 
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button class="bg-[#4dfa03] hover:bg-green-400 font-extrabold text-black px-4 py-1.5 rounded-full nav-button flex items-center gap-1 transition-all whitespace-nowrap text-sm border border-black/10">
-                        FREE SKETCH!
-                        <ChevronRightIcon class="w-3.5 h-3.5 text-black inline-block" />
-                    </button>
-                    <ShoppingCartIcon class="w-5 h-5 text-black cursor-pointer hover:text-green-600 transition-colors" />
-                    <span class="hidden md:inline-block border border-gray-200 rounded-full px-3 py-1 text-black text-sm font-medium">$100</span>
-                    <div class="w-7 h-7 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center flex-shrink-0">
-                        <img src="" alt="user" class="w-full h-full object-cover" />
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </div>
-
-    <!-- Bento Grid Section - menggunakan component terpisah -->
     <BentoGridSection class="bento-grid-section" />
 
     <div class="bg-[#dedede]">
@@ -475,7 +428,6 @@ const openLink = (url) => {
     </div>
 
     <div class="bg-gradient-to-b from-black to-gray-800 text-white pb-28">
-        <!-- Bagian Perception - sudah diresposivekan -->
         <div class="px-6 sm:px-10 md:px-20 lg:px-40 pt-8 sm:pt-10 md:pt-12 pb-8 sm:pb-10">
             <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight">
                 Perception
@@ -485,95 +437,86 @@ const openLink = (url) => {
             </p>
         </div>
 
-        <!-- Slider dengan Navigation -->
         <div ref="sliderContainerRef" class="relative w-full overflow-hidden py-4 group">
-        <!-- Tombol navigasi kiri -->
-        <button
-            ref="sliderPrevBtn"
-            class="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-black rounded-full p-2 sm:p-2.5 md:p-3 shadow-lg hover:bg-green-400 transition-all duration-300 opacity-0 -translate-x-5 scale-90 hidden"
-            style="display: none;"
-        >
-            <ChevronLeftIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-        </button>
-
-        <!-- Tombol navigasi kanan -->
-        <button
-            ref="sliderNextBtn"
-            class="absolute right-2 sm:right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-black rounded-full p-2 sm:p-2.5 md:p-3 shadow-lg hover:bg-green-400 transition-all duration-300 opacity-0 translate-x-5 scale-90 hidden"
-            style="display: none;"
-        >
-            <ChevronRightIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-        </button>
-
-        <!-- Track slider -->
-        <div ref="sliderTrackRef" class="flex gap-3 sm:gap-4 md:gap-5 w-max will-change-transform px-3 sm:px-4 md:px-6 py-2 cursor-grab active:cursor-grabbing">
-            <div
-                v-for="item in testimonials"
-                :key="item.id"
-                class="flex-shrink-0 w-[280px] sm:w-[350px] md:w-[420px] lg:w-[500px] bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 flex flex-col gap-2 sm:gap-3 cursor-default shadow-sm"
+            <button
+                ref="sliderPrevBtn"
+                class="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-black rounded-full p-2 sm:p-2.5 md:p-3 shadow-lg hover:bg-green-400 transition-all duration-300 opacity-0 -translate-x-5 scale-90 hidden"
+                style="display: none;"
             >
-                <!-- Header: avatar + name + country -->
-                <div class="flex items-start justify-between">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <div
-                            class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xs sm:text-sm md:text-md font-bold text-black flex-shrink-0"
-                            :style="{ backgroundColor: item.avatarColor }"
-                        >
-                            {{ item.avatar }}
+                <ChevronLeftIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+            </button>
+
+            <button
+                ref="sliderNextBtn"
+                class="absolute right-2 sm:right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-20 bg-[#b4f000] backdrop-blur-sm text-black rounded-full p-2 sm:p-2.5 md:p-3 shadow-lg hover:bg-green-400 transition-all duration-300 opacity-0 translate-x-5 scale-90 hidden"
+                style="display: none;"
+            >
+                <ChevronRightIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+            </button>
+
+            <div ref="sliderTrackRef" class="flex gap-3 sm:gap-4 md:gap-5 w-max will-change-transform px-3 sm:px-4 md:px-6 py-2 cursor-grab active:cursor-grabbing">
+                <div
+                    v-for="item in testimonials"
+                    :key="item.id"
+                    class="flex-shrink-0 w-[280px] sm:w-[350px] md:w-[420px] lg:w-[500px] bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 flex flex-col gap-2 sm:gap-3 cursor-default shadow-sm"
+                >
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <div
+                                class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xs sm:text-sm md:text-md font-bold text-black flex-shrink-0"
+                                :style="{ backgroundColor: item.avatarColor }"
+                            >
+                                {{ item.avatar }}
+                            </div>
+                            <div>
+                                <p class="text-sm sm:text-base font-bold text-black leading-tight">{{ item.name }}</p>
+                                <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center gap-1">
+                                    <span>{{ item.flag }}</span>
+                                    <span class="hidden sm:inline">{{ item.country }}</span>
+                                </p>
+                                <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center truncate max-w-[120px] sm:max-w-[180px] md:max-w-[220px]">
+                                    {{ item.role }} - {{ item.company }}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p class="text-sm sm:text-base font-bold text-black leading-tight">{{ item.name }}</p>
-                            <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center gap-1">
-                                <span>{{ item.flag }}</span>
-                                <span class="hidden sm:inline">{{ item.country }}</span>
-                            </p>
-                            <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center truncate max-w-[120px] sm:max-w-[180px] md:max-w-[220px]">
-                                {{ item.role }} - {{ item.company }}
-                            </p>
+                        <div class="flex flex-col gap-[2px] sm:gap-[3px] mt-1 flex-shrink-0">
+                            <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
+                            <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
+                            <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
                         </div>
                     </div>
-                    <!-- three dots -->
-                    <div class="flex flex-col gap-[2px] sm:gap-[3px] mt-1 flex-shrink-0">
-                        <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
-                        <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
-                        <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
+
+                    <div class="flex items-center gap-1 border-t-2 border-gray-100 pt-2">
+                        <StarSolid v-for="i in item.rating" :key="i" class="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-black" />
+                        <span class="text-xs sm:text-sm md:text-md font-semibold text-black ml-1">{{ item.rating }}</span>
                     </div>
-                </div>
 
-                <!-- Stars + rating number -->
-                <div class="flex items-center gap-1 border-t-2 border-gray-100 pt-2">
-                    <StarSolid v-for="i in item.rating" :key="i" class="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-black" />
-                    <span class="text-xs sm:text-sm md:text-md font-semibold text-black ml-1">{{ item.rating }}</span>
+                    <p class="text-xs sm:text-sm md:text-md text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-4">
+                        {{ item.text }}
+                    </p>
                 </div>
-
-                <!-- Review text -->
-                <p class="text-xs sm:text-sm md:text-md text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-4">
-                    {{ item.text }}
-                </p>
             </div>
-        </div>
         </div>
 
         <!-- Logo partner -->
-        <div class="px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 pb-8 sm:pb-10 md:pb-14">
-            <div class="flex flex-wrap justify-center items-center gap-x-6 sm:gap-x-8 md:gap-x-10 gap-y-3 sm:gap-y-4 opacity-80">
-                <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="Monster Energy" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="Brian Antonion" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="Kastel Oil" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/04_resurock.png" alt="Resurock" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/05_ufo_logo.png" alt="UFO Logo" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/06_balkun_brothers.png" alt="Balkun Brothers" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/07_fuego.png" alt="Fuego" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/08_p_logo.png" alt="P Logo" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/09_pigdon_street_film_festival.png" alt="Pigdon Street Film Festival" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/10_atliens.png" alt="Atliens" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/11_showdown.png" alt="Showdown" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
-                <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="Cheung Kuong" class="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+        <div class="px-4 pt-4 pb-8">
+            <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 opacity-80">
+                <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="Monster Energy" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="Brian Antonion" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="Kastel Oil" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/04_resurock.png" alt="Resurock" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/05_ufo_logo.png" alt="UFO Logo" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/06_balkun_brothers.png" alt="Balkun Brothers" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/07_fuego.png" alt="Fuego" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/08_p_logo.png" alt="P Logo" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/09_pigdon_street_film_festival.png" alt="Pigdon Street Film Festival" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/10_atliens.png" alt="Atliens" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/11_showdown.png" alt="Showdown" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+                <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="Cheung Kuong" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
             </div>
         </div>
     </div>
 
-    <!-- featured section -->
     <div class="relative z-10 -mt-20 -mb-20 bg-black text-black py-12 rounded-3xl text-center">
         <div class="mx-auto px-10 justify-between flex gap-6">
             <img src="/public/assets/image/our-work.svg" alt="Featured Image" class="">
@@ -607,39 +550,41 @@ const openLink = (url) => {
     </div>
 
     <!-- Our Services -->
-    <div class="bg-white pt-28 pb-8 px-16 text-black">
+    <div class="bg-white pt-28 pb-2 px-32 text-black">
         <div class="flex justify-center items-start gap-8">
             <div class="flex flex-col flex-shrink-0">
-                <h1 class="text-6xl font-extrabold pb-2">Our <br>Services</h1>
-                <p class="max-w-md">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
+                <h4 style="font-family: 'Arial Black' !important; line-height: 1;" class="text-[48px] pb-8">
+                    Our<br>Services
+                </h4>
+                <p class="max-w-xl text-[13px]" style="font-family: 'Barlow' !important;">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
             </div>
             <div class="flex flex-col px-12">
                 <div class="flex justify-center gap-8">
                     <div class="flex flex-col flex-1">
-                        <h1 class="text-5xl font-bold pb-2">Design Service</h1>
+                        <h1 class="text-[27px] font-extrabold pb-2" style="font-family: 'Barlow' !important;">Design Service</h1>
                         <p class="leading-relaxed">
-                            <span class="inline-flex flex-wrap gap-x-1 mt-2 text-xl">
-                                <span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Brand Identity</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Logo Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Poster Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Packaging Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Social Media Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Infographic Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Editorial Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer"> Book Design</span>
+                            <span class="inline-flex flex-wrap mt-2 text-xl">
+                                <span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Brand Identity</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Logo Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Poster Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Packaging Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Social Media Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Infographic Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Editorial Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer"> Book Design</span>
                             </span>
                         </p>
                     </div>
                     <div class="flex flex-col flex-1">
-                        <h1 class="text-5xl font-bold pb-2">Illustration Service</h1>
+                        <h1 class="text-[27px] font-extrabold pb-2" style="font-family: 'Barlow' !important;">Illustration Service</h1>
                         <p class="leading-relaxed">
-                            <span class="inline-flex flex-wrap gap-x-1 mt-2 text-xl">
-                                <span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">2D Illustration</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Environmental Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Game Design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Character design</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Mascot Illustration</span>
-                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:border hover:border-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:border-black hover:text-black cursor-pointer">Advertising Illustration</span>
+                            <span class="inline-flex flex-wrap mt-2 text-xl">
+                                <span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">2D Illustration</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Environmental Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Game Design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Character design</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Mascot Illustration</span>
+                                <b class="text-yellow-500">/</b><span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Advertising Illustration</span>
                             </span>
                         </p>
                     </div>
@@ -693,71 +638,103 @@ const openLink = (url) => {
     <!-- ============================================================ -->
     <!-- product placement                                            -->
     <!-- ============================================================ -->
-    <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-14 px-16 text-black">
+    <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-4 px-16 text-black">
+    <!-- Header row: title + filter tabs -->
+    <div class="flex justify-between items-end mb-4 px-16">
+      <h1 class="shop-title text-[48px] font-extrabold font-barlow leading-tight">
+        Official<br />Supplaybox <br> Shop
+      </h1>
 
-        <!-- Header row: title + filter tabs -->
-        <div class="flex justify-between items-end mb-10">
-            <h1 class="shop-title text-6xl font-bold leading-tight">
-                Official<br />Supplaybox Shop
-            </h1>
-
-            <!-- Filter tabs: wrapped in a single pill container -->
-            <div class="shop-filter-wrap">
-                <button
-                    class="shop-filter-btn"
-                    :class="activeFilter === 'artwork' ? 'shop-filter-active' : 'shop-filter-inactive'"
-                    @click="onFilterChange('artwork')"
-                >
-                    <span class="filter-dot" :class="activeFilter === 'artwork' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
-                    Artwork
-                </button>
-                <button
-                    class="shop-filter-btn"
-                    :class="activeFilter === 'font' ? 'shop-filter-active' : 'shop-filter-inactive'"
-                    @click="onFilterChange('font')"
-                >
-                    <span class="filter-dot" :class="activeFilter === 'font' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
-                    Font
-                </button>
-            </div>
-        </div>
-
-        <!-- Product grid -->
-        <div class="grid grid-cols-4 mb-10 gap-4">
-            <div
-                v-for="product in filteredProducts()"
-                :key="product.id"
-                class="product-card group cursor-pointer border border-black/10 transition-all duration-300 ease-out rounded-2xl overflow-hidden"
-                @click="redirectToProduct(product.id)"
-            >
-                <!-- Artwork image wrapper dengan padding -->
-                <div class="product-card-image-wrap p-12 pb-0 transition-colors duration-300">
-                    <div class="overflow-hidden aspect-[3/4] w-full rounded-xl">
-                        <img
-                            :src="product.image"
-                            :alt="product.name"
-                            class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
-                        />
-                    </div>
-                </div>
-
-                <!-- Card footer -->
-                <div class="product-card-footer px-4 py-3 flex items-center justify-center transition-colors duration-300">
-                    <span class="text-2xl font-semibold text-black">{{ product.name }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- CTA button -->
-        <div class="flex justify-center">
-            <button class="shop-cta-btn group relative overflow-hidden bg-black text-white font-bold text-sm tracking-widest uppercase px-12 py-4 rounded-full transition-all duration-300 hover:tracking-[0.18em]">
-                <!-- Green fill slides in from left on hover -->
-                <span class="absolute inset-0 bg-[#b4f000] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-350 ease-out rounded-full"></span>
-                <span class="relative z-10 group-hover:text-black transition-colors duration-200">View All Product</span>
-            </button>
-        </div>
-
+      <div class="shop-filter-wrap">
+        <button
+          class="shop-filter-btn"
+          :class="activeFilter === 'artwork' ? 'shop-filter-active' : 'shop-filter-inactive'"
+          @click="onFilterChange('artwork')"
+        >
+          <span class="filter-dot" :class="activeFilter === 'artwork' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
+          Artwork
+        </button>
+        <button
+          class="shop-filter-btn"
+          :class="activeFilter === 'font' ? 'shop-filter-active' : 'shop-filter-inactive'"
+          @click="onFilterChange('font')"
+        >
+          <span class="filter-dot" :class="activeFilter === 'font' ? 'filter-dot-active' : 'filter-dot-inactive'"></span>
+          Font
+        </button>
+      </div>
     </div>
+
+    <div class="grid grid-cols-4 mb-10">
+      <div
+        v-for="product in filteredProducts()"
+        :key="product.id"
+        class="product-card group cursor-pointer transition-all duration-300 ease-out overflow-hidden"
+      >
+        <!-- Card dengan border yang disesuaikan -->
+        <div 
+          class="product-card-inner border-b border-black/20"
+          :class="[
+            // Border kiri: hilang untuk card index 3 dan 7 (card ke-4 dan ke-8)
+            (product.index === 3 || product.index === 7) ? 'border-r-0' : 'border-r border-black/20',
+            // Border kanan: hilang untuk card index 0 dan 4 (card ke-1 dan ke-5)
+            (product.index === 0 || product.index === 4) ? 'border-l-0' : 'border-l border-black/20',
+          ]"
+        >
+          <div
+            class="product-card-image-wrap p-8 pb-0 transition-colors duration-300"
+            @click="redirectToProduct(product.id)"
+          >
+            <div class="overflow-hidden aspect-[3/4] w-full rounded-xl">
+              <img
+                :src="product.image"
+                :alt="product.name"
+                class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+              />
+            </div>
+          </div>
+
+          <div class="product-card-footer px-4 py-3 flex flex-col items-center justify-center gap-2 transition-colors duration-300">
+            <span
+              class="font-barlow text-[35px] text-center cursor-pointer hover:underline"
+              @click="redirectToProduct(product.id)"
+            >
+              {{ product.name }}
+            </span>
+
+            <button
+              @click.stop="handleAddToCart(product)"
+              class="add-to-cart-btn w-full mt-1 py-2 rounded-xl font-black text-sm flex items-center justify-center gap-1.5 transition-all active:scale-95"
+              :class="addedIds.has(product.id)
+                ? 'bg-[#4dfa03] text-black'
+                : 'bg-black text-white hover:bg-gray-800'"
+            >
+              <template v-if="addedIds.has(product.id)">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                Added!
+              </template>
+              <template v-else>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                </svg>
+                {{ product.is_free ? 'Get Free' : 'Add to Cart' }}
+              </template>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA button -->
+    <div class="flex justify-center pb-8">
+      <button class="shop-cta-btn group relative overflow-hidden bg-black text-white font-semibold text-[22px] font-barlow tracking-widest uppercase px-4 py-2 rounded-full transition-all duration-300 hover:tracking-[0.18em]">
+        <span class="absolute inset-0 bg-[#b4f000] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-350 ease-out rounded-full"></span>
+        <span class="relative z-10 group-hover:text-black transition-colors duration-200">View All Product</span>
+      </button>
+    </div>
+  </div>
     <!-- ============================================================ -->
 
     <FooterSection />
@@ -800,7 +777,7 @@ const openLink = (url) => {
     gap: 7px;
     padding: 7px 16px;
     border-radius: 100px;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     border: none;
@@ -842,8 +819,37 @@ const openLink = (url) => {
     border: 1.5px solid #999;
 }
 
+.product-card-inner {
+  background-color: #e6e6e6;
+  transition: background-color 0.3s ease-out, border-color 0.3s ease-out;
+  border-top: none;
+}
+
+.product-card:hover .product-card-inner {
+  background-color: #b4f000;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.product-card-image-wrap {
+  background-color: #e6e6e6;
+  transition: background-color 0.3s ease-out;
+}
+
+.product-card-footer {
+  background-color: #e6e6e6;
+  transition: background-color 0.3s ease-out;
+}
+
+.product-card:hover .product-card-image-wrap {
+  background-color: #b4f000;
+}
+
+.product-card:hover .product-card-footer {
+  background-color: #b4f000;
+}
+
 .product-card {
-    background-color: #ffffff;
+    background-color: #e6e6e6;
     transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
                 background-color 0.3s ease-out;
@@ -851,12 +857,12 @@ const openLink = (url) => {
 }
 
 .product-card-image-wrap {
-    background-color: #d0d0d0;
+    background-color: #e6e6e6;
     transition: background-color 0.3s ease-out;
 }
 
 .product-card-footer {
-    background-color: #d0d0d0;
+    background-color: #e6e6e6;
     transition: background-color 0.3s ease-out;
 }
 
@@ -866,14 +872,17 @@ const openLink = (url) => {
     background-color: #b4f000;
     z-index: 10;
 }
+.product-card:hover .product-card-image-wrap { background-color: #b4f000; }
+.product-card:hover .product-card-footer     { background-color: #b4f000; border-top-color: rgba(0,0,0,0.1); }
 
-.product-card:hover .product-card-image-wrap {
-    background-color: #b4f000;
+.add-to-cart-btn {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.15s ease;
 }
-
-.product-card:hover .product-card-footer {
-    background-color: #b4f000;
-    border-top-color: rgba(0,0,0,0.1);
+.product-card:hover .add-to-cart-btn {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .shop-cta-btn .absolute {

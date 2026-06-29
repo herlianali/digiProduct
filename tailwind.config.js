@@ -8,6 +8,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        'barlow': ['Barlow', 'sans-serif'],
+        'sans': ['Barlow', 'system-ui', 'sans-serif'],
+        'heading': ['Barlow', 'sans-serif'],
+        'body': ['Barlow', 'sans-serif'],
+      },
       colors: {
         'brand-yellow': '#ffe000',
         'brand-yellow-light': '#fff9cc',
