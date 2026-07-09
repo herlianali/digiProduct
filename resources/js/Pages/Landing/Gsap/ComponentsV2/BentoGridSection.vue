@@ -1,9 +1,49 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { ShoppingCartIcon } from '@heroicons/vue/24/outline'
+import { ChevronRightIcon } from '@heroicons/vue/20/solid'
 import gsap from '@/plugins/gsap'
 
 const bentoGridRef = ref(null)
+const helloText = ref('')
+const fullHelloText = 'Hi friends,'
+let typewriterTimeout = null
+let isTypewriterActive = true
+
+const TYPE_SPEED = 100
+const DELETE_SPEED = 80
+const PAUSE_AFTER_TYPE = 1500
+const PAUSE_AFTER_DELETE = 400
+
+const runTypewriterLoop = () => {
+  if (!isTypewriterActive) return
+
+  let i = 0
+  helloText.value = ''
+
+  const typeStep = () => {
+    if (!isTypewriterActive) return
+    if (i < fullHelloText.length) {
+      helloText.value += fullHelloText.charAt(i)
+      i++
+      typewriterTimeout = setTimeout(typeStep, TYPE_SPEED)
+    } else {
+      typewriterTimeout = setTimeout(deleteStep, PAUSE_AFTER_TYPE)
+    }
+  }
+
+  const deleteStep = () => {
+    if (!isTypewriterActive) return
+    if (helloText.value.length > 0) {
+      helloText.value = helloText.value.slice(0, -1)
+      typewriterTimeout = setTimeout(deleteStep, DELETE_SPEED)
+    } else {
+      typewriterTimeout = setTimeout(runTypewriterLoop, PAUSE_AFTER_DELETE)
+    }
+  }
+
+  typeStep()
+}
 
 // Map: card element -> array of active arrow tweens
 const activeTweens = new Map()
@@ -119,6 +159,7 @@ const initCardEntranceAnimation = () => {
 onMounted(() => {
   initCardHoverAnimations()
   initCardEntranceAnimation()
+  setTimeout(runTypewriterLoop, 400)
 })
 
 onUnmounted(() => {
@@ -129,6 +170,8 @@ onUnmounted(() => {
     card.removeEventListener('mouseleave', onLeave)
   })
   handlers.clear()
+  isTypewriterActive = false
+  clearTimeout(typewriterTimeout)
 })
 </script>
 
@@ -137,44 +180,53 @@ onUnmounted(() => {
     <div class="w-full px-3 sm:px-4">
 
       <!-- ===================== DESKTOP GRID (md+) ===================== -->
-      <div class="hidden md:grid grid-cols-12 gap-3 lg:gap-4">
+      <div
+        class="hidden md:grid gap-3 lg:gap-4"
+        style="grid-template-columns: repeat(12, minmax(0,1fr));"
+      >
 
         <!-- ROW 1 -->
 
         <!-- Welcome Card -->
-        <div class="bento-card col-span-3 bg-[#fce109] rounded-2xl p-4 flex flex-col relative overflow-hidden cursor-pointer">
+        <div
+          class="bento-card bg-[#fce109] rounded-2xl p-4 flex flex-col relative overflow-hidden cursor-pointer"
+          style="grid-column: 1 / 4; grid-row: 1 / 2;"
+        >
           <div class="flex justify-between items-start">
             <div>
-              <p class="text-md font-medium text-black/70">Welcome to</p>
-              <h1 class="font-extrabold text-3xl xl:text-4xl text-black leading-tight tracking-tighter">SUPPLAYBOX</h1>
+              <p class="font-medium text-black/70" style="font-size: clamp(1rem, 3.5cqw, 1rem);">Welcome to</p>
+              <h1 class="font-extrabold text-black leading-tight tracking-tighter" style="font-size: clamp(2rem, 8cqw, 2.25rem);">SUPPLAYBOX</h1>
             </div>
-            <img data-arrow="top-right" src="/public/assets/image/banner/arrow-black-right.svg" class="w-6 h-6 flex-shrink-0" alt="" />
+            <img data-arrow="top-right" src="/public/assets/image/banner/arrow-black-right.svg" class="flex-shrink-0" style="width: 6cqw; height: 6cqw; max-width: 24px; max-height: 24px;" alt="" />
           </div>
-          <p class="text-xl xl:text-2xl font-light text-black mt-1">Hi Robert,</p>
-          <p class="text-sm text-black/80 mt-2 max-w-[55%] leading-relaxed flex-1">Most people freeze at the starting line. Don't hesitate. Just give it a shot.</p>
-          <div class="mt-1">
-            <button class="absolute bottom-8 w-fit z-10 bg-[#4dfa03] hover:bg-green-700 border border-black font-extrabold text-lg xl:text-2xl rounded-full px-8 py-1 flex items-center transition-all whitespace-nowrap">
-              FREE SKETCH!
+          <p class="font-light text-black mt-1 typewriter-text" style="font-size: clamp(2rem, 5cqw, 1.5rem); min-height: 1.5em;">{{ helloText }}<span class="typewriter-cursor"></span></p>
+          <p class="text-black/80 max-w-[55%] leading-relaxed flex-1" style="font-size: clamp(0.7rem, 3cqw, 0.875rem);">Most people freeze at the starting line. Don't hesitate. Just give it a shot.</p>
+          <div class="mt-9">
+            <button class="absolute w-fit z-10 bg-[#4dfa03] hover:bg-green-700 border border-black font-extrabold rounded-full px-4 py-1 flex items-center transition-all whitespace-nowrap" style="font-size: clamp(1rem, 4.5cqw, 2.5rem); bottom: clamp(10px, 1cqw, 8px); left: clamp(1.5rem, 6cqw, 12rem);">
+              FREE SKETCH! <ChevronRightIcon class="w-[25px] h-[25px] font-bold" />
             </button>
-            <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute right-0 -bottom-5 w-[60%] max-w-[360px] object-contain pointer-events-none z-20" />
+            <img src="/public/assets/image/banner/card-supplaybox-animated.svg" alt="mascot" class="absolute right-0 object-contain pointer-events-none z-20" style="width: 55cqw; max-width: 200px; bottom: clamp(-24px, -3cqw, -8px);" />
           </div>
         </div>
 
         <!-- Design & Illustration (row-span-2) -->
-        <div class="bento-card col-span-2 row-span-2 bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden cursor-pointer relative">
-          <div class="flex justify-center items-center p-4 h-[14em]">
+        <div
+          class="bento-card bg-gray-200 border border-black rounded-2xl flex flex-col overflow-hidden cursor-pointer relative"
+          style="grid-column: 4 / 6; grid-row: 1 / 3;"
+        >
+          <div class="flex justify-center items-center p-2" style="height: clamp(160px, 70cqw, 360px);">
             <img src="/public/assets/image/banner/card-service-animated2.svg" class="w-full h-full" alt="" />
           </div>
           <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-            <h3 class="font-bold text-white px-4 py-1 text-lg">Design Service</h3>
+            <h3 class="font-bold text-white px-4 py-1" style="font-size: clamp(1rem, 4.5cqw, 1.125rem);">Design Service</h3>
             <div class="rounded-t-2xl bg-gray-200">
-              <p class="text-[12px] text-gray-800 leading-relaxed px-4 py-2 text-justify">
+              <p class="text-gray-800 leading-relaxed px-4 py-2 text-justify" style="font-size: clamp(0.65rem, 3cqw, 0.8125rem);">
                 Brand Identity / Logo Design / Poster Design / Packaging Design / Social Media Design / Infographic Design / Editorial Design / Book Design
               </p>
               <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
-                <h3 class="font-bold text-white px-4 py-1 text-lg">Illustration Service</h3>
+                <h3 class="font-bold text-white px-4 py-1" style="font-size: clamp(1rem, 4.5cqw, 1.125rem);">Illustration Service</h3>
                 <div class="rounded-t-2xl bg-gray-200">
-                  <p class="text-[12px] text-gray-800 leading-relaxed px-4 pt-2 text-justify">
+                  <p class="text-gray-800 leading-relaxed px-4 pt-2 text-justify" style="font-size: clamp(0.65rem, 3cqw, 0.8125rem);">
                     2D Illustration / Environmental Design / Game Design / Character design / Mascot Illustration / Advertising Illustration
                   </p>
                 </div>
@@ -182,38 +234,44 @@ onUnmounted(() => {
             </div>
           </div>
           <div class="pb-1 flex justify-center p-2">
-            <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" class="w-8 h-8" />
+            <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" style="width: 9cqw; height: 9cqw; max-width: 32px; max-height: 32px;" />
           </div>
           <div class="flex-1 overflow-hidden relative min-h-[6rem]">
-            <img src="/public/assets/image/banner/card-service-animated.svg" alt="service illustration" class="absolute -bottom-9 left-6 w-[16em] h-[16em] object-center z-20" />
+            <img src="/public/assets/image/banner/card-service-animated.svg" alt="service illustration" class="absolute -bottom-5 left-8 object-center z-20" style="width: 80cqw; height: 80cqw;" />
           </div>
         </div>
 
         <!-- Teepublic -->
-        <div class="bento-card col-span-2 bg-[#4c60d8] rounded-2xl flex flex-col cursor-pointer">
-          <div class="px-4 pt-4 flex justify-between items-center">
+        <div
+          class="bento-card bg-[#4c60d8] rounded-2xl flex flex-col cursor-pointer"
+          style="grid-column: 6 / 8; grid-row: 1 / 2;"
+        >
+          <div class="px-2 pt-2 flex justify-between items-center">
             <div class="tracking-wider flex items-center gap-1">
-              <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" class="w-8 h-8" />
-              <span class="text-white font-bold text-md">TEEPUBLIC</span>
+              <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" style="width: 12cqw; height: 12cqw; max-width: 32px; max-height: 32px;" />
+              <span class="text-white font-bold" style="font-size: clamp(1.2rem, 4cqw, 1rem);">TEEPUBLIC</span>
             </div>
-            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-6 h-6" />
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" style="margin-right: 6px; width: 8cqw; height: 8cqw; max-width: 24px; max-height: 24px;" />
           </div>
-          <div class="flex items-center overflow-hidden h-[12em]">
-            <img src="/public/assets/image/banner/card-teepublic-animated.svg" alt="teepublic" class="w-full h-auto object-cover" />
+          <div class="flex items-end overflow-hidden">
+            <img src="/public/assets/image/banner/card-teepublic-animated.svg" alt="teepublic" class="w-full h-full object-cover" />
           </div>
           <div class="px-4 pb-4">
-            <p class="font-bold text-white text-md">Unlimited<br />Prints.</p>
+            <p class="font-bold text-white" style="font-size: clamp(0.8rem, 4cqw, 1rem);">Unlimited<br />Prints.</p>
           </div>
         </div>
 
         <!-- Behance -->
-        <div class="bento-card col-span-3 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer">
+        <div
+          class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer"
+          style="grid-column: 8 / 11; grid-row: 1 / 2;"
+        >
           <div class="px-4 pt-4 flex justify-between items-start">
             <div>
-              <p class="font-bold text-white text-3xl xl:text-4xl leading-tight">Bē</p>
-              <p class="text-[11px] text-white leading-tight">More<br />Professional<br />Portofolio</p>
+              <p class="font-bold text-white leading-tight" style="font-size: clamp(1.5rem, 9cqw, 2.25rem);">Bē</p>
+              <p class="text-white leading-tight" style="font-size: clamp(0.65rem, 3cqw, 0.75rem);">More<br />Professional<br />Portofolio</p>
             </div>
-            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="w-6 h-6" />
+            <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" style="width: 6cqw; height: 6cqw; max-width: 24px; max-height: 24px;" />
           </div>
           <div class="flex-1 overflow-hidden">
             <img src="/public/assets/image/banner/card-be-animated.svg" alt="behance" class="w-full h-full object-cover object-left" />
@@ -221,33 +279,33 @@ onUnmounted(() => {
         </div>
 
         <!-- Icons + Upwork + Amidst (col-span-2, row-span-2) -->
-        <div class="col-span-2 row-span-2 flex flex-col gap-3">
-          <div class="flex justify-between items-center gap-2 pr-1 pt-1">
-            <ShoppingCartIcon class="w-10 h-10 text-green-500 cursor-pointer hover:text-green-600 transition-colors" />
-            <span class="border-2 border-black rounded-full px-8 py-1 text-black text-lg font-medium text-center whitespace-nowrap">$100</span>
-            <div class="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center">
+        <div class="flex flex-col gap-3" style="grid-column: 11 / 13; grid-row: 1 / 3;">
+          <div class="flex justify-between items-center gap-2 pr-1 pt-1" style="container-type: inline-size;">
+            <ShoppingCartIcon class="text-green-500 cursor-pointer hover:text-green-600 transition-colors" style="width: 10cqw; height: 10cqw; max-width: 40px; max-height: 40px;" />
+            <span class="border-2 border-black rounded-full px-8 py-1 text-black font-medium text-center whitespace-nowrap" style="font-size: clamp(0.9rem, 4.5cqw, 1.125rem);">$100</span>
+            <div class="rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center" style="width: 10cqw; height: 10cqw; max-width: 40px; max-height: 40px;">
               <img src="" alt="user" class="w-full h-full object-cover" />
             </div>
           </div>
 
           <div class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden flex-1 cursor-pointer">
             <div class="px-4 pt-4 relative">
-              <p class="text-base text-white">New Seller</p>
-              <p class="text-white text-base">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
-              <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-4 right-4 w-6 h-6" />
+              <p class="text-white" style="font-size: clamp(0.8rem, 4cqw, 1rem);">New Seller</p>
+              <p class="text-white" style="font-size: clamp(0.8rem, 4cqw, 1rem);">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
+              <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="absolute top-4 right-4" style="width: 6cqw; height: 6cqw; max-width: 24px; max-height: 24px;" />
             </div>
             <div class="flex-1 flex flex-col justify-end overflow-hidden">
-              <div class="h-[200px] xl:h-[280px] overflow-hidden">
+              <div class="overflow-hidden" style="height: 55cqw;">
                 <img src="/public/assets/image/banner/card-upwork-animated.svg" alt="upwork" class="w-full h-full object-cover object-bottom" />
               </div>
               <div class="rounded-t-2xl bg-[#268a00] px-4 py-3 -mt-[50px] relative z-10">
-                <p class="text-white text-[13px] font-extrabold leading-tight">Enjoy many Bonuses<br />and Discounts<br />on this Platform!</p>
-                <p class="text-[12px] text-white mt-1">Help us<br />to grow even more :)</p>
+                <p class="text-white font-extrabold leading-tight" style="font-size: clamp(0.75rem, 3.5cqw, 0.8125rem);">Enjoy many Bonuses<br />and Discounts<br />on this Platform!</p>
+                <p class="text-white mt-1" style="font-size: clamp(0.7rem, 3.2cqw, 0.75rem);">Help us<br />to grow even more :)</p>
               </div>
             </div>
           </div>
 
-          <div class="bento-card bg-white rounded-2xl p-3 flex flex-col justify-center text-base cursor-pointer border border-gray-100">
+          <div class="bento-card bg-white rounded-2xl p-3 flex flex-col justify-center cursor-pointer border border-gray-100" style="font-size: clamp(0.85rem, 4.2cqw, 1rem);">
             <p class="text-[#cccccc]">Amidst</p>
             <p class="text-[#b3b3b3] font-medium italic">the noise</p>
             <p class="text-[#cccccc]">and</p>
@@ -257,8 +315,8 @@ onUnmounted(() => {
             <p class="text-[#108a00] font-medium">about</p>
             <p class="text-[#cccccc]">being <span class="text-[#108a00] font-medium">fast</span></p>
             <p class="text-[#cccccc]">and <span class="text-[#108a00] font-medium">empty.</span></p>
-            <p class="text-[#cccccc] mt-0.5">but...<span class="inline-flex items-center justify-center w-4 h-4 ml-1 align-middle">
-              <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Down Arrow" class="w-3 h-3">
+            <p class="text-[#cccccc] mt-0.5">but...<span class="inline-flex items-center justify-center ml-1 align-middle" style="width: 4cqw; height: 4cqw; max-width: 16px; max-height: 16px;">
+              <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Down Arrow" class="w-full h-full">
             </span></p>
           </div>
         </div>
@@ -266,24 +324,27 @@ onUnmounted(() => {
         <!-- ROW 2 -->
 
         <!-- Pinterest + TikTok + Starter Pack -->
-        <div class="col-span-3 grid grid-cols-2 grid-rows-2 gap-3 h-[380px] xl:h-[420px]">
+        <div
+          class="grid grid-cols-2 grid-rows-2 gap-3"
+          style="grid-column: 1 / 4; grid-row: 2 / 3; height: clamp(360px, 25vw, 380px);"
+        >
           <div class="bento-card row-span-2 bg-[#E60023] rounded-2xl p-3 flex flex-col relative overflow-hidden cursor-pointer">
             <div class="flex justify-between items-start pb-2">
-              <img src="/public/assets/image/banner/card-path-logo.svg" class="w-10 h-10" alt="" />
-              <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" class="w-6 h-6" alt="" />
+              <img src="/public/assets/image/banner/card-path-logo.svg" style="width: 20cqw; height: 20cqw; max-width: 40px; max-height: 40px;" alt="" />
+              <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" style="width: 14cqw; height: 14cqw; max-width: 44px; max-height: 44px;" alt="" />
             </div>
-            <p class="text-white text-md mt-3 leading-relaxed relative z-10">Let's <b class="font-black italic">CONNECT</b> on Pinterest, Share some pins, and dive into our <b class="font-black italic">Portfolio</b> + inspo boards.</p>
-            <div class="absolute bottom-0 left-0 right-0 h-[40%] overflow-hidden">
-              <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="w-[14em] h-[14em] object-cover object-top" />
+            <p class="text-white pt-2 leading-relaxed relative z-10" style="font-size: clamp(0.8rem, 4cqw, 1rem);">Let's <b class="font-black italic">CONNECT</b> on Pinterest, Share some pins, and dive into our <b class="font-black italic">Portfolio</b> + inspo boards.</p>
+            <div class="absolute bottom-0 left-0 right-0 h-[55%] overflow-hidden">
+              <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="absolute bottom-0 left-0 object-cover" style="width: 120cqw; height: 120cqw; object-position: bottom;" />
             </div>
           </div>
 
           <div class="bento-card bg-white border border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer">
             <div class="flex justify-between items-start px-1 pt-1">
-              <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="w-10 h-10" alt="TikTok" />
-              <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok" class="w-6 h-6" />
+              <img src="/public/assets/image/banner/card-tiktok-logo.svg" style="width: 20cqw; height: 20cqw; max-width: 40px; max-height: 40px;" alt="TikTok" />
+              <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok" style="width: 14cqw; height: 14cqw; max-width: 24px; max-height: 24px;" />
             </div>
-            <p class="text-[11px] max-w-[120px] px-1 pt-4 font-semibold">Some memes for entertainment, and behind the scenes of our routine.</p>
+            <p class="text-[10px] max-w-[120px] px-1 pt-2 font-semibold">some memes for entertainment, and behind the scenes of our routine.</p>
             <div class="absolute -bottom-1 left-0 right-0 h-[45%] overflow-hidden">
               <img src="/public/assets/image/banner/card-tiktok-animated.svg" alt="tiktok" class="w-full h-full object-cover object-top" />
             </div>
@@ -293,10 +354,10 @@ onUnmounted(() => {
             <div>
               <p class="text-[12px] font-bold text-black">Starter Pack<br />Design.</p>
               <div class="flex items-center pt-6 relative h-6">
-                <span class="absolute left-0 w-7 h-7 rounded-full bg-[#34bf72] border border-black"></span>
-                <span class="absolute left-3 w-7 h-7 rounded-full bg-[#fec200] border border-black"></span>
-                <span class="absolute left-6 w-7 h-7 rounded-full bg-[#3bffff] border border-black"></span>
-                <span class="absolute left-9 w-7 h-7 rounded-full bg-[#fa191e] border border-black"></span>
+                <span class="absolute left-0 rounded-full bg-[#34bf72] border border-black" style="width: 18cqw; height: 18cqw; max-width: 28px; max-height: 28px;"></span>
+                <span class="absolute left-3 rounded-full bg-[#fec200] border border-black" style="width: 18cqw; height: 18cqw; max-width: 28px; max-height: 28px;"></span>
+                <span class="absolute left-6 rounded-full bg-[#3bffff] border border-black" style="width: 18cqw; height: 18cqw; max-width: 28px; max-height: 28px;"></span>
+                <span class="absolute left-9 rounded-full bg-[#fa191e] border border-black" style="width: 18cqw; height: 18cqw; max-width: 28px; max-height: 28px;"></span>
                 <span class="absolute left-[6em] text-[12px] text-gray-500">+2 More</span>
               </div>
             </div>
@@ -307,11 +368,14 @@ onUnmounted(() => {
         </div>
 
         <!-- Fiverr + Our Product + Our Team -->
-        <div class="col-span-5 flex flex-col gap-3 h-[380px] xl:h-[420px]">
-          <div class="bento-card bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden flex-shrink-0 h-[130px] xl:h-[140px] cursor-pointer">
+        <div
+          class="flex flex-col gap-3"
+          style="grid-column: 6 / 11; grid-row: 2 / 3; height: clamp(260px, 19vw, 380px);"
+        >
+          <div class="bento-card bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden flex-shrink-0 cursor-pointer" style="height: clamp(85px, 8vw, 125px);">
             <div class="flex justify-between items-start gap-2 relative z-10">
-              <img data-arrow="left" src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="p-2">
-              <div class="flex flex-col items-end text-[#0b3117] text-lg xl:text-2xl">
+              <img data-arrow="left" src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="p-2" style="width: 9cqw; height: 9cqw; max-width: 36px; max-height: 36px;">
+              <div class="flex flex-col items-end text-[#0b3117]" style="font-size: clamp(0.9rem, 4.5cqw, 1.5rem);">
                 <p>Top Rated</p>
                 <p>Badge on <em class="font-bold">fiverr</em>.</p>
               </div>
@@ -319,22 +383,22 @@ onUnmounted(() => {
             <div class="absolute bottom-0 left-0 h-[90%] w-[50%] overflow-hidden">
               <img src="/public/assets/image/banner/card-toprated-animated.svg" alt="fiverr" class="w-full h-full object-cover object-top" />
             </div>
-            <img src="/public/assets/image/banner/card-fiver-badge.svg" alt="Fiverr Badge" class="absolute bottom-6 right-28 w-8 h-8" />
-            <div class="absolute bottom-1 right-2 text-right text-[11px] italic text-[#0b3117]">
+            <img src="/public/assets/image/banner/card-fiver-badge.svg" alt="Fiverr Badge" class="absolute bottom-6 right-28" style="width: 8cqw; height: 8cqw; max-width: 32px; max-height: 32px;" />
+            <div class="absolute bottom-1 right-2 text-right italic text-[#0b3117]" style="font-size: clamp(0.65rem, 3cqw, 0.6875rem);">
               <span class="block">For secure</span>
               <span class="block">transactions!</span>
             </div>
           </div>
 
           <div class="grid grid-cols-12 gap-3 flex-1 min-h-0">
-            <div class="bento-card col-span-5 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer">
+            <div class="bento-card col-span-5 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer" >
               <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[200px] border-r-[200px] border-b-[120px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
-              <p class="font-extrabold text-black text-xl xl:text-2xl relative z-20 px-2">Our<br />Product</p>
+              <p class="font-extrabold text-black relative z-20 px-2" style="font-size: clamp(1.1rem, 5.5cqw, 1.5rem);">Our<br />Product</p>
               <div class="flex-1 flex items-center justify-center py-1 relative z-10">
                 <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-[40%] h-[40%] object-contain" />
               </div>
               <div class="text-center relative z-10 absolute -bottom-1 left-0 right-0">
-                <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline w-8 h-8" />
+                <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline" style="width: 8cqw; height: 8cqw; max-width: 32px; max-height: 32px;" />
               </div>
             </div>
 
@@ -343,7 +407,7 @@ onUnmounted(() => {
                 <img src="/public/assets/image/banner/card-ourteam-animated.png" alt="team" class="w-full h-full px-4" />
               </div>
               <div class="absolute bottom-4 left-2 right-2">
-                <p class="font-['Archivo_Black',sans-serif] text-white text-2xl font-bold leading-tight">Meet<br />Our Team</p>
+                <p class="font-['Archivo_Black',sans-serif] text-white font-bold leading-tight" style="font-size: clamp(1.25rem, 6cqw, 1.5rem);">Meet<br />Our Team</p>
               </div>
             </div>
           </div>
@@ -543,6 +607,8 @@ onUnmounted(() => {
   will-change: transform, box-shadow;
   backface-visibility: hidden;
   -webkit-font-smoothing: subpixel-antialiased;
+  container-type: inline-size;
+  container-name: card;
 }
 
 .bento-card:hover {
@@ -559,6 +625,21 @@ onUnmounted(() => {
 
 .overflow-hidden {
   -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background-color: currentColor;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink-cursor 0.8s step-end infinite;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 button:active {

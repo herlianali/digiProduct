@@ -410,12 +410,12 @@ const openLink = (url) => {
             :radius="10"
             :responsive="true"
             :manual-positions="[
-                { xPct: 3,  type: 'out' },
-                { xPct: 27, type: 'out' },
+                { xPct: 4,  type: 'out' },
+                { xPct: 25, type: 'out' },
                 { xPct: 30, type: 'in' },
-                { xPct: 40, type: 'out' },
+                { xPct: 38, type: 'out' },
                 { xPct: 43, type: 'in' },
-                { xPct: 95, type: 'out' }
+                { xPct: 93, type: 'out' }
             ]"
             :manual-positions-mobile="[
                 { xPct: 12, type: 'out' },

@@ -31,15 +31,15 @@ const platformMenu = [
     {
         group: 'Service',
         items: [
-            { label: 'Fiverr',    href: 'https://fiverr.com', active: true },
-            { label: 'Upwork',    href: 'https://upwork.com' },
+            { label: 'Fiverr',    href: 'https://www.fiverr.com/users/supplaybox/portfolio' },
+            { label: 'Upwork',    href: 'https://www.upwork.com/freelancers/~018928f9b657bc5557?p=2002178990555295744' },
         ],
     },
     {
         group: 'Portofolio',
         items: [
-            { label: 'Behance',   href: 'https://behance.net' },
-            { label: 'Pinterest', href: 'https://pinterest.com' },
+            { label: 'Behance',   href: 'https://www.behance.net/supplay_box' },
+            { label: 'Pinterest', href: 'https://pin.it/yegYhYpFy' },
         ],
     },
     {
@@ -230,11 +230,14 @@ const scrollToSection = (sectionId) => {
                             :href="item.href" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            class="menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 hover:bg-black/5 transition-all"
-                            :class="item.active ? 'bg-[#fee100] hover:bg-yellow-300 -ml-2 pl-4' : ''"
+                            class="group menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 transition-all duration-200 hover:bg-[#fee100] hover:-ml-2 hover:pl-4"
+                            :class="item.active ? 'bg-[#fee100] -ml-2 pl-4' : ''"
                             @click="closePlatform"
                         >
-                            <span v-if="item.active" class="text-xs">→</span>
+                            <span 
+                                class="text-xs transition-opacity duration-200"
+                                :class="item.active ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                            >→</span>
                             {{ item.label }}
                         </a>
                         
@@ -247,9 +250,10 @@ const scrollToSection = (sectionId) => {
                             :href="item.href" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            class="menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 hover:bg-black/5 transition-all"
+                            class="group menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 transition-all duration-200 hover:bg-[#fee100] hover:-ml-2 hover:pl-4"
                             @click="closePlatform"
                         >
+                            <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">→</span>
                             {{ item.label }}
                         </a>
                     </div>
@@ -259,14 +263,15 @@ const scrollToSection = (sectionId) => {
                         <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">Microstock</span>
                         <hr class="border-gray-200 my-1">
                         <a 
-                            v-for="item in platformMenu[2].items" 
+                            v-for="item in platformMenu[1].items" 
                             :key="item.label"
                             :href="item.href" 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            class="menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 hover:bg-black/5 transition-all"
+                            class="group menu-item no-underline font-bold text-black text-sm py-1.5 px-2 rounded-lg flex items-center gap-2 transition-all duration-200 hover:bg-[#fee100] hover:-ml-2 hover:pl-4"
                             @click="closePlatform"
                         >
+                            <span class="text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">→</span>
                             {{ item.label }}
                         </a>
                     </div>
