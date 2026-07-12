@@ -130,7 +130,7 @@ onUnmounted(() => {
 // ─── Arrow Animation ───────────────────────────────────────────────
 const initArrowAnimation = () => {
     if (!arrowRef.value) return
-    
+
     arrowAnimation = gsap.to(arrowRef.value, {
         x: 8,
         duration: 0.6,
@@ -599,8 +599,8 @@ const openLink = (url) => {
                         </div>
                         <div ref="arrowRef" class="bg-[#ff6600] p-2 rounded-full ml-4 flex-shrink-0">
                             <img
-                                src="/public/assets/image/banner/arrow-white-bottom.svg" 
-                                alt="" 
+                                src="/public/assets/image/banner/arrow-white-bottom.svg"
+                                alt=""
                                 class="rotate-90 -scale-100 w-6 h-6"
                             >
                         </div>
@@ -672,7 +672,7 @@ const openLink = (url) => {
         class="product-card group cursor-pointer transition-all duration-300 ease-out overflow-hidden"
       >
         <!-- Card dengan border yang disesuaikan -->
-        <div 
+        <div
           class="product-card-inner border-b border-black/20"
           :class="[
             // Border kiri: hilang untuk card index 3 dan 7 (card ke-4 dan ke-8)

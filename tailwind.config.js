@@ -9,10 +9,16 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        'arial': ['Arial', 'sans-serif'],
+        'arial-black': ['Arial Black', 'sans-serif'],
+        'bell': ['"Bell MT"', 'sans-serif'],
         'barlow': ['Barlow', 'sans-serif'],
-        'sans': ['Barlow', 'system-ui', 'sans-serif'],
-        'heading': ['Barlow', 'sans-serif'],
-        'body': ['Barlow', 'sans-serif'],
+        'barlow-bold': ['Barlow Bold', 'sans-serif'],
+        'barlow-condensed': ['Barlow Condensed', 'sans-serif'],
+        'barlow-condensed-extrabold': ['Barlow Condensed ExtraBold', 'sans-serif'],
+        'sans': ['Arial', 'system-ui', 'sans-serif'],
+        'heading': ['Arial', 'sans-serif'],
+        'body': ['Arial', 'sans-serif'],
       },
       colors: {
         'brand-yellow': '#ffe000',

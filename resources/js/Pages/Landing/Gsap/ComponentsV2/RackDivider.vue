@@ -74,7 +74,7 @@ let resizeObserver = null
 onMounted(() => {
     updateViewport()
     window.addEventListener('resize', updateViewport)
-    
+
     // ✅ ResizeObserver untuk akurasi lebih baik (handle sidebar, zoom, dll)
     if (typeof ResizeObserver !== 'undefined') {
         resizeObserver = new ResizeObserver(() => updateViewport())
@@ -194,7 +194,7 @@ const buildTopPath = () => {
     } else {
         d = `M0,0 L${VW.value},0 L${VW.value},${barY.value} L0,${barY.value} Z`
     }
-    
+
     tabs.value.forEach(({ xl, xr, type }) => {
         if (type === 'in') {
             const nY = notchEndY.value
