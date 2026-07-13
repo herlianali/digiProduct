@@ -397,7 +397,7 @@ onUnmounted(() => {
                     <img src="/public/assets/image/banner/card-path-logo.svg" class="flex-shrink-0" style="width: 28cqw; height: 28cqw; max-width: 50px; max-height: 50px;" alt="" />
                     <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" />
                 </div>
-                <img class="py-1" src="/public/assets/image/banner/text-pinterest.svg" alt="">
+                <img class="px-3 py-2" src="/public/assets/image/banner/text-pinterest.svg" alt="">
                 <div class="absolute -bottom-12 left-0 right-0 overflow-hidden">
                     <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="" style="width: 180cqw; height: 140cqw; object-position: bottom; object-fit: cover;" />
                 </div>
