@@ -1,3 +1,4 @@
+<!-- index.vue -->
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import FooterSection from './ComponentsV2/FooterSection.vue'
@@ -75,6 +76,10 @@ const redirectToAboutUs = () => {
     window.location.href = `/our-team`
 }
 
+const redirectToGetInTouch = () => {
+    window.location.href = `/get-in-touch?voucher=FRST`
+}
+
 const filteredProducts = () => {
   const filtered = products.filter(p => p.category === activeFilter.value)
   return filtered.map((product, index) => ({
@@ -114,18 +119,64 @@ const testimonials = [
     { id: 6, name: 'Diego Reyes', role: 'CEO', company: 'Brillo Brands', country: 'Mexico', flag: '🇲🇽', avatar: 'DR', avatarColor: '#f97316', text: 'Exceptional work, tight deadlines, zero stress. This is the team you want on your side.', rating: 5 },
 ]
 
+let marqueeObserver = null
+let arrowObserver = null
+
+let isMarqueeInViewport = true
+
+const applyMarqueeState = () => {
+    if (!sliderTween) return
+    if (isMarqueeInViewport && !isSliderHovered.value) {
+        sliderTween.resume()
+    } else {
+        sliderTween.pause()
+    }
+}
+
 onMounted(() => {
     initSectionAnimations()
     initInfiniteSlider()
     initProductSectionAnimation()
     initArrowAnimation()
+    initVisibilityGates()
 })
 
 onUnmounted(() => {
     if (sliderTween) sliderTween.kill()
     if (arrowAnimation) arrowAnimation.kill()
     ScrollTrigger.getAll().forEach(t => t.kill())
+    marqueeObserver?.disconnect()
+    arrowObserver?.disconnect()
 })
+
+// ─── Pause animasi infinite saat elemen di luar viewport ───────────
+const initVisibilityGates = () => {
+    if (sliderContainerRef.value) {
+        marqueeObserver = new IntersectionObserver(
+            ([entry]) => {
+                isMarqueeInViewport = entry.isIntersecting
+                applyMarqueeState()
+            },
+            { threshold: 0 }
+        )
+        marqueeObserver.observe(sliderContainerRef.value)
+    }
+
+    if (arrowRef.value) {
+        arrowObserver = new IntersectionObserver(
+            ([entry]) => {
+                if (!arrowAnimation) return
+                if (entry.isIntersecting) {
+                    arrowAnimation.resume()
+                } else {
+                    arrowAnimation.pause()
+                }
+            },
+            { threshold: 0 }
+        )
+        arrowObserver.observe(arrowRef.value)
+    }
+}
 
 // ─── Arrow Animation ───────────────────────────────────────────────
 const initArrowAnimation = () => {
@@ -245,14 +296,14 @@ const initInfiniteSlider = () => {
 
     const container = sliderContainerRef.value
     container.addEventListener('mouseenter', () => {
-        sliderTween.pause()
         isSliderHovered.value = true
+        applyMarqueeState()
         showNavigationButtons()
     })
 
     container.addEventListener('mouseleave', () => {
-        sliderTween.resume()
         isSliderHovered.value = false
+        applyMarqueeState()
         hideNavigationButtons()
     })
 
@@ -337,6 +388,9 @@ const initInfiniteSlider = () => {
         const slideIndex = Math.round(-normalizedX / slideWidth)
         const targetX = -slideIndex * slideWidth
         gsap.to(track, { x: targetX, duration: 0.4, ease: 'power2.out' })
+        // Setelah drag selesai, kembalikan ke state sesuai hover/visibility saat ini
+        // (bukan langsung resume, supaya tidak melanggar aturan pause saat hover/off-viewport)
+        applyMarqueeState()
     }
 
     track.addEventListener('mousedown', onMouseDown)
@@ -454,44 +508,36 @@ const openLink = (url) => {
                 <ChevronRightIcon class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
             </button>
 
-            <div ref="sliderTrackRef" class="flex gap-3 sm:gap-4 md:gap-5 w-max will-change-transform px-3 sm:px-4 md:px-6 py-2 cursor-grab active:cursor-grabbing">
+            <div ref="sliderTrackRef" class="flex gap-2.5 sm:gap-3 w-max will-change-transform px-3 sm:px-4 md:px-6 py-2 cursor-grab active:cursor-grabbing">
                 <div
                     v-for="item in testimonials"
                     :key="item.id"
-                    class="flex-shrink-0 w-[280px] sm:w-[350px] md:w-[420px] lg:w-[500px] bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 flex flex-col gap-2 sm:gap-3 cursor-default shadow-sm"
+                    class="testimonial-card flex-shrink-0 w-[260px] sm:w-[300px] md:w-[340px] lg:w-[380px] bg-white rounded-2xl p-3 sm:p-3.5 md:p-4 flex flex-col gap-1.5 sm:gap-2 cursor-default shadow-sm"
                 >
                     <div class="flex items-start justify-between">
-                        <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex items-center gap-2">
                             <div
-                                class="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xs sm:text-sm md:text-md font-bold text-black flex-shrink-0"
+                                class="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full flex items-center justify-center text-[22px] font-bold text-black flex-shrink-0"
                                 :style="{ backgroundColor: item.avatarColor }"
                             >
                                 {{ item.avatar }}
                             </div>
                             <div>
-                                <p class="text-sm sm:text-base font-bold text-black leading-tight">{{ item.name }}</p>
-                                <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center gap-1">
+                                <p class="text-2xl font-bold text-black leading-tight">{{ item.name }}</p>
+                                <p class="text-[11px] sm:text-xs text-gray-500 mt-0.5 flex items-center gap-1">
                                     <span>{{ item.flag }}</span>
                                     <span class="hidden sm:inline">{{ item.country }}</span>
                                 </p>
-                                <p class="text-xs sm:text-sm md:text-md text-gray-500 mt-0.5 flex items-center truncate max-w-[120px] sm:max-w-[180px] md:max-w-[220px]">
-                                    {{ item.role }} - {{ item.company }}
-                                </p>
                             </div>
                         </div>
-                        <div class="flex flex-col gap-[2px] sm:gap-[3px] mt-1 flex-shrink-0">
-                            <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
-                            <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
-                            <span class="w-0.5 h-0.5 sm:w-1 sm:h-1 rounded-full bg-gray-400 block"></span>
-                        </div>
                     </div>
 
-                    <div class="flex items-center gap-1 border-t-2 border-gray-100 pt-2">
-                        <StarSolid v-for="i in item.rating" :key="i" class="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 text-black" />
-                        <span class="text-xs sm:text-sm md:text-md font-semibold text-black ml-1">{{ item.rating }}</span>
+                    <div class="flex items-center gap-1 border-t border-gray-100 pt-1.5">
+                        <StarSolid v-for="i in item.rating" :key="i" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-black" />
+                        <span class="text-[10px] sm:text-xs font-semibold text-black ml-1">{{ item.rating }}</span>
                     </div>
 
-                    <p class="text-xs sm:text-sm md:text-md text-gray-700 leading-relaxed line-clamp-3 sm:line-clamp-4">
+                    <p class="text-[11px] sm:text-xs text-gray-700 leading-snug line-clamp-3">
                         {{ item.text }}
                     </p>
                 </div>
@@ -500,19 +546,8 @@ const openLink = (url) => {
 
         <!-- Logo partner -->
         <div class="px-4 pt-4 pb-8">
-            <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 opacity-80">
-                <img src="/public/assets/icons/brand-partner/01_monster_energy.png" alt="Monster Energy" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/02_brian_antonion.png" alt="Brian Antonion" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/03_kastel_oil.png" alt="Kastel Oil" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/04_resurock.png" alt="Resurock" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/05_ufo_logo.png" alt="UFO Logo" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/06_balkun_brothers.png" alt="Balkun Brothers" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/07_fuego.png" alt="Fuego" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/08_p_logo.png" alt="P Logo" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/09_pigdon_street_film_festival.png" alt="Pigdon Street Film Festival" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/10_atliens.png" alt="Atliens" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/11_showdown.png" alt="Showdown" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
-                <img src="/public/assets/icons/brand-partner/12_cheung_kuong.png" alt="Cheung Kuong" class="h-18 w-auto object-contain filter blur-[0.5px] brightness-150 saturate-0" />
+            <div class="flex flex-wrap justify-center items-center px-4 opacity-80">
+                <img src="/public/assets/icons/brand-partner/all-logo.png" />
             </div>
         </div>
     </div>
@@ -531,7 +566,7 @@ const openLink = (url) => {
                     <span class="text-white group-hover:text-[#b4f000] transition-colors duration-300">More Portfolio</span>
                     <img src="/public/assets/image/panah-porto.svg" alt="" class="w-4 h-4 transition-all duration-300 group-hover:translate-x-1 group-hover:brightness-0 group-hover:saturate-100 group-hover:invert-[60%] group-hover:sepia-[100%] group-hover:hue-rotate-[60deg]">
                 </div>
-                <div class="bg-[#333333] rounded-xl flex items-center">
+                <div class="bg-[#333333] rounded-xl flex items-center gap-2 px-2">
                     <div class="social-icon-wrapper group" @click="openLink('https://pin.it/yegYhYpFy')">
                         <img src="/public/assets/image/pinterest-icon-porto.svg" alt="Pinterest" class="h-6 object-cover transition-all duration-300 group-hover:scale-110 group-hover:brightness-0 group-hover:invert group-hover:sepia-0 group-hover:saturate-100 group-hover:hue-rotate-[60deg]">
                     </div>
@@ -550,18 +585,18 @@ const openLink = (url) => {
     </div>
 
     <!-- Our Services -->
-    <div class="bg-white pt-28 pb-2 px-32 text-black">
+    <div id="our-services" class="bg-white pt-28 pb-2 px-24 text-black" style="scroll-margin-top: 100px;">
         <div class="flex justify-center items-start gap-8">
-            <div class="flex flex-col flex-shrink-0">
-                <h4 style="font-family: 'Arial Black' !important; line-height: 1;" class="text-[48px] pb-8">
+            <div class="flex flex-col min-w-[480px] max-w-[600px]">
+                <h4 style="font-family: 'Arial Black' !important; line-height: 1;" class="text-[64px] pb-4">
                     Our<br>Services
                 </h4>
-                <p class="max-w-xl text-[13px]" style="font-family: 'Barlow' !important;">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
+                <p class="max-w-2xl text-[18px]" style="font-family: 'Barlow' !important;">Price differences across various service provider platforms due to additional costs for taxes and service fees set by each platform.</p>
             </div>
-            <div class="flex flex-col px-12">
+            <div class="flex flex-col">
                 <div class="flex justify-center gap-8">
                     <div class="flex flex-col flex-1">
-                        <h1 class="text-[27px] font-extrabold pb-2" style="font-family: 'Barlow' !important;">Design Service</h1>
+                        <h1 class="text-[40px] font-extrabold pb-2" style="font-family: 'Barlow' !important;">Design Service</h1>
                         <p class="leading-relaxed">
                             <span class="inline-flex flex-wrap mt-2 text-xl">
                                 <span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">Brand Identity</span>
@@ -576,7 +611,7 @@ const openLink = (url) => {
                         </p>
                     </div>
                     <div class="flex flex-col flex-1">
-                        <h1 class="text-[27px] font-extrabold pb-2" style="font-family: 'Barlow' !important;">Illustration Service</h1>
+                        <h1 class="text-[40px] font-extrabold pb-2" style="font-family: 'Barlow' !important;">Illustration Service</h1>
                         <p class="leading-relaxed">
                             <span class="inline-flex flex-wrap mt-2 text-xl">
                                 <span class="skill-item bg-transparent hover:outline hover:outline-2 hover:outline-black rounded-full px-3 text-black inline-block whitespace-nowrap transition-all duration-300 hover:bg-[#b4f000] hover:text-black cursor-pointer">2D Illustration</span>
@@ -591,7 +626,7 @@ const openLink = (url) => {
                 </div>
                 <div class="flex justify-start items-center mt-6 w-full">
                     <div class="flex items-center w-full">
-                        <div class="bg-[#e6e6e6] rounded-r-full py-2 pl-4 pr-2 flex items-center justify-between flex-1">
+                        <div class="bg-[#e6e6e6] rounded-r-full py-2 pl-4 pr-2 flex items-center justify-between flex-1" @click="redirectToGetInTouch">
                             <span class="text-2xl">Claim coupon <b class="text-black">10% off</b> for your first order</span>
                             <button class="bg-black text-white px-16 py-1 rounded-full uppercase text-2xl font-medium whitespace-nowrap ml-4 transition-all duration-300 ease-out hover:bg-[#b4f000] hover:text-black">
                                 claim!
@@ -638,7 +673,7 @@ const openLink = (url) => {
     <!-- ============================================================ -->
     <!-- product placement                                            -->
     <!-- ============================================================ -->
-    <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-4 px-16 text-black">
+    <div ref="productSectionRef" id="shop" class="bg-[#e6e6e6] py-4 px-16 text-black" style="scroll-margin-top: 100px;">
     <!-- Header row: title + filter tabs -->
     <div class="flex justify-between items-end mb-4 px-16">
       <h1 class="shop-title text-[48px] font-extrabold font-barlow leading-tight">

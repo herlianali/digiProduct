@@ -1,5 +1,6 @@
+<!-- OurWorkSection -->
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -11,7 +12,9 @@ const works = ref([
     title: 'ATLENS',
     subtitle: 'CANNED ENERGY',
     tagline: 'BLOOD OF THE DRAGON',
-    category: 'POSTER',
+    category: 'Poster',
+    size: 'w-3 h-3',
+    categoryIcon: '/assets/icons/poster-icon.svg',
     location: 'OKEECHOBEE',
     background: 'bg-[#b41f19]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
@@ -21,7 +24,9 @@ const works = ref([
     id: 2,
     title: 'X-HAWN',
     subtitle: 'SKI SAINT BRUNO',
-    category: 'POSTER',
+    category: 'Poster',
+    size: 'w-3 h-3',
+    categoryIcon: '/assets/icons/poster-icon.svg',
     background: 'bg-[#e5f001]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-2.jpg'
@@ -31,7 +36,9 @@ const works = ref([
     title: 'MONSTER',
     subtitle: 'International Films Festival',
     location: 'Pigdon Street',
-    category: 'POSTER',
+    category: 'Poster',
+    size: 'w-3 h-3',
+    categoryIcon: '/assets/icons/poster-icon.svg',
     background: 'bg-[#8b27b7]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-3.jpg'
@@ -40,7 +47,9 @@ const works = ref([
     id: 4,
     title: 'Cherry-King',
     subtitle: 'Brand Identity',
-    category: 'FEATURED',
+    category: 'Packaging',
+    size: 'w-4 h-4',
+    categoryIcon: '/assets/icons/packaging-icon.svg',
     background: 'bg-[#3d54a4]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-4.jpg'
@@ -49,7 +58,9 @@ const works = ref([
     id: 5,
     title: 'OKEECHOBEE',
     subtitle: 'Canned Energy',
-    category: 'POSTER',
+    category: 'Poster',
+    size: 'w-3 h-3',
+    categoryIcon: '/assets/icons/poster-icon.svg',
     background: 'bg-[#b4f000]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-5.jpg'
@@ -58,7 +69,9 @@ const works = ref([
     id: 6,
     title: 'X-HAWN',
     subtitle: 'SKI SAINT BRUNO',
-    category: 'POSTER',
+    category: 'Poster',
+    size: 'w-3 h-3',
+    categoryIcon: '/assets/icons/poster-icon.svg',
     background: 'bg-[#e5f001]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-2.jpg'
@@ -67,7 +80,9 @@ const works = ref([
     id: 7,
     title: 'Cherry-King',
     subtitle: 'Brand Identity',
-    category: 'FEATURED',
+    category: 'Packaging',
+    size: 'w-4 h-4',
+    categoryIcon: '/assets/icons/packaging-icon.svg',
     background: 'bg-[#3d54a4]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-4.jpg'
@@ -76,7 +91,9 @@ const works = ref([
     id: 8,
     title: 'Cherry-King',
     subtitle: 'Brand Identity',
-    category: 'FEATURED',
+    category: 'Packaging',
+    size: 'w-4 h-4',
+    categoryIcon: '/assets/icons/packaging-icon.svg',
     background: 'bg-[#3d54a4]',
     description: 'We have collaborated with many individual and international corporate clients from many countries.',
     image: '/assets/image/portfolio/porto-4.jpg'
@@ -88,9 +105,13 @@ const sliderContainerRef = ref(null)
 const trackRef = ref(null)
 const cardsRef = ref([])
 
-const CARD_W = 320
-const CARD_GAP = 30
+const CARD_W = 290
+const CARD_GAP = 20
+const SLOT = CARD_W + CARD_GAP
 const AUTOPLAY_DELAY = 4000
+
+// Sederhana: ease default untuk transisi
+const TRANSITION_DURATION = 0.6
 
 const currentIndex = ref(0)
 const visibleCards = ref(5)
@@ -115,7 +136,7 @@ const updateVisibleCards = () => {
 // ─── Update posisi card dengan GSAP (CIRCULAR) ────────────────────
 const updateCardsPosition = (animate = true) => {
   const total = works.value.length
-  
+
   cardsRef.value.forEach((card, index) => {
     if (!card) return
 
@@ -126,90 +147,41 @@ const updateCardsPosition = (animate = true) => {
 
     const distance = Math.abs(offset)
     const isCenter = offset === 0
-    
-    // Pastikan card di dalam visible range
     const isVisible = distance <= visibleCards.value
-    
+
     // Scale - HANYA card tengah yang lebih besar
-    // Card lain tetap scale 1 (tinggi sama)
-    let scale = 1
-    if (isCenter) {
-      scale = 1.15 // Hanya card tengah yang membesar
-    }
-    
-    // Opacity - card samping lebih transparan
-    let opacity = 1
-    if (isCenter) {
-      opacity = 1
-    } else if (distance <= visibleCards.value) {
-      opacity = 1 - (distance / (visibleCards.value + 1)) * 0.4
-      opacity = Math.max(0.5, opacity)
-    } else {
-      opacity = 0
-    }
-    
+    let scale = isCenter ? 1.15 : 1
+
+    // Opacity - card di luar visible range disembunyikan
+    let opacity = isVisible ? 1 : 0
+
     // Z-index
     const zIndex = isCenter ? 50 : 30 - distance
-    
-    // Brightness - card samping lebih gelap
-    const brightness = isCenter ? 1 : Math.max(0.5, 1 - distance * 0.1)
-    
-    // POSISI X - dengan spacing yang konsisten
-    const xPosition = offset * (CARD_W + CARD_GAP)
-    
-    // Gunakan transform origin di center agar zoom dari tengah
-    gsap.set(card, { transformOrigin: 'center center' })
 
-    // Filter hanya brightness (tanpa blur)
-    const filterValue = `brightness(${isVisible ? brightness : 0})`
+    // POSISI X - dengan spacing yang konsisten
+    const xPosition = offset * SLOT
 
     if (animate) {
       gsap.to(card, {
         x: xPosition,
         scale: scale,
-        opacity: isVisible ? opacity : 0,
+        opacity: opacity,
         zIndex: zIndex,
-        duration: 0.7,
-        ease: 'power3.inOut',
-        filter: filterValue,
+        duration: TRANSITION_DURATION,
+        ease: 'power2.out',
         overwrite: true,
         onComplete: () => {
-          if (!isVisible) {
-            gsap.set(card, { pointerEvents: 'none' })
-          } else {
-            gsap.set(card, { pointerEvents: 'auto' })
-          }
+          gsap.set(card, { pointerEvents: isVisible ? 'auto' : 'none' })
         }
       })
     } else {
       gsap.set(card, {
         x: xPosition,
         scale: scale,
-        opacity: isVisible ? opacity : 0,
+        opacity: opacity,
         zIndex: zIndex,
-        filter: filterValue,
         pointerEvents: isVisible ? 'auto' : 'none'
       })
-    }
-
-    // Animasi konten di dalam card - HANYA card tengah yang kontennya full
-    const content = card.querySelector('.card-content')
-    if (content) {
-      if (animate) {
-        gsap.to(content, {
-          opacity: isCenter ? 1 : 0.5,
-          y: isCenter ? 0 : 10,
-          duration: 0.5,
-          delay: isCenter ? 0.1 : 0,
-          ease: 'power2.out',
-          overwrite: true
-        })
-      } else {
-        gsap.set(content, {
-          opacity: isCenter ? 1 : 0.5,
-          y: isCenter ? 0 : 10
-        })
-      }
     }
   })
 }
@@ -217,20 +189,19 @@ const updateCardsPosition = (animate = true) => {
 // ─── Navigasi ──────────────────────────────────────────────────────
 const goToIndex = (newIndex, fromAutoplay = false) => {
   if (isAnimating.value) return
-  
-  // Wrap index untuk circular
+
   const total = works.value.length
   let targetIndex = newIndex
   if (targetIndex < 0) targetIndex = total - 1
   if (targetIndex >= total) targetIndex = 0
-  
+
   isAnimating.value = true
   currentIndex.value = targetIndex
   updateCardsPosition(true)
-  
+
   setTimeout(() => {
     isAnimating.value = false
-  }, 800)
+  }, TRANSITION_DURATION * 1000 + 50)
 
   if (!fromAutoplay) {
     stopAutoPlay()
@@ -263,15 +234,35 @@ const startAutoPlay = () => {
   }, AUTOPLAY_DELAY)
 }
 
+// ─── Pause autoplay saat section di luar viewport ──────────────────
+let visibilityObserver = null
+
+const initVisibilityObserver = () => {
+  if (!sectionRef.value) return
+  visibilityObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        startAutoPlay()
+      } else {
+        stopAutoPlay()
+      }
+    },
+    { threshold: 0.1 }
+  )
+  visibilityObserver.observe(sectionRef.value)
+}
+
 // ─── Touch & Drag ──────────────────────────────────────────────────
 let touchStartX = 0
 let touchStartY = 0
+let touchDeltaX = 0
 let isSwiping = false
 let isHorizontalSwipe = null
 
 const onTouchStart = (e) => {
   touchStartX = e.touches[0].clientX
   touchStartY = e.touches[0].clientY
+  touchDeltaX = 0
   isSwiping = true
   isHorizontalSwipe = null
   stopAutoPlay()
@@ -288,49 +279,104 @@ const onTouchMove = (e) => {
 
   if (isHorizontalSwipe) {
     e.preventDefault()
+    touchDeltaX = deltaX
+    
+    // Update posisi secara real-time saat drag
+    const total = works.value.length
+    cardsRef.value.forEach((card, index) => {
+      if (!card) return
+      let offset = index - currentIndex.value
+      if (offset > total / 2) offset -= total
+      if (offset < -total / 2) offset += total
+      
+      const xPosition = offset * SLOT + touchDeltaX
+      const isVisible = Math.abs(offset) <= visibleCards.value
+      
+      gsap.set(card, {
+        x: xPosition,
+        opacity: isVisible ? 1 : 0,
+        scale: offset === 0 ? 1.15 : 1
+      })
+    })
   }
 }
 
-const onTouchEnd = (e) => {
+const onTouchEnd = () => {
   if (!isSwiping) return
   isSwiping = false
-  const deltaX = e.changedTouches[0].clientX - touchStartX
 
-  if (isHorizontalSwipe && Math.abs(deltaX) > 40) {
-    if (deltaX > 0) slideLeft()
-    else slideRight()
+  if (isHorizontalSwipe) {
+    const steps = Math.round(-touchDeltaX / SLOT)
+    if (steps !== 0) {
+      goToIndex(currentIndex.value + steps)
+    } else {
+      updateCardsPosition(true)
+      startAutoPlay()
+    }
   } else {
     startAutoPlay()
   }
   isHorizontalSwipe = null
+  touchDeltaX = 0
 }
 
 // Mouse drag
 let mouseStartX = 0
+let mouseDeltaX = 0
 let isDragging = false
+let hasDraggedEnough = false
 
 const onMouseDown = (e) => {
   isDragging = true
+  hasDraggedEnough = false
   mouseStartX = e.clientX
+  mouseDeltaX = 0
   stopAutoPlay()
   gsap.set(sliderContainerRef.value, { cursor: 'grabbing' })
 }
 
 const onMouseMove = (e) => {
   if (!isDragging) return
-  const delta = e.clientX - mouseStartX
-  if (Math.abs(delta) > 50) {
-    if (delta > 0) slideLeft()
-    else slideRight()
-    isDragging = false
-  }
+  mouseDeltaX = e.clientX - mouseStartX
+  if (Math.abs(mouseDeltaX) > 3) hasDraggedEnough = true
+  
+  // Update posisi secara real-time
+  const total = works.value.length
+  cardsRef.value.forEach((card, index) => {
+    if (!card) return
+    let offset = index - currentIndex.value
+    if (offset > total / 2) offset -= total
+    if (offset < -total / 2) offset += total
+    
+    const xPosition = offset * SLOT + mouseDeltaX
+    const isVisible = Math.abs(offset) <= visibleCards.value
+    
+    gsap.set(card, {
+      x: xPosition,
+      opacity: isVisible ? 1 : 0,
+      scale: offset === 0 ? 1.15 : 1
+    })
+  })
 }
 
 const onMouseUp = () => {
   if (!isDragging) return
   isDragging = false
-  startAutoPlay()
   gsap.set(sliderContainerRef.value, { cursor: 'grab' })
+
+  if (hasDraggedEnough) {
+    const steps = Math.round(-mouseDeltaX / SLOT)
+    if (steps !== 0) {
+      goToIndex(currentIndex.value + steps)
+    } else {
+      updateCardsPosition(true)
+      startAutoPlay()
+    }
+  } else {
+    startAutoPlay()
+  }
+  mouseDeltaX = 0
+  hasDraggedEnough = false
 }
 
 const addDragEvents = () => {
@@ -359,6 +405,7 @@ const removeDragEvents = () => {
 
 // ─── Click Handler ─────────────────────────────────────────────────
 const handleCardClick = (index) => {
+  if (hasDraggedEnough) return
   if (index !== currentIndex.value) {
     goToIndex(index)
   }
@@ -383,6 +430,16 @@ const initAnimations = () => {
   )
 }
 
+// ─── Resize handler ──────────────────────────────────────────────
+let resizeTimeout = null
+const handleResize = () => {
+  clearTimeout(resizeTimeout)
+  resizeTimeout = setTimeout(() => {
+    updateVisibleCards()
+    updateCardsPosition(false)
+  }, 150)
+}
+
 // ─── Lifecycle ─────────────────────────────────────────────────────
 onMounted(() => {
   nextTick(() => {
@@ -390,12 +447,9 @@ onMounted(() => {
     updateCardsPosition(false)
     addDragEvents()
     initAnimations()
-    startAutoPlay()
-    
-    window.addEventListener('resize', () => {
-      updateVisibleCards()
-      updateCardsPosition(false)
-    })
+    initVisibilityObserver()
+
+    window.addEventListener('resize', handleResize)
   })
 })
 
@@ -403,7 +457,9 @@ onUnmounted(() => {
   stopAutoPlay()
   ScrollTrigger.getAll().forEach(t => t.kill())
   removeDragEvents()
-  window.removeEventListener('resize', updateVisibleCards)
+  window.removeEventListener('resize', handleResize)
+  clearTimeout(resizeTimeout)
+  visibilityObserver?.disconnect()
 })
 
 // Watch currentIndex untuk update posisi
@@ -416,13 +472,13 @@ watch(currentIndex, () => {
   <section ref="sectionRef" class="py-10 bg-black overflow-hidden">
     <div class="w-full">
       <div class="slider-wrapper relative overflow-hidden">
-        
+
         <div
           ref="sliderContainerRef"
           class="relative h-[620px] md:h-[680px] w-full cursor-grab overflow-visible"
         >
           <!-- Track untuk sliding dengan GSAP -->
-          <div 
+          <div
             ref="trackRef"
             class="relative flex items-center justify-center h-full"
             style="will-change: transform;"
@@ -433,7 +489,7 @@ watch(currentIndex, () => {
               :key="work.id"
               :ref="el => cardsRef[index] = el"
               class="absolute cursor-pointer rounded-3xl overflow-hidden"
-              style="width: 320px; height: 580px;"
+              style="width: 280px; height: 580px;"
               @click="handleCardClick(index)"
             >
               <div class="relative bg-white rounded-3xl overflow-hidden shadow-xl border-0 w-full h-full">
@@ -443,14 +499,16 @@ watch(currentIndex, () => {
                     :src="work.image"
                     :alt="work.title"
                     class="w-full h-full object-cover"
+                    draggable="false"
                   />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent rounded-3xl"></div>
                 </div>
 
-                <!-- Content -->
-                <div :class="[work.background, 'card-content absolute bottom-0 left-0 right-0 p-5 text-white rounded-3xl']">
+                <!-- Content - Tanpa opacity, selalu solid -->
+                <div :class="[work.background, 'absolute bottom-0 left-0 right-0 p-5 text-white rounded-3xl']">
                   <div class="flex items-start gap-2 text-xs mb-2">
-                    <span class="font-semibold tracking-wider text-white bg-black px-2 py-1 rounded-lg">
+                    <span class="font-semibold tracking-wider text-white bg-black px-2 py-1 rounded-xl">
+                      <img :src="work.categoryIcon" :alt="work.category" :class="work.size" class="text-white inline-block">
                       {{ work.category }}
                     </span>
                   </div>
@@ -504,19 +562,19 @@ watch(currentIndex, () => {
         </button>
 
         <!-- Indicator dots -->
-        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 z-40 flex gap-2 pb-4">
+        <!-- <div class="absolute bottom-0 left-1/2 -translate-x-1/2 z-40 flex gap-2 pb-4">
           <button
             v-for="i in works.length"
             :key="i"
             class="w-2 h-2 rounded-full transition-all duration-300"
             :class="[
-              i - 1 === currentIndex 
-                ? 'bg-white w-6' 
+              i - 1 === currentIndex
+                ? 'bg-white w-6'
                 : 'bg-white/40 hover:bg-white/60'
             ]"
             @click="goToIndex(i - 1)"
           />
-        </div>
+        </div> -->
 
       </div>
     </div>

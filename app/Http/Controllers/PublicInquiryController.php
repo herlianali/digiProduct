@@ -9,9 +9,12 @@ use Inertia\Inertia;
 
 class PublicInquiryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('Landing/Gsap/GetInTuch/Index');
+        $voucherCode = $request->query('voucher');
+        return Inertia::render('Landing/Gsap/GetInTuch/Index', [
+            'voucher_code' => $voucherCode,
+        ]);
     }
 
     public function store(Request $request)

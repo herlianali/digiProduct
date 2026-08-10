@@ -43,8 +43,8 @@ Route::get('/our-team',                  [LandingController::class, 'OurTeam'])-
 Route::get('/portfolio/detail/{id}',     [LandingController::class, 'PortfolioDetail'])->name('PortfolioDetail');
 Route::get('/product-place',             [ProductPlacementController::class, 'index'])->name('ProductPlace.index');
 Route::get('/product-place/detail/{id}', [ProductPlacementController::class, 'show'])->name('ProductPlace.show');
-Route::get('/get-in-touch',              [PublicInquiryController::class, 'index'])->name('GetInTuch');
-Route::post('/get-in-touch/store',       [PublicInquiryController::class, 'store'])->name('GetInTuch.store');
+Route::get('/get-in-touch',              [PublicInquiryController::class, 'index'])->name('GetInTouch');
+Route::post('/get-in-touch/store',       [PublicInquiryController::class, 'store'])->name('GetInTouch.store');
 Route::post('/orders/guest',             [GuestOrderController::class, 'store'])->name('orders.guest.store');
 Route::post('/vouchers/validate',        [GuestOrderController::class, 'validateVoucher'])->name('vouchers.validate');
 

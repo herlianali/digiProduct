@@ -325,6 +325,7 @@ const flash = computed(() => page.props.flash ?? {})
 // State untuk notifikasi toast
 const showSuccessToast = ref(false)
 const toastMessage = ref('')
+const voucher_code = ref('')
 
 const form = useForm({
     full_name:           '',

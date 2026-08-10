@@ -111,15 +111,6 @@ const startCardAnimations = (card) => {
   }))
 
   const allImgs = card.querySelectorAll('img')
-  const nonArrowImgs = Array.from(allImgs).filter(img => !getArrowDir(img.src || img.getAttribute('src') || ''))
-  if (nonArrowImgs.length) {
-    tweens.push(gsap.to(nonArrowImgs, {
-      scale: 1.07,
-      duration: 0.35,
-      ease: 'power2.out',
-      stagger: 0.02,
-    }))
-  }
 
   allImgs.forEach(img => {
     const src = img.src || img.getAttribute('src') || ''
@@ -149,7 +140,7 @@ const stopCardAnimations = (card) => {
   gsap.set(card, { scale: 1, y: 0, boxShadow: 'none' })
   const allImgs = card.querySelectorAll('img')
   allImgs.forEach(img => {
-    gsap.set(img, { scale: 1, x: 0, y: 0 })
+    gsap.set(img, { x: 0, y: 0 })
   })
 }
 
@@ -216,12 +207,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="bentoGridRef" class="mt-6 bg-white">
+  <div ref="bentoGridRef" class="mt-3 bg-white">
     <div class="w-full px-3 sm:px-4">
 
       <!-- ===================== DESKTOP GRID (md+) ===================== -->
       <div
-        class="hidden md:grid gap-4 lg:gap-6"
+        class="hidden md:grid gap-2 lg:gap-3"
         style="grid-template-columns: 1.3fr 1.3fr 1.2fr 1.0fr 0.9fr 0.8fr 0.8fr 1.3fr 1.4fr repeat(3, minmax(0,1fr)); grid-template-rows: auto auto;"
       >
 
@@ -238,12 +229,13 @@ onUnmounted(() => {
                     Welcome to
                 </span>
                 <br>
-                <p
+                <img src="/public/assets/image/banner/supplaybox.svg" class="w-[220px]"  alt="">
+                <!-- <p
                     class="font-barlow-condensed-extrabold font-[1000]"
                     style="font-size: clamp(2.8rem, 8cqw, 2.8rem); transform: scaleX(0.9); display: inline-block; transform-origin: left center;"
                 >
                     SUPPLAYBOX
-                </p>
+                </p> -->
             </div>
             <img data-arrow="top-right" src="/public/assets/image/banner/arrow-black-right.svg" class="flex-shrink-0" alt="" />
           </div>
@@ -270,31 +262,33 @@ onUnmounted(() => {
         >
           <div class="flex p-4" style="">
             <img
-                src="/public/assets/image/banner/card-service-animated2.svg"
-                style="width: 100%; height: auto;"
-                alt=""
+              src="/public/assets/image/banner/card-service-animated2.svg"
+              style="width: 100%; height: auto;"
+              alt=""
             />
           </div>
           <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
             <h3 class="font-bold text-white px-4 py-1" style="font-size: clamp(1.5rem, 4.5cqw, 1.125rem);">Design Service</h3>
             <div class="rounded-t-2xl bg-gray-200">
-              <p class="font-semibold leading-none px-6 py-4 text-justify italic" style="font-size: clamp(0.80rem, 3cqw, 0.8125rem);">
+              <p class="text- leading-none px-6 py-4 text-justify italic" style="font-size: clamp(0.80rem, 3cqw, 0.8125rem);">
                 Brand Identity / Logo Design / Poster Design / Packaging Design / Social Media Design / Infographic Design / Editorial Design / Book Design
               </p>
               <div class="bg-black rounded-tl-2xl rounded-tr-2xl">
                 <h3 class="font-bold text-white px-4 py-1" style="font-size: clamp(1.5rem, 4.5cqw, 1.125rem);">Illustration Service</h3>
                 <div class="rounded-t-2xl bg-gray-200">
-                  <p class="font-semibold leading-none px-6 pt-4 text-justify italic" style="font-size: clamp(0.80rem, 3cqw, 0.8125rem);">
+                  <p class="text- leading-none px-6 pt-4 text-justify italic" style="font-size: clamp(0.80rem, 3cqw, 0.8125rem);">
                     2D Illustration / Environmental Design / Game Design / Character design / Mascot Illustration / Advertising Illustration
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div class="pt-4 flex justify-center">
+          <div class="flex justify-center">
             <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="" />
           </div>
-          <div class="absolute -bottom-5 left-0 right-0 overflow-hidden">
+
+          <!-- TAMBAHKAN z-10 DAN pointer-events-none DI SINI -->
+          <div class="absolute bottom-0 left-0 right-0 overflow-hidden z-10 pointer-events-none">
             <img src="/public/assets/image/banner/card-service-animated.svg" alt="service illustration" class="" style="height: 110cqw; object-position: bottom; object-fit: cover;" />
           </div>
         </div>
@@ -304,18 +298,25 @@ onUnmounted(() => {
           class="bento-card bg-[#4c60d8] rounded-2xl flex flex-col cursor-pointer"
           style="grid-column: 6 / 8; grid-row: 1 / 2;"
         >
-          <div class="px-3 pt-3 flex justify-between items-center">
-            <div class="tracking-wider flex items-center gap-1">
+          <div class="px-3 pt-3 flex justify-end items-center">
+            <!-- <div class="tracking-wider flex items-center gap-1">
               <img src="/public/assets/image/banner/card-teepublic-icon.svg" alt="" style="width: 12cqw; height: 12cqw; max-width: 32px; max-height: 32px;" />
               <span class="text-white font-[1000]" style="font-size: clamp(1.4rem, 4cqw, 2rem); transform: scaleX(0.8); display: inline-block; transform-origin: left center;">TEEPUBLIC</span>
-            </div>
+            </div> -->
             <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" class="mr-1"/>
           </div>
-          <div class="flex items-center overflow-hidden">
+          <!-- <div class="flex items-center overflow-hidden">
             <img src="/public/assets/image/banner/card-teepublic-animated.svg" alt="teepublic" class="" style="height: clamp(120px, 20vw, 200px);" />
           </div>
           <div class="px-4 pb-4">
             <p class="font-bold text-white leading-none" style="font-size: clamp(1.6rem, 4cqw, 3rem);">Unlimited<br />Prints.</p>
+          </div> -->
+          <div class="absolute inset-0 z-10 flex items-center justify-center overflow-hidden">
+            <img 
+                src="/public/assets/image/banner/teepublic.png" 
+                alt="pinterest" 
+                class="w-full h-full "
+            />
           </div>
         </div>
 
@@ -337,10 +338,10 @@ onUnmounted(() => {
         </div>
 
         <!-- Icons + Upwork + Amidst (col-span-2, row-span-2) -->
-        <div class="flex flex-col gap-6" style="grid-column: 11 / 13; grid-row: 1 / 3; height: clamp(53rem, 40cqw, 79rem);">
+        <div class="flex flex-col gap-3" style="grid-column: 11 / 13; grid-row: 1 / 3; height: clamp(53rem, 40cqw, 79rem);">
           <div class="flex justify-between items-center pr-1 pt-1" style="container-type: inline-size;">
             <img src="/public/assets/image/banner/card-icon.svg" class="w-11 h-11" alt="Icon">
-            <span class="border-2 border-black rounded-full px-8 text-black font-[1000] text-center whitespace-nowrap" style="font-size: clamp(1.4rem, 4.5cqw, 1.9rem);">$100</span>
+            <span class="border-2 border-black rounded-full px-8 text-black font-[1000] text-center whitespace-nowrap" style="font-size: clamp(1.4rem, 4.5cqw, 1.9rem);">$0</span>
             <div class="rounded-full overflow-hidden flex items-center justify-center" style="width: 16cqw; height: 16cqw; max-width: 75px; max-height: 75px;">
               <UserCircleIcon class="w-full h-full" />
             </div>
@@ -368,49 +369,55 @@ onUnmounted(() => {
             </div>
           </div>
 
-            <div class="bento-card bg-white rounded-2xl p-3 flex justify-start cursor-pointer border border-gray-100 relative">
-                <div class="relative inline-block ">
-                    <img
-                        src="/public/assets/image/banner/text-landing-page.svg"
-                        alt="amidst"
-                        class="w-[100%] h-auto object-contain object-top mx-auto"
-                    />
-                    <img
-                        data-arrow="bottom"
-                        src="/public/assets/image/banner/arrow-black-bottom.svg"
-                        alt="Down Arrow"
-                        class="absolute bottom-0 -right-8 !w-[20px] !h-[20px]"
-                    />
-                </div>
+          <div class="bento-card bg-white rounded-2xl p-3 cursor-pointer border border-gray-100">
+            <div class="relative inline-block ">
+              <img
+                src="/public/assets/image/banner/amidst.png"
+                alt="amidst"
+                class="w-[66%] h-auto object-contain object-left"
+              />
+              <img
+                data-arrow="bottom"
+                src="/public/assets/image/banner/arrow-black-bottom.svg"
+                alt="Down Arrow"
+                class="absolute bottom-0 left-20 !w-[20px] !h-[20px]"
+              />
             </div>
+          </div>
         </div>
 
         <!-- ROW 2 -->
 
         <!-- Pinterest + TikTok + Starter Pack -->
         <div
-            class="grid grid-cols-2 grid-rows-2 gap-6"
+            class="grid grid-cols-2 grid-rows-2 gap-3"
             style="grid-column: 1 / 4; grid-row: 2 / 3; height: clamp(340px, 40cqw, 500px);"
         >
-            <div class="bento-card row-span-2 bg-[#E60023] rounded-2xl p-5 flex flex-col relative overflow-hidden cursor-pointer">
-                <div class="flex justify-between items-start pb-2">
+            <div class="bento-card row-span-2 bg-[#E60023] rounded-2xl flex flex-col relative overflow-hidden cursor-pointer">
+                <div class="flex justify-between items-start pt-4 px-6">
                     <img src="/public/assets/image/banner/card-path-logo.svg" class="flex-shrink-0" style="width: 28cqw; height: 28cqw; max-width: 50px; max-height: 50px;" alt="" />
-                    <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" alt="" />
+                    <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" style="width: 14cqw; height: 14cqw; max-width: 36px; max-height: 36px;" alt="" />
                 </div>
-                <img class="px-3 py-2" src="/public/assets/image/banner/text-pinterest.svg" alt="">
-                <div class="absolute -bottom-12 left-0 right-0 overflow-hidden">
-                    <img src="/public/assets/image/banner/card-path-animated.svg" alt="pinterest" class="" style="width: 180cqw; height: 140cqw; object-position: bottom; object-fit: cover;" />
+                <div class="absolute inset-0 z-10 flex items-center justify-center">
+                  <img 
+                      src="/public/assets/image/banner/path.png" 
+                      alt="pinterest" 
+                      class="w-full h-full "
+                  />
                 </div>
             </div>
 
-            <div class="bento-card bg-white border border-gray-800 rounded-2xl p-4 relative overflow-hidden cursor-pointer">
+            <div class="bento-card bg-white rounded-2xl p-4 relative overflow-hidden cursor-pointer">
                 <div class="flex justify-between items-start px-1 pt-1">
                     <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="flex-shrink-0" style="width: 30cqw; height: 30cqw; max-width: 55px; max-height: 55px;" alt="TikTok" />
                     <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok"/>
                 </div>
-                <p class="px-1 pt-2 leading-tight" style="font-size: clamp(0.9rem, 4cqw, 0.9rem);">some memes <br> for entertainment, <br> and behind the scenes <br> of our routine.</p>
-                <div class="absolute bottom-0 left-0 right-0 h-[47%] overflow-hidden">
-                    <img src="/public/assets/image/banner/card-tiktok-animated.svg" alt="tiktok" class="w-full h-full object-cover object-top" />
+                <div class="absolute inset-0 z-10 flex items-center justify-center">
+                  <img 
+                      src="/public/assets/image/banner/tiktok.png" 
+                      alt="tiktok" 
+                      class="w-full h-full "
+                  />
                 </div>
             </div>
 
@@ -433,7 +440,7 @@ onUnmounted(() => {
 
         <!-- Fiverr + Our Product + Our Team -->
         <div
-          class="flex flex-col gap-6"
+          class="flex flex-col gap-3"
           style="grid-column: 6 / 11; grid-row: 2 / 3;  height: clamp(360px, 40cqw, 500px);"
         >
           <div class="bento-card bg-[#f2ecea] rounded-2xl p-3 relative overflow-hidden flex-shrink-0 cursor-pointer" style="height: clamp(120px, 40cqw, 160px);">
@@ -457,13 +464,20 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <div class="grid grid-cols-3 gap-6 flex-1 min-h-0">
+          <div class="grid grid-cols-3 gap-3 flex-1 min-h-0">
             <div class="bento-card col-span-1 bg-[#fee100] rounded-2xl p-2 relative overflow-hidden cursor-pointer h-full flex-shrink-0">
-              <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[280px] border-r-[280px] border-b-[130px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
+              <!-- <div class="absolute left-1/2 bottom-0 -translate-x-1/2 w-0 h-0 z-0 border-l-[280px] border-r-[280px] border-b-[130px] border-l-transparent border-r-transparent border-b-[#c0f901]"></div>
               <p class="font-extrabold text-black relative z-20 px-2 leading-none [-webkit-text-stroke:2px_black]" style="font-size: clamp(1.8rem, 5.5cqw, 2.2rem);">Our<br />Product</p>
               <div class="flex-1 flex items-center justify-center pt-4 relative z-10">
                 <img src="/public/assets/image/banner/card-ourproduct-animated.svg" alt="product" class="w-[85%] h-[85%] object-contain" />
-              </div>
+              </div> -->
+              <div class="absolute -inset-1 z-10 flex items-center justify-center">
+                  <img 
+                      src="/public/assets/image/banner/our-product.png" 
+                      alt="tiktok" 
+                      class="w-full h-full"
+                  />
+                </div>
               <div class="text-center z-10 absolute bottom-5 left-0 right-0">
                 <img data-arrow="bottom" src="/public/assets/image/banner/arrow-black-bottom.svg" alt="Arrow" class="inline" />
               </div>
@@ -514,7 +528,7 @@ onUnmounted(() => {
         <div class="bento-card col-span-1 row-span-3">
           <div class="col-span-3 flex justify-end items-center gap-3 py-1 pr-1">
             <ShoppingCartIcon class="w-6 h-6 text-green-500" />
-            <span class="border-[1.5px] border-black rounded-full px-3 py-0.5 text-black text-[11px] font-medium whitespace-nowrap">$100</span>
+            <span class="border-[1.5px] border-black rounded-full px-3 py-0.5 text-black text-[11px] font-medium whitespace-nowrap">$0</span>
             <div class="w-6 h-6 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center">
               <img src="" alt="user" class="w-full h-full object-cover" />
             </div>
