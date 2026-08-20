@@ -1,6 +1,6 @@
 <!-- OurWorkSection -->
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -116,6 +116,10 @@ const TRANSITION_DURATION = 0.6
 const currentIndex = ref(0)
 const visibleCards = ref(5)
 const isAnimating = ref(false)
+let entranceAnimation = null
+let dragFrame = null
+let pendingDragX = 0
+let dragSetters = []
 
 // ─── Hitung jumlah card yang terlihat ─────────────────────────────
 const updateVisibleCards = () => {
@@ -281,23 +285,7 @@ const onTouchMove = (e) => {
     e.preventDefault()
     touchDeltaX = deltaX
     
-    // Update posisi secara real-time saat drag
-    const total = works.value.length
-    cardsRef.value.forEach((card, index) => {
-      if (!card) return
-      let offset = index - currentIndex.value
-      if (offset > total / 2) offset -= total
-      if (offset < -total / 2) offset += total
-      
-      const xPosition = offset * SLOT + touchDeltaX
-      const isVisible = Math.abs(offset) <= visibleCards.value
-      
-      gsap.set(card, {
-        x: xPosition,
-        opacity: isVisible ? 1 : 0,
-        scale: offset === 0 ? 1.15 : 1
-      })
-    })
+    scheduleDragPosition(touchDeltaX)
   }
 }
 
@@ -320,6 +308,33 @@ const onTouchEnd = () => {
   touchDeltaX = 0
 }
 
+const scheduleDragPosition = (deltaX) => {
+  pendingDragX = deltaX
+  if (dragFrame) return
+
+  dragFrame = requestAnimationFrame(() => {
+    dragFrame = null
+    const total = works.value.length
+    cardsRef.value.forEach((card, index) => {
+      if (!card) return
+      let offset = index - currentIndex.value
+      if (offset > total / 2) offset -= total
+      if (offset < -total / 2) offset += total
+
+      if (!dragSetters[index]) {
+        dragSetters[index] = {
+          x: gsap.quickSetter(card, 'x', 'px'),
+          opacity: gsap.quickSetter(card, 'opacity'),
+          scale: gsap.quickSetter(card, 'scale'),
+        }
+      }
+      dragSetters[index].x(offset * SLOT + pendingDragX)
+      dragSetters[index].opacity(Math.abs(offset) <= visibleCards.value ? 1 : 0)
+      dragSetters[index].scale(offset === 0 ? 1.15 : 1)
+    })
+  })
+}
+
 // Mouse drag
 let mouseStartX = 0
 let mouseDeltaX = 0
@@ -340,23 +355,7 @@ const onMouseMove = (e) => {
   mouseDeltaX = e.clientX - mouseStartX
   if (Math.abs(mouseDeltaX) > 3) hasDraggedEnough = true
   
-  // Update posisi secara real-time
-  const total = works.value.length
-  cardsRef.value.forEach((card, index) => {
-    if (!card) return
-    let offset = index - currentIndex.value
-    if (offset > total / 2) offset -= total
-    if (offset < -total / 2) offset += total
-    
-    const xPosition = offset * SLOT + mouseDeltaX
-    const isVisible = Math.abs(offset) <= visibleCards.value
-    
-    gsap.set(card, {
-      x: xPosition,
-      opacity: isVisible ? 1 : 0,
-      scale: offset === 0 ? 1.15 : 1
-    })
-  })
+  scheduleDragPosition(mouseDeltaX)
 }
 
 const onMouseUp = () => {
@@ -417,13 +416,13 @@ const readmoreLink = (id) => {
 
 // ─── Animasi Scroll ────────────────────────────────────────────────
 const initAnimations = () => {
-  gsap.fromTo(sectionRef.value,
+  entranceAnimation = gsap.fromTo(sectionRef.value,
     { opacity: 0, y: 50 },
     {
-      opacity: 1, y: 0, duration: 1,
+      opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
       scrollTrigger: {
         trigger: sectionRef.value,
-        start: 'top 80%',
+        start: 'top 85%',
         toggleActions: 'play none none reverse'
       }
     }
@@ -446,7 +445,7 @@ onMounted(() => {
     updateVisibleCards()
     updateCardsPosition(false)
     addDragEvents()
-    initAnimations()
+    requestAnimationFrame(() => initAnimations())
     initVisibilityObserver()
 
     window.addEventListener('resize', handleResize)
@@ -455,16 +454,13 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopAutoPlay()
-  ScrollTrigger.getAll().forEach(t => t.kill())
+  entranceAnimation?.kill()
+  if (dragFrame) cancelAnimationFrame(dragFrame)
+  dragSetters = []
   removeDragEvents()
   window.removeEventListener('resize', handleResize)
   clearTimeout(resizeTimeout)
   visibilityObserver?.disconnect()
-})
-
-// Watch currentIndex untuk update posisi
-watch(currentIndex, () => {
-  updateCardsPosition(true)
 })
 </script>
 
@@ -498,6 +494,9 @@ watch(currentIndex, () => {
                   <img
                     :src="work.image"
                     :alt="work.title"
+                    :loading="index === currentIndex ? 'eager' : 'lazy'"
+                    decoding="async"
+                    :fetchpriority="index === currentIndex ? 'high' : 'low'"
                     class="w-full h-full object-cover"
                     draggable="false"
                   />
@@ -508,7 +507,7 @@ watch(currentIndex, () => {
                 <div :class="[work.background, 'absolute bottom-0 left-0 right-0 p-5 text-white rounded-3xl']">
                   <div class="flex items-start gap-2 text-xs mb-2">
                     <span class="font-semibold tracking-wider text-white bg-black px-2 py-1 rounded-xl">
-                      <img :src="work.categoryIcon" :alt="work.category" :class="work.size" class="text-white inline-block">
+                      <img :src="work.categoryIcon" :alt="work.category" loading="lazy" decoding="async" :class="work.size" class="text-white inline-block">
                       {{ work.category }}
                     </span>
                   </div>
@@ -621,6 +620,9 @@ div[class*="rounded-3xl"] {
 .absolute.cursor-pointer {
   border-radius: 1.5rem !important;
   overflow: hidden !important;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .absolute.cursor-pointer > div {

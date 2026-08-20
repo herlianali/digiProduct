@@ -1,10 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { ShoppingCartIcon } from '@heroicons/vue/24/outline'
 import { ChevronRightIcon, UserCircleIcon } from '@heroicons/vue/20/solid'
 import gsap from '@/plugins/gsap'
+import { useCart } from '@/Composables/useCart'
+import CartSidebar from './CartSidebar.vue'
+
+defineOptions({ inheritAttrs: false })
 
 const bentoGridRef = ref(null)
+const cart = useCart()
+const cartOpen = ref(false)
 const helloText = ref('')
 const fullHelloText = 'Hi friends,'
 let typewriterTimeout = null
@@ -25,6 +30,7 @@ const teamImages = [
 const currentTeamImage = ref('yusrin.png')
 const teamImageRef = ref(null)
 let teamImageInterval = null
+let entranceAnimation = null
 
 const rotateTeamImages = () => {
   let index = 0
@@ -164,7 +170,7 @@ const initCardEntranceAnimation = () => {
   const cards = bentoGridRef.value?.querySelectorAll('.bento-card')
   if (!cards) return
 
-  gsap.fromTo(cards,
+  entranceAnimation = gsap.fromTo(cards,
     { opacity: 0, y: 30, scale: 0.95 },
     {
       opacity: 1, y: 0, scale: 1,
@@ -182,17 +188,38 @@ const initCardEntranceAnimation = () => {
 }
 
 const linkTo = (url) => {
-  window.open(url, '_blank')
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
+const navigateTo = (url) => {
+  window.location.href = url
+}
+
+const formatPrice = (value) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value || 0)
+}
+
+const openCart = () => {
+  cartOpen.value = true
+}
+
+const closeCart = () => {
+  cartOpen.value = false
 }
 
 onMounted(() => {
   initCardHoverAnimations()
   initCardEntranceAnimation()
-  setTimeout(runTypewriterLoop, 400)
+  typewriterTimeout = setTimeout(runTypewriterLoop, 400)
   rotateTeamImages()
 })
 
 onUnmounted(() => {
+  entranceAnimation?.kill()
   activeTweens.forEach((tweens) => tweens.forEach(t => t.kill()))
   activeTweens.clear()
   handlers.forEach(({ onEnter, onLeave }, card) => {
@@ -207,7 +234,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="bentoGridRef" class="mt-3 bg-white">
+  <div ref="bentoGridRef" v-bind="$attrs" class="mt-3 bg-white">
     <div class="w-full px-3 sm:px-4">
 
       <!-- ===================== DESKTOP GRID (md+) ===================== -->
@@ -222,6 +249,9 @@ onUnmounted(() => {
         <div
           class="bento-card bg-[#fce109] rounded-2xl pt-4 px-6 flex flex-col relative overflow-hidden cursor-pointer"
           style="grid-column: 1 / 4; grid-row: 1 / 2;"
+          role="link"
+          tabindex="0"
+          @click="navigateTo('/get-in-touch')"
         >
           <div class="flex justify-between items-start pb-2">
             <div style="line-height: 1; margin: 0; padding: 0;">
@@ -324,6 +354,9 @@ onUnmounted(() => {
         <div
           class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer"
           style="grid-column: 8 / 11; grid-row: 1 / 2;"
+          role="link"
+          tabindex="0"
+          @click="linkTo('https://www.behance.net/supplay_box')"
         >
           <div class="px-6 pt-6 flex justify-between items-start">
             <div>
@@ -340,14 +373,26 @@ onUnmounted(() => {
         <!-- Icons + Upwork + Amidst (col-span-2, row-span-2) -->
         <div class="flex flex-col gap-3" style="grid-column: 11 / 13; grid-row: 1 / 3; height: clamp(53rem, 40cqw, 79rem);">
           <div class="flex justify-between items-center pr-1 pt-1" style="container-type: inline-size;">
-            <img src="/public/assets/image/banner/card-icon.svg" class="w-11 h-11" alt="Icon">
-            <span class="border-2 border-black rounded-full px-8 text-black font-[1000] text-center whitespace-nowrap" style="font-size: clamp(1.4rem, 4.5cqw, 1.9rem);">$0</span>
+            <button type="button" class="relative rounded-full" aria-label="Open cart" @click="openCart">
+              <img src="/public/assets/image/banner/cart-icon.svg" alt="" class="w-11 h-11" />
+              <span v-if="cart.count.value > 0" class="absolute -top-1 -right-1 min-w-[20px] h-[20px] rounded-full bg-[#4dfa03] px-1 text-[10px] font-black text-black flex items-center justify-center">
+                {{ cart.count.value > 99 ? '99+' : cart.count.value }}
+              </span>
+            </button>
+            <button type="button" class="border-2 border-black rounded-full px-8 text-black font-[1000] text-center whitespace-nowrap" style="font-size: clamp(1.4rem, 4.5cqw, 1.9rem);" @click="openCart">
+              {{ formatPrice(cart.subtotal.value) }}
+            </button>
             <div class="rounded-full overflow-hidden flex items-center justify-center" style="width: 16cqw; height: 16cqw; max-width: 75px; max-height: 75px;">
               <UserCircleIcon class="w-full h-full" />
             </div>
           </div>
 
-          <div class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden flex-1 cursor-pointer">
+          <div
+            class="bento-card bg-black rounded-2xl flex flex-col overflow-hidden flex-1 cursor-pointer"
+            role="link"
+            tabindex="0"
+            @click="linkTo('https://www.upwork.com/agencies/1986005566260199906/')"
+          >
             <div class="px-4 pt-4 relative">
                 <div class="flex flex-col items-start mr-6 text-white" style="font-size: clamp(1.8rem, 4.5cqw, 2rem); line-height: 1;">
                     <p style="margin: 0; line-height: 1.2;">New Seller</p>
@@ -393,7 +438,12 @@ onUnmounted(() => {
             class="grid grid-cols-2 grid-rows-2 gap-3"
             style="grid-column: 1 / 4; grid-row: 2 / 3; height: clamp(340px, 40cqw, 500px);"
         >
-            <div class="bento-card row-span-2 bg-[#E60023] rounded-2xl flex flex-col relative overflow-hidden cursor-pointer">
+            <div
+              class="bento-card row-span-2 bg-[#E60023] rounded-2xl flex flex-col relative overflow-hidden cursor-pointer"
+              role="link"
+              tabindex="0"
+              @click="linkTo('https://pin.it/76OPEmaFE')"
+            >
                 <div class="flex justify-between items-start pt-4 px-6">
                     <img src="/public/assets/image/banner/card-path-logo.svg" class="flex-shrink-0" style="width: 28cqw; height: 28cqw; max-width: 50px; max-height: 50px;" alt="" />
                     <img data-arrow="right" src="/public/assets/image/banner/arrow-white-right.svg" style="width: 14cqw; height: 14cqw; max-width: 36px; max-height: 36px;" alt="" />
@@ -407,7 +457,12 @@ onUnmounted(() => {
                 </div>
             </div>
 
-            <div class="bento-card bg-white rounded-2xl p-4 relative overflow-hidden cursor-pointer">
+            <div
+              class="bento-card bg-white rounded-2xl p-4 relative overflow-hidden cursor-pointer"
+              role="link"
+              tabindex="0"
+              @click="linkTo('https://www.tiktok.com/@supplaybox?is_from_webapp=1&sender_device=pc')"
+            >
                 <div class="flex justify-between items-start px-1 pt-1">
                     <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="flex-shrink-0" style="width: 30cqw; height: 30cqw; max-width: 55px; max-height: 55px;" alt="TikTok" />
                     <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok"/>
@@ -443,7 +498,13 @@ onUnmounted(() => {
           class="flex flex-col gap-3"
           style="grid-column: 6 / 11; grid-row: 2 / 3;  height: clamp(360px, 40cqw, 500px);"
         >
-          <div class="bento-card bg-[#f2ecea] rounded-2xl p-3 relative overflow-hidden flex-shrink-0 cursor-pointer" style="height: clamp(120px, 40cqw, 160px);">
+          <div
+            class="bento-card bg-[#f2ecea] rounded-2xl p-3 relative overflow-hidden flex-shrink-0 cursor-pointer"
+            style="height: clamp(120px, 40cqw, 160px);"
+            role="link"
+            tabindex="0"
+            @click="linkTo('https://www.fiverr.com/s/ljebb62')"
+          >
             <div class="flex justify-between items-start relative z-10">
                 <img data-arrow="left" src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="m-2">
                 <div class="flex flex-col items-end mr-6 text-[#0b3117]" style="font-size: clamp(1rem, 4.5cqw, 1.6rem); line-height: 1;">
@@ -509,7 +570,12 @@ onUnmounted(() => {
 
       <!-- ===================== MOBILE LAYOUT (FLEX) ===================== -->
       <div class="md:hidden grid grid-cols-3 gap-3 w-full auto-rows-auto">
-        <div class="bento-card col-span-2 bg-[#fce109] rounded-2xl p-3 relative overflow-hidden cursor-pointer min-h-[140px]">
+        <div
+          class="bento-card col-span-2 bg-[#fce109] rounded-2xl p-3 relative overflow-hidden cursor-pointer min-h-[140px]"
+          role="link"
+          tabindex="0"
+          @click="navigateTo('/get-in-touch')"
+        >
           <div class="flex justify-between items-start">
             <div>
               <p class="text-[10px] font-medium text-black/70">Welcome to</p>
@@ -527,8 +593,15 @@ onUnmounted(() => {
 
         <div class="bento-card col-span-1 row-span-3">
           <div class="col-span-3 flex justify-end items-center gap-3 py-1 pr-1">
-            <ShoppingCartIcon class="w-6 h-6 text-green-500" />
-            <span class="border-[1.5px] border-black rounded-full px-3 py-0.5 text-black text-[11px] font-medium whitespace-nowrap">$0</span>
+            <button type="button" class="relative" aria-label="Open cart" @click="openCart">
+              <img src="/public/assets/image/banner/cart-icon.svg" alt="" class="w-6 h-6" />
+              <span v-if="cart.count.value > 0" class="absolute -top-2 -right-2 min-w-[15px] h-[15px] rounded-full bg-[#4dfa03] px-0.5 text-[8px] font-black text-black flex items-center justify-center">
+                {{ cart.count.value > 99 ? '99+' : cart.count.value }}
+              </span>
+            </button>
+            <button type="button" class="border-[1.5px] border-black rounded-full px-3 py-0.5 text-black text-[11px] font-medium whitespace-nowrap" @click="openCart">
+              {{ formatPrice(cart.subtotal.value) }}
+            </button>
             <div class="w-6 h-6 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center">
               <img src="" alt="user" class="w-full h-full object-cover" />
             </div>
@@ -573,7 +646,12 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="bento-card col-span-1 bg-white border-[1.5px] border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[105px]">
+        <div
+          class="bento-card col-span-1 bg-white border-[1.5px] border-gray-800 rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[105px]"
+          role="link"
+          tabindex="0"
+          @click="linkTo('https://www.tiktok.com/@supplaybox?is_from_webapp=1&sender_device=pc')"
+        >
           <div class="flex justify-between items-start">
             <img src="/public/assets/image/banner/card-tiktok-logo.svg" class="w-6 h-6" alt="TikTok" />
             <img data-arrow="right" src="/public/assets/image/banner/arrow-black-right.svg" alt="TikTok" class="w-3 h-3" />
@@ -613,7 +691,12 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="bento-card col-span-1 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[120px]">
+        <div
+          class="bento-card col-span-1 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[120px]"
+          role="link"
+          tabindex="0"
+          @click="linkTo('https://www.behance.net/supplay_box')"
+        >
           <div class="px-2 pt-2 flex justify-between items-start">
             <div>
               <p class="font-bold text-white text-xl leading-none">Bē</p>
@@ -626,7 +709,12 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="bento-card col-span-1 row-span-2 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[220px]">
+        <div
+          class="bento-card col-span-1 row-span-2 bg-black rounded-2xl flex flex-col overflow-hidden cursor-pointer min-h-[220px]"
+          role="link"
+          tabindex="0"
+          @click="linkTo('https://www.upwork.com/agencies/1986005566260199906/')"
+        >
           <div class="px-3 pt-3 relative">
             <p class="text-[9px] text-white leading-none">New Seller</p>
             <p class="text-white text-[9px] leading-tight">on <b class="font-['Archivo_Black',sans-serif]">upwork</b></p>
@@ -640,7 +728,12 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <div class="bento-card col-span-2 bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[90px]">
+        <div
+          class="bento-card col-span-2 bg-[#f2ecea] rounded-2xl p-2 relative overflow-hidden cursor-pointer min-h-[90px]"
+          role="link"
+          tabindex="0"
+          @click="linkTo('https://www.fiverr.com/s/ljebb62')"
+        >
           <div class="flex justify-between items-center relative z-10">
             <img data-arrow="left" src="/public/assets/image/banner/arrow-black-left.svg" alt="" class="w-5 h-5 p-0.5">
             <div class="flex flex-col items-end text-[#0b3117] text-[10px] leading-tight">
@@ -691,6 +784,9 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
+  <Teleport to="body">
+    <CartSidebar :open="cartOpen" @close="closeCart" />
+  </Teleport>
 </template>
 
 <style scoped>

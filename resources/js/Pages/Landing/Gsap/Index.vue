@@ -3,7 +3,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import FooterSection from './ComponentsV2/FooterSection.vue'
 import LoadingScreen from './ComponentsV2/LoadingScreen.vue'
-import BannerCards from './ComponentsV2/BannerCards.vue'
 import OurWorkSection from './ComponentsV2/OurWorkSection.vue'
 import ProductSection from './ComponentsV2/ProductSection.vue'
 import RackDivider from './ComponentsV2/RackDivider.vue'
@@ -13,21 +12,17 @@ import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import { useCart } from '@/Composables/useCart'
-import {
-    StarIcon as StarSolid,
-    ArrowUpRightIcon as ArrowUpRightSolid,
-    ArrowDownIcon as ArrowDownSolid,
-} from '@heroicons/vue/24/solid'
+import { StarIcon as StarSolid } from '@heroicons/vue/24/solid'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const bannerRef = ref(null)
 const sliderTrackRef = ref(null)
 const sliderContainerRef = ref(null)
 const sliderPrevBtn = ref(null)
 const sliderNextBtn = ref(null)
-let isSliderHovered = ref(false)
-let autoScrollInterval = null
+const isSliderHovered = ref(false)
+let idleHandle = null
+let sliderCleanup = []
 
 const arrowRef = ref(null)
 let arrowAnimation = null
@@ -37,7 +32,6 @@ const addedIds = ref(new Set())
 // ─── Product Section ───────────────────────────────────────────────
 const productSectionRef = ref(null)
 const activeFilter = ref('artwork')
-const activeProductId = ref(2)
 
 const handleAddToCart = (product) => {
     cart.add({
@@ -133,20 +127,47 @@ const applyMarqueeState = () => {
     }
 }
 
+const scheduleIdle = (callback) => {
+    if ('requestIdleCallback' in window) {
+        idleHandle = window.requestIdleCallback(callback, { timeout: 1200 })
+    } else {
+        idleHandle = window.setTimeout(callback, 250)
+    }
+}
+
 onMounted(() => {
-    initSectionAnimations()
-    initInfiniteSlider()
-    initProductSectionAnimation()
-    initArrowAnimation()
-    initVisibilityGates()
+    // Let the first paint complete before creating the heavier scroll animations.
+    requestAnimationFrame(() => {
+        initArrowAnimation()
+        initVisibilityGates()
+    })
+
+    scheduleIdle(() => {
+        initSectionAnimations()
+        initInfiniteSlider()
+        initProductSectionAnimation()
+        ScrollTrigger.refresh()
+    })
 })
 
 onUnmounted(() => {
+    if ('cancelIdleCallback' in window && typeof idleHandle === 'number') {
+        window.cancelIdleCallback(idleHandle)
+    } else if (idleHandle) {
+        clearTimeout(idleHandle)
+    }
+    sliderCleanup.forEach(({ target, type, handler }) => target.removeEventListener(type, handler))
     if (sliderTween) sliderTween.kill()
     if (arrowAnimation) arrowAnimation.kill()
-    ScrollTrigger.getAll().forEach(t => t.kill())
     marqueeObserver?.disconnect()
     arrowObserver?.disconnect()
+    ScrollTrigger.getAll().forEach(trigger => {
+        const triggerElement = trigger.trigger
+        if (triggerElement === productSectionRef.value || triggerElement === sliderContainerRef.value ||
+            triggerElement?.matches?.('.section-title, .shop-title, .shop-filter-btn, .shop-cta-btn')) {
+            trigger.kill()
+        }
+    })
 })
 
 // ─── Pause animasi infinite saat elemen di luar viewport ───────────
@@ -295,17 +316,22 @@ const initInfiniteSlider = () => {
     let dragOffset = 0
 
     const container = sliderContainerRef.value
-    container.addEventListener('mouseenter', () => {
+    const onMouseEnter = () => {
         isSliderHovered.value = true
         applyMarqueeState()
         showNavigationButtons()
-    })
-
-    container.addEventListener('mouseleave', () => {
+    }
+    const onMouseLeave = () => {
         isSliderHovered.value = false
         applyMarqueeState()
         hideNavigationButtons()
-    })
+    }
+    container.addEventListener('mouseenter', onMouseEnter)
+    container.addEventListener('mouseleave', onMouseLeave)
+    sliderCleanup.push(
+        { target: container, type: 'mouseenter', handler: onMouseEnter },
+        { target: container, type: 'mouseleave', handler: onMouseLeave },
+    )
 
     const slidePrev = () => {
         if (!sliderTween) return
@@ -348,17 +374,21 @@ const initInfiniteSlider = () => {
     }
 
     if (sliderPrevBtn.value) {
-        sliderPrevBtn.value.addEventListener('click', (e) => {
+        const onPrevClick = (e) => {
             e.stopPropagation()
             slidePrev()
-        })
+        }
+        sliderPrevBtn.value.addEventListener('click', onPrevClick)
+        sliderCleanup.push({ target: sliderPrevBtn.value, type: 'click', handler: onPrevClick })
     }
 
     if (sliderNextBtn.value) {
-        sliderNextBtn.value.addEventListener('click', (e) => {
+        const onNextClick = (e) => {
             e.stopPropagation()
             slideNext()
-        })
+        }
+        sliderNextBtn.value.addEventListener('click', onNextClick)
+        sliderCleanup.push({ target: sliderNextBtn.value, type: 'click', handler: onNextClick })
     }
 
     const onMouseDown = (e) => {
@@ -396,6 +426,11 @@ const initInfiniteSlider = () => {
     track.addEventListener('mousedown', onMouseDown)
     window.addEventListener('mousemove', onMouseMove)
     window.addEventListener('mouseup', onMouseUp)
+    sliderCleanup.push(
+        { target: track, type: 'mousedown', handler: onMouseDown },
+        { target: window, type: 'mousemove', handler: onMouseMove },
+        { target: window, type: 'mouseup', handler: onMouseUp },
+    )
     track.style.cursor = 'grab'
 }
 
@@ -445,7 +480,6 @@ const openLink = (url) => {
 
     <NavbarFloating
         trigger-el=".bento-grid-section"
-        balance="$100"
         avatar-url=""
         @cta-click="() => {}"
     />
@@ -547,7 +581,7 @@ const openLink = (url) => {
         <!-- Logo partner -->
         <div class="px-4 pt-4 pb-8">
             <div class="flex flex-wrap justify-center items-center px-4 opacity-80">
-                <img src="/public/assets/icons/brand-partner/all-logo.png" />
+                <img src="/public/assets/icons/brand-partner/all-logo.png" loading="lazy" decoding="async" alt="Partner logos" />
             </div>
         </div>
     </div>
@@ -722,9 +756,11 @@ const openLink = (url) => {
           >
             <div class="overflow-hidden aspect-[3/4] w-full rounded-xl">
               <img
-                :src="product.image"
-                :alt="product.name"
-                class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
+              :src="product.image"
+              :alt="product.name"
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
               />
             </div>
           </div>

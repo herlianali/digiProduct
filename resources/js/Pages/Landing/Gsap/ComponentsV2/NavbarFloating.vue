@@ -2,7 +2,8 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import gsap from '@/plugins/gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ShoppingCartIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
+import { ChevronRightIcon } from '@heroicons/vue/24/outline'
+import { UserCircleIcon } from '@heroicons/vue/20/solid'
 import { useCart } from '@/Composables/useCart'
 import CartSidebar from './CartSidebar.vue'
 
@@ -76,6 +77,14 @@ const redirectLink = (section) => {
         case 'contact': return window.location.origin + '/get-in-touch'
         default:        return '#'
     }
+}
+
+const formatPrice = (value) => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        maximumFractionDigits: 0,
+    }).format(value || 0)
 }
 
 const handleCartClick = () => {
@@ -189,7 +198,7 @@ const scrollToSection = (sectionId) => {
                                 class="relative p-1 hover:text-green-600 transition-colors"
                                 @click="handleCartClick"
                             >
-                                <ShoppingCartIcon class="w-5 h-5 text-black" />
+                                <img src="/public/assets/image/banner/cart-icon.svg" alt="" class="w-5 h-5" />
                                 <Transition name="badge">
                                     <span
                                         v-if="cart.count.value > 0"
@@ -201,11 +210,11 @@ const scrollToSection = (sectionId) => {
                             </button>
 
                             <span class="hidden md:inline-block border border-gray-200 rounded-full px-3 py-1 text-black text-sm font-medium">
-                                {{ balance }}
+                                {{ formatPrice(cart.subtotal.value) }}
                             </span>
 
-                            <div class="w-7 h-7 rounded-full bg-gray-200 border border-gray-300 overflow-hidden flex items-center justify-center flex-shrink-0">
-                                <img :src="avatarUrl" alt="user" class="w-full h-full object-cover" />
+                            <div class="w-7 h-7 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                <UserCircleIcon alt="user" class="w-full h-full object-cover" />
                             </div>
                         </div>
                     </div>
